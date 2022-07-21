@@ -24,7 +24,7 @@ jobs:
   - script: npm run webpack
     displayName: 'npm run webpack'
   - task: CopyFiles@2
-    displayName: 'Copy framework files to staging'
+    displayName: 'Copy files to staging'
     inputs:
       sourceFolder: '$(Build.SourcesDirectory)'
       contents: |
@@ -34,26 +34,26 @@ jobs:
         NOTICE.html
         package.json
         README.md
-      targetFolder: '$(Build.ArtifactStagingDirectory)/framework'
+      targetFolder: '$(Build.ArtifactStagingDirectory)'
       cleanTargetFolder: true
   - script: npm prune --production
     displayName: 'npm prune --production' # so that only production dependencies are included in SBOM
   - task: ManifestGeneratorTask@0
-    displayName: 'Generate SBOM for framework'
+    displayName: 'Generate SBOM'
     inputs:
-      BuildDropPath: '$(Build.ArtifactStagingDirectory)/framework'
+      BuildDropPath: '$(Build.ArtifactStagingDirectory)'
       # The list of components can't be determined from the webpacked file in the staging dir, so reference the original node_modules folder
       BuildComponentPath: '$(Build.SourcesDirectory)/node_modules'
       PackageName: 'Azure Functions Node.js Framework'
   - script: npm pack
-    displayName: 'npm pack framework'
-    workingDirectory: '$(Build.ArtifactStagingDirectory)/framework'
+    displayName: 'npm pack'
+    workingDirectory: '$(Build.ArtifactStagingDirectory)'
   - task: CopyFiles@2
     displayName: 'Copy package to staging drop folder'
     inputs:
       sourceFolder: '$(Build.ArtifactStagingDirectory)'
       contents: |
-        framework/*.tgz
+        *.tgz
       targetFolder: '$(Build.ArtifactStagingDirectory)/drop'
       cleanTargetFolder: true
   - task: PublishPipelineArtifact@1

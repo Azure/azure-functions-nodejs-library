@@ -10,13 +10,13 @@
     ],
     "author": "Microsoft",
     "license": "MIT",
-    "homepage": "https://github.com/Azure/azure-functions-nodejs-framework",
+    "homepage": "https://github.com/Azure/azure-functions-nodejs-library",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Azure/azure-functions-nodejs-framework.git"
+        "url": "https://github.com/Azure/azure-functions-nodejs-library.git"
     },
     "bugs": {
-        "url": "https://github.com/Azure/azure-functions-nodejs-framework/issues"
+        "url": "https://github.com/Azure/azure-functions-nodejs-library/issues"
     },
     "main": "dist/src/main-bundle.js",
     "types": "types/index.d.ts",
