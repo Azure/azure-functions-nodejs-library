@@ -19,7 +19,7 @@ import EventEmitter = require('events');
 
 const asyncDoneLearnMoreLink = 'https://go.microsoft.com/fwlink/?linkid=2097909';
 
-export class V3InvocationModel implements InvocationModel<Context> {
+export class V3InvocationModel implements InvocationModel {
     #doneEmitter: EventEmitter = new EventEmitter();
     #isDone = false;
     #resultIsPromise = false;
@@ -31,7 +31,7 @@ export class V3InvocationModel implements InvocationModel<Context> {
         this.#funcInfo = new FunctionInfo(coreCtx.metadata);
     }
 
-    async getArguments(): Promise<InvocationArguments<Context>> {
+    async getArguments(): Promise<InvocationArguments> {
         const { context, inputs } = CreateContextAndInputs(
             this.#funcInfo,
             this.#coreCtx.request,
