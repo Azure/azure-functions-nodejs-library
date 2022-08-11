@@ -1,18 +1,19 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { CoreInvocationContext, InvocationModel, ProgrammingModel, setProgrammingModel } from '@azure/functions-core';
+import * as coreTypes from '@azure/functions-core';
+import { CoreInvocationContext, setProgrammingModel } from '@azure/functions-core';
 import { version } from './constants';
-import { V3InvocationModel } from './V3InvocationModel';
+import { InvocationModel } from './InvocationModel';
 
-class V3ProgrammingModel implements ProgrammingModel {
-    name = 'defaultV3';
+class ProgrammingModel implements coreTypes.ProgrammingModel {
+    name = '@azure/functions';
     version = version;
     getInvocationModel(coreCtx: CoreInvocationContext): InvocationModel {
-        return new V3InvocationModel(coreCtx);
+        return new InvocationModel(coreCtx);
     }
 }
 
 export function setup() {
-    setProgrammingModel(new V3ProgrammingModel());
+    setProgrammingModel(new ProgrammingModel());
 }

@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 import { AzureFunction, Context } from '@azure/functions';
+import * as coreTypes from '@azure/functions-core';
 import {
     CoreInvocationContext,
     InvocationArguments,
-    InvocationModel,
     RpcInvocationResponse,
     RpcLog,
     RpcParameterBinding,
@@ -19,7 +19,7 @@ import EventEmitter = require('events');
 
 const asyncDoneLearnMoreLink = 'https://go.microsoft.com/fwlink/?linkid=2097909';
 
-export class V3InvocationModel implements InvocationModel {
+export class InvocationModel implements coreTypes.InvocationModel {
     #doneEmitter: EventEmitter = new EventEmitter();
     #isDone = false;
     #resultIsPromise = false;
