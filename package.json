@@ -18,10 +18,10 @@
     "bugs": {
         "url": "https://github.com/Azure/azure-functions-nodejs-library/issues"
     },
-    "main": "dist/src/main-bundle.js",
+    "main": "dist/src/index-bundle.js",
     "types": "types/index.d.ts",
     "files": [
-        "dist/src/main-bundle.js",
+        "dist/src/index-bundle.js",
         "types/index.d.ts",
         "LICENSE",
         "README.md",
@@ -30,7 +30,7 @@
     ],
     "scripts": {
         "build": "node ./node_modules/typescript/bin/tsc",
-        "test": "node ./dist/test/main.js",
+        "test": "node ./dist/test/index.js",
         "lint": "eslint .",
         "lint-fix": "eslint . --fix",
         "updateVersion": "ts-node ./scripts/updateVersion.ts",

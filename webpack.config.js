@@ -1,8 +1,8 @@
 module.exports = {
-    entry: "./dist/src/main.js",
+    entry: "./dist/src/index.js",
     output: {
         path: `${__dirname}/dist/src`,
-        filename: "main-bundle.js",
+        filename: "index-bundle.js",
         libraryTarget: "commonjs2"
     },
     target: 'node',
