@@ -28,7 +28,7 @@ jobs:
     inputs:
       sourceFolder: '$(Build.SourcesDirectory)'
       contents: |
-        dist/src/main-bundle.js
+        dist/src/index-bundle.js
         types/index.d.ts
         LICENSE
         NOTICE.html
