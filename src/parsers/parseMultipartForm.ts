@@ -27,7 +27,7 @@ export function parseMultipartForm(chunk: Buffer, boundary: string): [string, Fo
         let line: Buffer;
         if (chunk[index] === newline) {
             lineEnd = chunk[index - 1] === carriageReturn ? index - 1 : index;
-            line = chunk.slice(lineStart, lineEnd);
+            line = chunk.subarray(lineStart, lineEnd);
             lineStart = index + 1;
         } else {
             continue;
@@ -37,7 +37,7 @@ export function parseMultipartForm(chunk: Buffer, boundary: string): [string, Fo
         const isBoundaryEnd = line.equals(endBoundaryBuffer);
         if (isBoundary || isBoundaryEnd) {
             if (currentPart) {
-                currentPart.value = chunk.slice(partValueStart, partValueEnd);
+                currentPart.value = chunk.subarray(partValueStart, partValueEnd);
             }
 
             if (isBoundaryEnd) {
