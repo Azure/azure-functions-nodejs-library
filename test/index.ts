@@ -7,31 +7,36 @@ import * as path from 'path';
 import { setupTestCoreApi } from './setupTestCoreApi';
 
 export async function run(): Promise<void> {
-    setupTestCoreApi();
+    try {
+        setupTestCoreApi();
 
-    const options: Mocha.MochaOptions = {
-        color: true,
-        reporter: 'mocha-multi-reporters',
-        reporterOptions: {
-            reporterEnabled: 'spec, mocha-junit-reporter',
-            mochaJunitReporterReporterOptions: {
-                mochaFile: path.resolve(__dirname, '..', '..', 'test', 'unit-test-results.xml'),
+        const options: Mocha.MochaOptions = {
+            color: true,
+            reporter: 'mocha-multi-reporters',
+            reporterOptions: {
+                reporterEnabled: 'spec, mocha-junit-reporter',
+                mochaJunitReporterReporterOptions: {
+                    mochaFile: path.resolve(__dirname, '..', '..', 'test', 'unit-test-results.xml'),
+                },
             },
-        },
-    };
+        };
 
-    addEnvVarsToMochaOptions(options);
-    console.log(`Mocha options: ${JSON.stringify(options, undefined, 2)}`);
+        addEnvVarsToMochaOptions(options);
+        console.log(`Mocha options: ${JSON.stringify(options, undefined, 2)}`);
 
-    const mocha = new Mocha(options);
+        const mocha = new Mocha(options);
 
-    const files: string[] = await globby('**/**.test.js', { cwd: __dirname });
+        const files: string[] = await globby('**/**.test.js', { cwd: __dirname });
 
-    files.forEach((f) => mocha.addFile(path.resolve(__dirname, f)));
+        files.forEach((f) => mocha.addFile(path.resolve(__dirname, f)));
 
-    const failures = await new Promise<number>((resolve) => mocha.run(resolve));
-    if (failures > 0) {
-        throw new Error(`${failures} tests failed.`);
+        const failures = await new Promise<number>((resolve) => mocha.run(resolve));
+        if (failures > 0) {
+            throw new Error(`${failures} tests failed.`);
+        }
+    } catch (err) {
+        console.error('Test run failed');
+        process.exit(1);
     }
 }
 
