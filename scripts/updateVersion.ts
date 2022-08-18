@@ -18,7 +18,7 @@ if (args.validate) {
 } else if (args.version) {
     updateVersion(args.version);
 } else {
-    console.log(`This script can be used to either update the version of the worker or validate that the repo is in a valid state with regards to versioning.
+    console.log(`This script can be used to either update the version of the library or validate that the repo is in a valid state with regards to versioning.
 
 Example usage:
 
@@ -43,7 +43,7 @@ function validateVersion() {
     if (!packageJsonVersion || !constantsVersion || !parsedVersion) {
         throw new Error('Failed to detect valid versions in all expected files');
     } else if (constantsVersion !== packageJsonVersion) {
-        throw new Error(`Worker versions do not match.`);
+        throw new Error(`Versions do not match.`);
     } else {
         console.log('Versions match! 🎉');
     }
