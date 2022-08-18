@@ -2,7 +2,7 @@ parameters:
 - name: NpmPublishTag
   displayName: 'Tag'
   type: string
-  default: 'latest'
+  default: 'next'
 - name: NpmPublishDryRun
   displayName: 'Dry Run'
   type: boolean
@@ -16,7 +16,7 @@ resources:
   - pipeline: nodeLibraryCI
     project: 'Azure Functions'
     source: azure-functions-nodejs-library.build
-    branch: v3.x
+    branch: v4.x
 
 jobs:
 - job: ReleaseTypes
@@ -28,7 +28,7 @@ jobs:
   - task: NodeTool@0
     displayName: 'Install Node.js'
     inputs:
-      versionSpec: 14.x
+      versionSpec: 18.x
   - download: nodeLibraryCI
   - script: mv *.tgz package.tgz
     displayName: 'Rename tgz file' # because the publish command below requires an exact path
