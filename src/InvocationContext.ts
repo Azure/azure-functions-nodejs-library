@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { ContextBindings, Logger, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
+import { ContextBindings, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
 import { RpcInvocationRequest, RpcLog, RpcParameterBinding } from '@azure/functions-core';
 import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
 import { fromRpcRetryContext, fromRpcTraceContext, fromTypedData } from './converters/RpcConverters';
@@ -58,9 +58,9 @@ class InvocationContext implements types.InvocationContext {
     triggerMetadata: TriggerMetadata;
     traceContext?: TraceContext;
     retryContext?: RetryContext;
-    log: Logger;
     req?: Request;
     res?: Response;
+    #userLogCallback: UserLogCallback;
 
     constructor(info: FunctionInfo, request: RpcInvocationRequest, userLogCallback: UserLogCallback) {
         this.invocationId = <string>request.invocationId;
@@ -72,16 +72,33 @@ class InvocationContext implements types.InvocationContext {
         if (request.traceContext) {
             this.traceContext = fromRpcTraceContext(request.traceContext);
         }
+        this.#userLogCallback = userLogCallback;
 
         this.bindings = {};
+    }
 
-        // Log message that is tied to function invocation
-        this.log = Object.assign((...args: any[]) => userLogCallback(RpcLog.Level.Information, ...args), {
-            error: (...args: any[]) => userLogCallback(RpcLog.Level.Error, ...args),
-            warn: (...args: any[]) => userLogCallback(RpcLog.Level.Warning, ...args),
-            info: (...args: any[]) => userLogCallback(RpcLog.Level.Information, ...args),
-            verbose: (...args: any[]) => userLogCallback(RpcLog.Level.Trace, ...args),
-        });
+    log(...args: any[]): void {
+        this.#userLogCallback(RpcLog.Level.Information, ...args);
+    }
+
+    trace(...args: any[]): void {
+        this.#userLogCallback(RpcLog.Level.Trace, ...args);
+    }
+
+    debug(...args: any[]): void {
+        this.#userLogCallback(RpcLog.Level.Debug, ...args);
+    }
+
+    info(...args: any[]): void {
+        this.#userLogCallback(RpcLog.Level.Information, ...args);
+    }
+
+    warn(...args: any[]): void {
+        this.#userLogCallback(RpcLog.Level.Warning, ...args);
+    }
+
+    error(...args: any[]): void {
+        this.#userLogCallback(RpcLog.Level.Error, ...args);
     }
 }
 

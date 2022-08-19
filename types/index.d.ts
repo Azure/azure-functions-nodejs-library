@@ -69,10 +69,41 @@ declare module '@azure/functions' {
         retryContext?: RetryContext;
 
         /**
-         * Allows you to write streaming function logs. Calling directly allows you to write streaming function logs
-         * at the default trace level.
+         * The recommended way to log data during invocation.
+         * Similar to Node.js's `console.log`, but has integration with Azure features like application insights
+         * Uses the 'information' log level
          */
-        log: Logger;
+        log(...args: any[]): void;
+
+        /**
+         * The recommended way to log trace data (level 0) during invocation.
+         * Similar to Node.js's `console.trace`, but has integration with Azure features like application insights
+         */
+        trace(...args: any[]): void;
+
+        /**
+         * The recommended way to log debug data (level 1) during invocation.
+         * Similar to Node.js's `console.debug`, but has integration with Azure features like application insights
+         */
+        debug(...args: any[]): void;
+
+        /**
+         * The recommended way to log information data (level 2) during invocation.
+         * Similar to Node.js's `console.info`, but has integration with Azure features like application insights
+         */
+        info(...args: any[]): void;
+
+        /**
+         * The recommended way to log warning data (level 3) during invocation.
+         * Similar to Node.js's `console.warn`, but has integration with Azure features like application insights
+         */
+        warn(...args: any[]): void;
+
+        /**
+         * The recommended way to log error data (level 4) during invocation.
+         * Similar to Node.js's `console.error`, but has integration with Azure features like application insights
+         */
+        error(...args: any[]): void;
 
         /**
          * HTTP request object. Provided to your function when using HTTP Bindings.
@@ -430,31 +461,7 @@ declare module '@azure/functions' {
          */
         direction: 'in' | 'out' | 'inout' | undefined;
     }
-    /**
-     * Allows you to write streaming function logs.
-     */
-    export interface Logger {
-        /**
-         * Writes streaming function logs at the default trace level.
-         */
-        (...args: any[]): void;
-        /**
-         * Writes to error level logging or lower.
-         */
-        error(...args: any[]): void;
-        /**
-         * Writes to warning level logging or lower.
-         */
-        warn(...args: any[]): void;
-        /**
-         * Writes to info level logging or lower.
-         */
-        info(...args: any[]): void;
-        /**
-         * Writes to verbose level logging.
-         */
-        verbose(...args: any[]): void;
-    }
+
     /**
      * Timer schedule information. Provided to your function when using a timer binding.
      */
