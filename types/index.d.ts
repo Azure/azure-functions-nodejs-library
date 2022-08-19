@@ -38,8 +38,7 @@ declare module '@azure/functions' {
         [name: string]: any;
     }
     /**
-     * The context object can be used for writing logs, reading data from bindings, setting outputs and using
-     * the context.done callback when your exported function is synchronous. A context object is passed
+     * The context object can be used for writing logs, reading data from bindings, and setting outputs. A context object is passed
      * to your function from the Azure Functions runtime on function invocation.
      */
     export interface Context {
@@ -73,19 +72,6 @@ declare module '@azure/functions' {
          * at the default trace level.
          */
         log: Logger;
-        /**
-         * A callback function that signals to the runtime that your code has completed. If your function is synchronous,
-         * you must call context.done at the end of execution. If your function is asynchronous, you should not use this
-         * callback.
-         *
-         * @param err A user-defined error to pass back to the runtime. If present, your function execution will fail.
-         * @param result An object containing output binding data. `result` will be passed to JSON.stringify unless it is
-         *  a string, Buffer, ArrayBufferView, or number.
-         *
-         * @deprecated Use of sync functions with `context.done()` is not recommended. Use async/await and pass the response as the return value instead.
-         * See the docs here for more information: https://aka.ms/functions-js-async-await
-         */
-        done(err?: Error | string | null, result?: any): void;
         /**
          * HTTP request object. Provided to your function when using HTTP Bindings.
          */
@@ -312,34 +298,6 @@ declare module '@azure/functions' {
          * @returns the updated HttpResponseFull instance
          */
         type(type: string): HttpResponseFull;
-        /**
-         * Automatically sets the content-type then calls context.done()
-         * @returns updated HttpResponseFull instance
-         * @deprecated this method calls context.done() which is deprecated, use async/await and pass the response as the return value instead.
-         * See the docs here for more information: https://aka.ms/functions-js-async-await
-         */
-        send(body?: any): HttpResponseFull;
-        /**
-         * Same as send()
-         * Automatically sets the content-type then calls context.done()
-         * @returns updated HttpResponseFull instance
-         * @deprecated this method calls context.done() which is deprecated, use async/await and pass the response as your function's return value instead.
-         * See the docs here for more information: https://aka.ms/functions-js-async-await
-         */
-        end(body?: any): HttpResponseFull;
-        /**
-         * Sets the status code then calls send()
-         * @returns updated HttpResponseFull instance
-         * @deprecated this method calls context.done() which is deprecated, use async/await and pass the response as your function's return value instead.
-         * See the docs here for more information: https://aka.ms/functions-js-async-await
-         */
-        sendStatus(statusCode: string | number): HttpResponseFull;
-        /**
-         * Sets the 'Content-Type' header to 'application/json' then calls send(body)
-         * @deprecated this method calls context.done() which is deprecated, use async/await and pass the response as your function's return value instead.
-         * See the docs here for more information: https://aka.ms/functions-js-async-await
-         */
-        json(body?: any): void;
     }
     /**
      * Http response object.

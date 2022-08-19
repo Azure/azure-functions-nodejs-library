@@ -45,12 +45,11 @@ export const timerTrigger: AzureFunction = async function (context: Context, myT
     context.log('Timer trigger function ran!', timeStamp);
 };
 
-const runServiceBus: AzureFunction = function (context: Context, myQueueItem: string) {
+const runServiceBus: AzureFunction = async function (context: Context, myQueueItem: string) {
     context.log('Node.js ServiceBus queue trigger function processed message', myQueueItem);
     context.log.verbose('EnqueuedTimeUtc =', context.bindingData.enqueuedTimeUtc);
     context.log.verbose('DeliveryCount =', context.bindingData.deliveryCount);
     context.log.verbose('MessageId =', context.bindingData.messageId);
-    context.done();
 };
 
 // Assumes output binding is named '$return'
@@ -148,26 +147,6 @@ const runHttpWithQueue: AzureFunction = async function (context: Context, req: H
     return;
 };
 
-const returnWithContextDone: AzureFunction = function (context: Context, _req: HttpRequest) {
-    context.log.info('Writing to queue');
-    context.done(null, { myOutput: { text: 'hello there, world', noNumber: true } });
-};
-
-const returnWithContextDoneMethods: AzureFunction = function (context: Context, _req: HttpRequest) {
-    context.res = context.res as HttpResponseFull;
-    context.res.send('hello world');
-    context.res.end('hello world');
-    context.res.sendStatus(200);
-};
-
-const returnWithJson: AzureFunction = function (context: Context, req: HttpRequest) {
-    if (context.res?.status instanceof Function) {
-        context.res.status(200).json({
-            hello: 'world',
-        });
-    }
-};
-
 export {
     runHttp,
     cookieFunction,
@@ -178,9 +157,6 @@ export {
     runServiceBus,
     runFunction,
     runHttpWithQueue,
-    returnWithContextDone,
-    returnWithContextDoneMethods,
-    returnWithJson,
 };
 
 // Function returns custom object

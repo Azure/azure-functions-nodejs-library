@@ -12,22 +12,6 @@ export class Response implements HttpResponseFull {
     enableContentNegotiation?: boolean;
     [key: string]: any;
 
-    // NOTE: This is considered private and people should not be referencing it, but for the sake of backwards compatibility we will avoid using `#`
-    _done: Function;
-
-    constructor(done: Function) {
-        this._done = done;
-    }
-
-    end(body?: any) {
-        if (body !== undefined) {
-            this.body = body;
-        }
-        this.setContentType();
-        this._done();
-        return this;
-    }
-
     setHeader(field: string, val: any): HttpResponseFull {
         this.headers[field.toLowerCase()] = val;
         return this;
@@ -47,24 +31,10 @@ export class Response implements HttpResponseFull {
         return this;
     }
 
-    sendStatus(statusCode: string | number) {
-        this.status(statusCode);
-        // eslint-disable-next-line deprecation/deprecation
-        return this.end();
-    }
-
     type(type) {
         return this.set(HeaderName.contentType, type);
     }
 
-    json(body) {
-        this.type(MediaType.json);
-        // eslint-disable-next-line deprecation/deprecation
-        this.send(body);
-        return;
-    }
-
-    send = this.end;
     header = this.setHeader;
     set = this.setHeader;
     get = this.getHeader;

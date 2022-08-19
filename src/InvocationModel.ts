@@ -14,15 +14,9 @@ import { format } from 'util';
 import { CreateContextAndInputs } from './Context';
 import { toTypedData } from './converters/RpcConverters';
 import { FunctionInfo } from './FunctionInfo';
-import { isError } from './utils/ensureErrorType';
-import EventEmitter = require('events');
-
-const asyncDoneLearnMoreLink = 'https://go.microsoft.com/fwlink/?linkid=2097909';
 
 export class InvocationModel implements coreTypes.InvocationModel {
-    #doneEmitter: EventEmitter = new EventEmitter();
     #isDone = false;
-    #resultIsPromise = false;
     #coreCtx: CoreInvocationContext;
     #funcInfo: FunctionInfo;
 
@@ -35,39 +29,14 @@ export class InvocationModel implements coreTypes.InvocationModel {
         const { context, inputs } = CreateContextAndInputs(
             this.#funcInfo,
             this.#coreCtx.request,
-            (level: RpcLog.Level, ...args: any[]) => this.#userLog(level, ...args),
-            this.#doneEmitter
+            (level: RpcLog.Level, ...args: any[]) => this.#userLog(level, ...args)
         );
         return { context, inputs };
     }
 
     async invokeFunction(context: Context, inputs: unknown[], functionCallback: AzureFunction): Promise<unknown> {
-        const legacyDoneTask = new Promise((resolve, reject) => {
-            this.#doneEmitter.on('done', (err?: unknown, result?: unknown) => {
-                this.#onDone();
-                if (isError(err)) {
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
-
         try {
-            let rawResult = functionCallback(context, ...inputs);
-            this.#resultIsPromise = !!rawResult && typeof rawResult.then === 'function';
-            let resultTask: Promise<any>;
-            if (this.#resultIsPromise) {
-                rawResult = Promise.resolve(rawResult).then((r) => {
-                    this.#onDone();
-                    return r;
-                });
-                resultTask = Promise.race([rawResult, legacyDoneTask]);
-            } else {
-                resultTask = legacyDoneTask;
-            }
-
-            return await resultTask;
+            return await Promise.resolve(functionCallback(context, ...inputs));
         } finally {
             this.#isDone = true;
         }
@@ -91,7 +60,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         const isDurableBinding = info?.bindings?.name?.type == 'activityTrigger';
 
         const returnBinding = info.getReturnBinding();
-        // Set results from return / context.done
+        // Set results from return
         if (result || (isDurableBinding && result != null)) {
             // $return binding is found: return result data to $return binding
             if (returnBinding) {
@@ -153,21 +122,10 @@ export class InvocationModel implements coreTypes.InvocationModel {
     #userLog(level: RpcLog.Level, ...args: any[]): void {
         if (this.#isDone && this.#coreCtx.state !== 'postInvocationHooks') {
             let badAsyncMsg =
-                "Warning: Unexpected call to 'log' on the context object after function execution has completed. Please check for asynchronous calls that are not awaited or calls to 'done' made before function execution completes. ";
-            badAsyncMsg += `Function name: ${this.#funcInfo.name}. Invocation Id: ${this.#coreCtx.invocationId}. `;
-            badAsyncMsg += `Learn more: ${asyncDoneLearnMoreLink}`;
+                "Warning: Unexpected call to 'log' on the context object after function execution has completed. Please check for asynchronous calls that are not awaited. ";
+            badAsyncMsg += `Function name: ${this.#funcInfo.name}. Invocation Id: ${this.#coreCtx.invocationId}.`;
             this.#systemLog(RpcLog.Level.Warning, badAsyncMsg);
         }
         this.#log(level, RpcLog.RpcLogCategory.User, ...args);
-    }
-
-    #onDone(): void {
-        if (this.#isDone) {
-            const message = this.#resultIsPromise
-                ? `Error: Choose either to return a promise or call 'done'. Do not use both in your script. Learn more: ${asyncDoneLearnMoreLink}`
-                : "Error: 'done' has already been called. Please check your script for extraneous calls to 'done'.";
-            this.#systemLog(RpcLog.Level.Error, message);
-        }
-        this.#isDone = true;
     }
 }

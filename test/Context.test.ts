@@ -25,11 +25,9 @@ const timerTriggerInput: RpcParameterBinding = {
 
 describe('Context', () => {
     let _logger: any;
-    let doneEmitter: any;
 
     beforeEach(() => {
         _logger = sinon.spy();
-        doneEmitter = sinon.spy();
     });
 
     it('camelCases timer trigger input when appropriate', async () => {
@@ -49,7 +47,7 @@ describe('Context', () => {
                 },
             },
         });
-        const workerOutputs = CreateContextAndInputs(info, msg, _logger, doneEmitter);
+        const workerOutputs = CreateContextAndInputs(info, msg, _logger);
         const myTimerWorker = workerOutputs.inputs[0];
         expect(myTimerWorker.schedule).to.be.empty;
         expect(myTimerWorker.scheduleStatus.last).to.equal('2016-10-04T10:15:00+00:00');
@@ -76,7 +74,7 @@ describe('Context', () => {
             },
         });
 
-        const { context } = CreateContextAndInputs(info, msg, _logger, doneEmitter);
+        const { context } = CreateContextAndInputs(info, msg, _logger);
         expect(context.bindingData.sys).to.be.undefined;
         expect(context.bindingData.invocationId).to.equal('1');
         expect(context.invocationId).to.equal('1');
@@ -110,7 +108,7 @@ describe('Context', () => {
             },
         });
 
-        const { context } = CreateContextAndInputs(info, msg, _logger, doneEmitter);
+        const { context } = CreateContextAndInputs(info, msg, _logger);
         const { bindingData } = context;
         expect(bindingData.sys.methodName).to.equal('test');
         expect(bindingData.sys.randGuid).to.not.be.undefined;
@@ -163,7 +161,7 @@ describe('Context', () => {
             },
         });
 
-        const { context } = CreateContextAndInputs(info, msg, _logger, doneEmitter);
+        const { context } = CreateContextAndInputs(info, msg, _logger);
         const { bindingData } = context;
         expect(bindingData.invocationId).to.equal('1');
         expect(bindingData.headers.header1).to.equal('value1');
@@ -207,7 +205,7 @@ describe('Context', () => {
             },
         });
 
-        const { context } = CreateContextAndInputs(info, msg, _logger, doneEmitter);
+        const { context } = CreateContextAndInputs(info, msg, _logger);
         const { bindingData } = context;
         expect(bindingData.invocationId).to.equal('1');
         expect(bindingData.headers.header1).to.equal('value1');

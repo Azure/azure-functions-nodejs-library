@@ -21,15 +21,13 @@ import { fromRpcTraceContext, fromTypedData } from './converters/RpcConverters';
 import { FunctionInfo } from './FunctionInfo';
 import { Request } from './http/Request';
 import { Response } from './http/Response';
-import EventEmitter = require('events');
 
 export function CreateContextAndInputs(
     info: FunctionInfo,
     request: RpcInvocationRequest,
-    userLogCallback: UserLogCallback,
-    doneEmitter: EventEmitter
+    userLogCallback: UserLogCallback
 ) {
-    const context = new InvocationContext(info, request, userLogCallback, doneEmitter);
+    const context = new InvocationContext(info, request, userLogCallback);
 
     const bindings: ContextBindings = {};
     const inputs: any[] = [];
@@ -56,7 +54,7 @@ export function CreateContextAndInputs(
     context.bindings = bindings;
     if (httpInput) {
         context.req = httpInput;
-        context.res = new Response(context.done);
+        context.res = new Response();
         // This is added for backwards compatability with what the host used to send to the worker
         context.bindingData.sys = {
             methodName: info.name,
@@ -87,14 +85,8 @@ class InvocationContext implements Context {
     log: Logger;
     req?: Request;
     res?: Response;
-    done: DoneCallback;
 
-    constructor(
-        info: FunctionInfo,
-        request: RpcInvocationRequest,
-        userLogCallback: UserLogCallback,
-        doneEmitter: EventEmitter
-    ) {
+    constructor(info: FunctionInfo, request: RpcInvocationRequest, userLogCallback: UserLogCallback) {
         this.invocationId = <string>request.invocationId;
         this.traceContext = fromRpcTraceContext(request.traceContext);
         const executionContext = <ExecutionContext>{
@@ -116,10 +108,6 @@ class InvocationContext implements Context {
 
         this.bindingData = getNormalizedBindingData(request);
         this.bindingDefinitions = getBindingDefinitions(info);
-
-        this.done = (err?: unknown, result?: any) => {
-            doneEmitter.emit('done', err, result);
-        };
     }
 }
 
@@ -127,8 +115,6 @@ export interface InvocationResult {
     return: any;
     bindings: ContextBindings;
 }
-
-export type DoneCallback = (err?: unknown, result?: any) => void;
 
 export type UserLogCallback = (level: RpcLog.Level, ...args: any[]) => void;
 
