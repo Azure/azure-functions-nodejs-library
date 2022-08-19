@@ -27,14 +27,9 @@ declare module '@azure/functions' {
         [name: string]: any;
     }
     /**
-     * Context binding data. Provided to your function trigger metadata and function invocation data.
+     * Metadata related to the input that triggered your function
      */
-    export interface ContextBindingData {
-        /**
-         * A unique GUID per function invocation.
-         */
-        invocationId: string;
-
+    export interface TriggerMetadata {
         [name: string]: any;
     }
     /**
@@ -43,39 +38,47 @@ declare module '@azure/functions' {
      */
     export interface Context {
         /**
-         * A unique GUID per function invocation.
+         * A unique guid specific to this invocation
          */
         invocationId: string;
+
         /**
-         * Function execution metadata.
+         * The name of the function that is being invoked
          */
-        executionContext: ExecutionContext;
+        functionName: string;
+
         /**
          * Input and trigger binding data, as defined in function.json. Properties on this object are dynamically
          * generated and named based off of the "name" property in function.json.
          */
         bindings: ContextBindings;
+
         /**
-         * Trigger metadata and function invocation data.
+         * Trigger metadata
          */
-        bindingData: ContextBindingData;
+        triggerMetadata: TriggerMetadata;
+
         /**
-         * TraceContext information to enable distributed tracing scenarios.
+         * TraceContext information to enable distributed tracing scenarios
          */
-        traceContext: TraceContext;
+        traceContext?: TraceContext;
+
         /**
-         * Bindings your function uses, as defined in function.json.
+         * The retry context of the current function execution if the retry policy is defined
          */
-        bindingDefinitions: BindingDefinition[];
+        retryContext?: RetryContext;
+
         /**
          * Allows you to write streaming function logs. Calling directly allows you to write streaming function logs
          * at the default trace level.
          */
         log: Logger;
+
         /**
          * HTTP request object. Provided to your function when using HTTP Bindings.
          */
         req?: HttpRequest;
+
         /**
          * HTTP response object. Provided to your function when using HTTP Bindings.
          */
@@ -367,63 +370,52 @@ declare module '@azure/functions' {
         /** Number of seconds until the cookie expires. A zero or negative number will expire the cookie immediately. */
         maxAge?: number;
     }
-    export interface ExecutionContext {
-        /**
-         * A unique GUID per function invocation.
-         */
-        invocationId: string;
-        /**
-         * The name of the function that is being invoked. The name of your function is always the same as the
-         * name of the corresponding function.json's parent directory.
-         */
-        functionName: string;
-        /**
-         * The directory your function is in (this is the parent directory of this function's function.json).
-         */
-        functionDirectory: string;
-        /**
-         * The retry context of the current function execution or null if the retry policy is not defined.
-         */
-        retryContext: RetryContext | null;
-    }
+
     export interface RetryContext {
         /**
          * Current retry count of the function executions.
          */
         retryCount: number;
+
         /**
          * Max retry count is the maximum number of times an execution is retried before eventual failure. A value of -1 means to retry indefinitely.
          */
         maxRetryCount: number;
+
         /**
          * Exception that caused the retry
          */
         exception?: Exception;
     }
+
     export interface Exception {
-        /** Exception source */
-        source?: string | null;
-        /** Exception stackTrace */
-        stackTrace?: string | null;
-        /** Exception message */
-        message?: string | null;
+        source?: string;
+
+        stackTrace?: string;
+
+        message?: string;
     }
+
     /**
-     * TraceContext information to enable distributed tracing scenarios.
+     * TraceContext information to enable distributed tracing scenarios
      */
     export interface TraceContext {
-        /** Describes the position of the incoming request in its trace graph in a portable, fixed-length format. */
-        traceparent: string | null | undefined;
-        /** Extends traceparent with vendor-specific data. */
-        tracestate: string | null | undefined;
-        /** Holds additional properties being sent as part of request telemetry. */
-        attributes:
-            | {
-                  [k: string]: string;
-              }
-            | null
-            | undefined;
+        /**
+         * Describes the position of the incoming request in its trace graph in a portable, fixed-length format
+         */
+        traceParent?: string | undefined;
+
+        /**
+         * Extends traceparent with vendor-specific data
+         */
+        traceState?: string | undefined;
+
+        /**
+         * Holds additional properties being sent as part of request telemetry
+         */
+        attributes?: { [k: string]: string };
     }
+
     export interface BindingDefinition {
         /**
          * The name of your binding, as defined in function.json.

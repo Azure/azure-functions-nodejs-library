@@ -1,23 +1,10 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import {
-    BindingDefinition,
-    Context,
-    ContextBindingData,
-    ContextBindings,
-    ExecutionContext,
-    Logger,
-    TraceContext,
-} from '@azure/functions';
+import { Context, ContextBindings, Logger, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
 import { RpcInvocationRequest, RpcLog, RpcParameterBinding } from '@azure/functions-core';
-import { v4 as uuid } from 'uuid';
-import {
-    convertKeysToCamelCase,
-    getBindingDefinitions,
-    getNormalizedBindingData,
-} from './converters/BindingConverters';
-import { fromRpcTraceContext, fromTypedData } from './converters/RpcConverters';
+import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
+import { fromRpcRetryContext, fromRpcTraceContext, fromTypedData } from './converters/RpcConverters';
 import { FunctionInfo } from './FunctionInfo';
 import { Request } from './http/Request';
 import { Response } from './http/Response';
@@ -55,20 +42,8 @@ export function CreateContextAndInputs(
     if (httpInput) {
         context.req = httpInput;
         context.res = new Response();
-        // This is added for backwards compatability with what the host used to send to the worker
-        context.bindingData.sys = {
-            methodName: info.name,
-            utcNow: new Date().toISOString(),
-            randGuid: uuid(),
-        };
-        // Populate from HTTP request for backwards compatibility if missing
-        if (!context.bindingData.query) {
-            context.bindingData.query = Object.assign({}, httpInput.query);
-        }
-        if (!context.bindingData.headers) {
-            context.bindingData.headers = Object.assign({}, httpInput.headers);
-        }
     }
+
     return {
         context: <Context>context,
         inputs: inputs,
@@ -77,25 +52,26 @@ export function CreateContextAndInputs(
 
 class InvocationContext implements Context {
     invocationId: string;
-    executionContext: ExecutionContext;
+    functionName: string;
     bindings: ContextBindings;
-    bindingData: ContextBindingData;
-    traceContext: TraceContext;
-    bindingDefinitions: BindingDefinition[];
+    triggerMetadata: TriggerMetadata;
+    traceContext?: TraceContext;
+    retryContext?: RetryContext;
     log: Logger;
     req?: Request;
     res?: Response;
 
     constructor(info: FunctionInfo, request: RpcInvocationRequest, userLogCallback: UserLogCallback) {
         this.invocationId = <string>request.invocationId;
-        this.traceContext = fromRpcTraceContext(request.traceContext);
-        const executionContext = <ExecutionContext>{
-            invocationId: this.invocationId,
-            functionName: info.name,
-            functionDirectory: info.directory,
-            retryContext: request.retryContext,
-        };
-        this.executionContext = executionContext;
+        this.functionName = info.name;
+        this.triggerMetadata = request.triggerMetadata ? convertKeysToCamelCase(request.triggerMetadata) : {};
+        if (request.retryContext) {
+            this.retryContext = fromRpcRetryContext(request.retryContext);
+        }
+        if (request.traceContext) {
+            this.traceContext = fromRpcTraceContext(request.traceContext);
+        }
+
         this.bindings = {};
 
         // Log message that is tied to function invocation
@@ -105,9 +81,6 @@ class InvocationContext implements Context {
             info: (...args: any[]) => userLogCallback(RpcLog.Level.Information, ...args),
             verbose: (...args: any[]) => userLogCallback(RpcLog.Level.Trace, ...args),
         });
-
-        this.bindingData = getNormalizedBindingData(request);
-        this.bindingDefinitions = getBindingDefinitions(info);
     }
 }
 

@@ -1,17 +1,20 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { TraceContext } from '@azure/functions';
+import { Exception, RetryContext, TraceContext } from '@azure/functions';
 import {
+    RpcException,
     RpcNullableBool,
     RpcNullableDouble,
     RpcNullableString,
     RpcNullableTimestamp,
+    RpcRetryContext,
     RpcTraceContext,
     RpcTypedData,
 } from '@azure/functions-core';
 import { isLong } from 'long';
 import { InternalException } from '../utils/InternalException';
+import { copyPropIfDefined, nonNullProp } from '../utils/nonNull';
 
 /**
  * Converts 'ITypedData' input from the RPC layer to JavaScript types.
@@ -46,20 +49,33 @@ export function fromTypedData(typedData?: RpcTypedData, convertStringToJson = tr
     }
 }
 
-/**
- * Converts 'IRpcTraceContext' input from RPC layer to dictionary of key value pairs.
- * @param traceContext IRpcTraceContext object containing the activityId, tracestate and attributes.
- */
-export function fromRpcTraceContext(traceContext: RpcTraceContext | null | undefined): TraceContext {
-    if (traceContext) {
-        return <TraceContext>{
-            traceparent: traceContext.traceParent,
-            tracestate: traceContext.traceState,
-            attributes: traceContext.attributes,
-        };
+export function fromRpcRetryContext(retryContext: RpcRetryContext): RetryContext {
+    const result: RetryContext = {
+        retryCount: nonNullProp(retryContext, 'retryCount'),
+        maxRetryCount: nonNullProp(retryContext, 'maxRetryCount'),
+    };
+    if (retryContext.exception) {
+        result.exception = fromRpcException(retryContext.exception);
     }
+    return result;
+}
 
-    return <TraceContext>{};
+function fromRpcException(exception: RpcException): Exception {
+    const result: Exception = {};
+    copyPropIfDefined(exception, result, 'message');
+    copyPropIfDefined(exception, result, 'source');
+    copyPropIfDefined(exception, result, 'stackTrace');
+    return result;
+}
+
+export function fromRpcTraceContext(traceContext: RpcTraceContext): TraceContext {
+    const result: TraceContext = {};
+    copyPropIfDefined(traceContext, result, 'traceParent');
+    copyPropIfDefined(traceContext, result, 'traceState');
+    if (traceContext.attributes) {
+        result.attributes = traceContext.attributes;
+    }
+    return result;
 }
 
 /**

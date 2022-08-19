@@ -47,9 +47,9 @@ export const timerTrigger: AzureFunction = async function (context: Context, myT
 
 const runServiceBus: AzureFunction = async function (context: Context, myQueueItem: string) {
     context.log('Node.js ServiceBus queue trigger function processed message', myQueueItem);
-    context.log.verbose('EnqueuedTimeUtc =', context.bindingData.enqueuedTimeUtc);
-    context.log.verbose('DeliveryCount =', context.bindingData.deliveryCount);
-    context.log.verbose('MessageId =', context.bindingData.messageId);
+    context.log.verbose('EnqueuedTimeUtc =', context.triggerMetadata.enqueuedTimeUtc);
+    context.log.verbose('DeliveryCount =', context.triggerMetadata.deliveryCount);
+    context.log.verbose('MessageId =', context.triggerMetadata.messageId);
 };
 
 // Assumes output binding is named '$return'

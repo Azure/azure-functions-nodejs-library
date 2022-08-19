@@ -28,3 +28,9 @@ export function nonNullValue<T>(value: T | undefined, propertyNameOrMessage?: st
 
     return value;
 }
+
+export function copyPropIfDefined<TData, TKey extends keyof TData>(source: TData, destination: TData, key: TKey): void {
+    if (source[key] !== null && source[key] !== undefined) {
+        destination[key] = source[key];
+    }
+}
