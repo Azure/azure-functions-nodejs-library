@@ -20,7 +20,7 @@ import {
  * This is to avoid breaking changes in v2.
  * @param body The body from the RPC layer.
  */
-export function fromRpcHttpBody(body: RpcTypedData) {
+export function fromRpcHttpBody(body: RpcTypedData | null | undefined) {
     if (body && body.bytes) {
         return (<Buffer>body.bytes).toString();
     } else {
