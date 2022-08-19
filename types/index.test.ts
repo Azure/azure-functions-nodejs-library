@@ -7,17 +7,17 @@
 /* eslint-disable deprecation/deprecation */
 import {
     AzureFunction,
-    Context,
     Cookie,
     HttpMethod,
     HttpRequest,
     HttpResponseFull,
     HttpResponseSimple,
+    InvocationContext,
     Timer,
 } from '@azure/functions';
 const get: HttpMethod = 'GET';
 
-const runHttp: AzureFunction = async function (context: Context, req: HttpRequest) {
+const runHttp: AzureFunction = async function (context: InvocationContext, req: HttpRequest) {
     if (req.method === get) {
         context.log("This is a 'GET' method");
     }
@@ -36,7 +36,7 @@ const runHttp: AzureFunction = async function (context: Context, req: HttpReques
     }
 };
 
-export const timerTrigger: AzureFunction = async function (context: Context, myTimer: Timer): Promise<void> {
+export const timerTrigger: AzureFunction = async function (context: InvocationContext, myTimer: Timer): Promise<void> {
     const timeStamp = new Date().toISOString();
 
     if (myTimer.isPastDue) {
@@ -45,7 +45,7 @@ export const timerTrigger: AzureFunction = async function (context: Context, myT
     context.log('Timer trigger function ran!', timeStamp);
 };
 
-const runServiceBus: AzureFunction = async function (context: Context, myQueueItem: string) {
+const runServiceBus: AzureFunction = async function (context: InvocationContext, myQueueItem: string) {
     context.log('Node.js ServiceBus queue trigger function processed message', myQueueItem);
     context.log.verbose('EnqueuedTimeUtc =', context.triggerMetadata.enqueuedTimeUtc);
     context.log.verbose('DeliveryCount =', context.triggerMetadata.deliveryCount);
@@ -53,7 +53,7 @@ const runServiceBus: AzureFunction = async function (context: Context, myQueueIt
 };
 
 // Assumes output binding is named '$return'
-const runHttpReturn: AzureFunction = async function (context: Context, req: HttpRequest) {
+const runHttpReturn: AzureFunction = async function (context: InvocationContext, req: HttpRequest) {
     context.log('JavaScript HTTP trigger function processed a request.');
     if (req.query.name || (req.body && req.body.name)) {
         return {
@@ -68,12 +68,12 @@ const runHttpReturn: AzureFunction = async function (context: Context, req: Http
     }
 };
 
-const runFunction: AzureFunction = async function (context: Context) {
+const runFunction: AzureFunction = async function (context: InvocationContext) {
     context.log('Ran function');
     return 'Ran function';
 };
 
-const cookieFunction: AzureFunction = async function (context: Context) {
+const cookieFunction: AzureFunction = async function (context: InvocationContext) {
     const cookies: Cookie[] = [
         {
             name: 'cookiename',
@@ -87,7 +87,7 @@ const cookieFunction: AzureFunction = async function (context: Context) {
     };
 };
 
-const httpResponseSimpleFunction: AzureFunction = async function (context: Context) {
+const httpResponseSimpleFunction: AzureFunction = async function (context: InvocationContext) {
     context.res = context.res as HttpResponseSimple;
     context.res = {
         body: {
@@ -109,7 +109,7 @@ const httpResponseSimpleFunction: AzureFunction = async function (context: Conte
     };
 };
 
-const statusStringFunction: AzureFunction = async function (context: Context) {
+const statusStringFunction: AzureFunction = async function (context: InvocationContext) {
     context.res = context.res as HttpResponseSimple;
     context.res = {
         status: '200',
@@ -117,7 +117,7 @@ const statusStringFunction: AzureFunction = async function (context: Context) {
     };
 };
 
-const httpResponseFullFunction: AzureFunction = async function (context: Context) {
+const httpResponseFullFunction: AzureFunction = async function (context: InvocationContext) {
     context.res = context.res as HttpResponseFull;
     context.res.status(200);
     context.res.setHeader('hello', 'world');
@@ -141,7 +141,11 @@ const httpResponseFullFunction: AzureFunction = async function (context: Context
     context.res.enableContentNegotiation = false;
 };
 
-const runHttpWithQueue: AzureFunction = async function (context: Context, req: HttpRequest, queueItem: Buffer) {
+const runHttpWithQueue: AzureFunction = async function (
+    context: InvocationContext,
+    req: HttpRequest,
+    queueItem: Buffer
+) {
     context.log('Http-triggered function with ' + req.method + ' method.');
     context.log('Pulling in queue item ' + queueItem);
     return;

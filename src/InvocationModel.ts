@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { AzureFunction, Context } from '@azure/functions';
+import { AzureFunction, InvocationContext } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import {
     CoreInvocationContext,
@@ -11,9 +11,9 @@ import {
     RpcParameterBinding,
 } from '@azure/functions-core';
 import { format } from 'util';
-import { CreateContextAndInputs } from './Context';
 import { toTypedData } from './converters/RpcConverters';
 import { FunctionInfo } from './FunctionInfo';
+import { CreateContextAndInputs } from './InvocationContext';
 
 export class InvocationModel implements coreTypes.InvocationModel {
     #isDone = false;
@@ -34,7 +34,11 @@ export class InvocationModel implements coreTypes.InvocationModel {
         return { context, inputs };
     }
 
-    async invokeFunction(context: Context, inputs: unknown[], functionCallback: AzureFunction): Promise<unknown> {
+    async invokeFunction(
+        context: InvocationContext,
+        inputs: unknown[],
+        functionCallback: AzureFunction
+    ): Promise<unknown> {
         try {
             return await Promise.resolve(functionCallback(context, ...inputs));
         } finally {
@@ -42,7 +46,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         }
     }
 
-    async getResponse(context: Context, result: unknown): Promise<RpcInvocationResponse> {
+    async getResponse(context: InvocationContext, result: unknown): Promise<RpcInvocationResponse> {
         const response: RpcInvocationResponse = { invocationId: this.#coreCtx.invocationId };
         response.outputData = [];
         const info = this.#funcInfo;

@@ -18,7 +18,7 @@ declare module '@azure/functions' {
      * @returns Output bindings (optional). If you are returning a result from a Promise (or an async function), this
      * result will be passed to JSON.stringify unless it is a string, Buffer, ArrayBufferView, or number.
      */
-    export type AzureFunction = (context: Context, ...args: any[]) => Promise<any> | void;
+    export type AzureFunction = (context: InvocationContext, ...args: any[]) => Promise<any> | void;
 
     /**
      * Context bindings object. Provided to your function binding data, as defined in function.json.
@@ -36,7 +36,7 @@ declare module '@azure/functions' {
      * The context object can be used for writing logs, reading data from bindings, and setting outputs. A context object is passed
      * to your function from the Azure Functions runtime on function invocation.
      */
-    export interface Context {
+    export interface InvocationContext {
         /**
          * A unique guid specific to this invocation
          */

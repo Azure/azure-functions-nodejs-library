@@ -1,7 +1,8 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { Context, ContextBindings, Logger, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
+import * as types from '@azure/functions';
+import { ContextBindings, Logger, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
 import { RpcInvocationRequest, RpcLog, RpcParameterBinding } from '@azure/functions-core';
 import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
 import { fromRpcRetryContext, fromRpcTraceContext, fromTypedData } from './converters/RpcConverters';
@@ -45,12 +46,12 @@ export function CreateContextAndInputs(
     }
 
     return {
-        context: <Context>context,
+        context: <types.InvocationContext>context,
         inputs: inputs,
     };
 }
 
-class InvocationContext implements Context {
+class InvocationContext implements types.InvocationContext {
     invocationId: string;
     functionName: string;
     bindings: ContextBindings;

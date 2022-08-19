@@ -3,7 +3,7 @@
 
 import { Cookie } from '@azure/functions';
 import { RpcHttpCookie, RpcHttpData, RpcNullableString, RpcTypedData } from '@azure/functions-core';
-import { Dict } from '../Context';
+import { Dict } from '../InvocationContext';
 import {
     fromTypedData,
     toNullableBool,
