@@ -22,7 +22,7 @@
     "types": "types/index.d.ts",
     "files": [
         "dist/src/index-bundle.js",
-        "types/index.d.ts",
+        "types/",
         "LICENSE",
         "README.md",
         "NOTICE.html",
