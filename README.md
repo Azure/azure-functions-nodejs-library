@@ -75,4 +75,4 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 ### Contributing to type definitions
 
-The type definitions are located in the `types` folder. Any changes should be applied directly to `./types/index.d.ts`. Please make sure to update the tests in `./types/index.test.ts` as well.
+The type definitions are located in the `types` folder. Please make sure to update the tests in `./test/types/index.test.ts` as well.

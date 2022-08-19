@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "strict": true,
+        "outDir": "dist",
+        "baseUrl": "./",
+        "paths": {
+            "@azure/functions": [
+                "../../types"
+            ]
+        }
+    }
+}

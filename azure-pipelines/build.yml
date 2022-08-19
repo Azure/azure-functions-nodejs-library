@@ -29,7 +29,7 @@ jobs:
       sourceFolder: '$(Build.SourcesDirectory)'
       contents: |
         dist/src/index-bundle.js
-        types/index.d.ts
+        types/**
         LICENSE
         NOTICE.html
         package.json
