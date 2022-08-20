@@ -4,6 +4,7 @@
 import { HttpResponse } from '@azure/functions';
 import { RpcHttpData, RpcTypedData } from '@azure/functions-core';
 import { Headers } from 'undici';
+import { InternalException } from '../utils/InternalException';
 import { toRpcHttpCookie } from './toRpcHttpCookie';
 import { toRpcTypedData } from './toRpcTypedData';
 
@@ -11,7 +12,7 @@ export function toRpcHttp(data: unknown): RpcTypedData | null | undefined {
     if (data === null || data === undefined) {
         return data;
     } else if (typeof data !== 'object') {
-        throw new Error(
+        throw new InternalException(
             'The HTTP response must be an object with optional properties "body", "status", "headers", and "cookies".'
         );
     }
@@ -19,16 +20,24 @@ export function toRpcHttp(data: unknown): RpcTypedData | null | undefined {
 
     const rpcResponse: RpcHttpData = {};
     rpcResponse.body = toRpcTypedData(response.body);
-    rpcResponse.statusCode = response.status?.toString();
-
-    rpcResponse.headers = {};
-    const headers = new Headers(response.headers);
-    for (const [key, value] of headers.entries()) {
-        rpcResponse.headers[key] = value;
+    if (response.status !== null && response.status !== undefined) {
+        if (typeof response.status !== 'string' && typeof response.status !== 'number') {
+            throw new InternalException('The HTTP response "status" property must be of type "number" or "string".');
+        } else {
+            rpcResponse.statusCode = response.status.toString();
+        }
     }
 
-    if (response.cookies) {
-        rpcResponse.cookies = [];
+    rpcResponse.headers = {};
+    if (response.headers !== null && response.headers !== undefined) {
+        const headers = new Headers(response.headers);
+        for (const [key, value] of headers.entries()) {
+            rpcResponse.headers[key] = value;
+        }
+    }
+
+    rpcResponse.cookies = [];
+    if (response.cookies !== null && response.cookies !== undefined) {
         for (const cookie of response.cookies) {
             rpcResponse.cookies.push(toRpcHttpCookie(cookie));
         }
