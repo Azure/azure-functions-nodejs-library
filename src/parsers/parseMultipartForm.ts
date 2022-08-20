@@ -1,7 +1,8 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { FormPart } from '@azure/functions';
+import { Blob } from 'buffer';
+import { FormData } from 'undici';
 import { HeaderName } from '../constants';
 import { getHeaderValue, parseContentDisposition } from './parseHeader';
 
@@ -9,10 +10,12 @@ const carriageReturn = Buffer.from('\r')[0];
 const newline = Buffer.from('\n')[0];
 
 // multipart/form-data specification https://datatracker.ietf.org/doc/html/rfc7578
-export function parseMultipartForm(chunk: Buffer, boundary: string): [string, FormPart][] {
-    const result: [string, FormPart][] = [];
+export function parseMultipartForm(chunk: Buffer, boundary: string): FormData {
+    const result = new FormData();
     let currentName: string | undefined;
-    let currentPart: FormPart | undefined;
+    let currentFileName: string | undefined;
+    let currentContentType: string | undefined;
+
     let inHeaders = false;
 
     const boundaryBuffer = Buffer.from(`--${boundary}`);
@@ -36,23 +39,24 @@ export function parseMultipartForm(chunk: Buffer, boundary: string): [string, Fo
         const isBoundary = line.equals(boundaryBuffer);
         const isBoundaryEnd = line.equals(endBoundaryBuffer);
         if (isBoundary || isBoundaryEnd) {
-            if (currentPart) {
-                currentPart.value = chunk.subarray(partValueStart, partValueEnd);
+            if (currentName) {
+                const value = chunk.subarray(partValueStart, partValueEnd);
+                if (currentFileName) {
+                    result.append(currentName, new Blob([value], { type: currentContentType }), currentFileName);
+                } else {
+                    result.append(currentName, value.toString());
+                }
             }
 
             if (isBoundaryEnd) {
                 break;
             }
 
-            currentPart = {
-                value: Buffer.from(''),
-            };
+            currentName = undefined;
+            currentFileName = undefined;
+            currentContentType = undefined;
             inHeaders = true;
         } else if (inHeaders) {
-            if (!currentPart) {
-                throw new Error(`Expected form data to start with boundary "${boundary}".`);
-            }
-
             const lineAsString = line.toString();
             if (!lineAsString) {
                 // A blank line means we're done with the headers for this part
@@ -64,7 +68,6 @@ export function parseMultipartForm(chunk: Buffer, boundary: string): [string, Fo
                 } else {
                     partValueStart = lineStart;
                     partValueEnd = lineStart;
-                    result.push([currentName, currentPart]);
                 }
             } else {
                 const contentDisposition = getHeaderValue(lineAsString, HeaderName.contentDisposition);
@@ -74,12 +77,12 @@ export function parseMultipartForm(chunk: Buffer, boundary: string): [string, Fo
 
                     // filename is optional, even for files
                     if (dispositionParts.has('fileName')) {
-                        currentPart.fileName = dispositionParts.get('fileName');
+                        currentFileName = dispositionParts.get('fileName');
                     }
                 } else {
                     const contentType = getHeaderValue(lineAsString, HeaderName.contentType);
                     if (contentType) {
-                        currentPart.contentType = contentType;
+                        currentContentType = contentType;
                     }
                 }
             }

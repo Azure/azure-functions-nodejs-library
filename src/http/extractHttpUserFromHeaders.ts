@@ -1,15 +1,16 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { HttpRequestHeaders, HttpRequestUser } from '@azure/functions';
+import { HttpRequestUser } from '@azure/functions';
+import { Headers } from 'undici';
+import { nonNullValue } from '../utils/nonNull';
 
-export function extractHttpUserFromHeaders(headers: HttpRequestHeaders): HttpRequestUser | null {
+export function extractHttpUserFromHeaders(headers: Headers): HttpRequestUser | null {
     let user: HttpRequestUser | null = null;
 
-    if (headers['x-ms-client-principal']) {
-        const claimsPrincipalData = JSON.parse(
-            Buffer.from(headers['x-ms-client-principal'], 'base64').toString('utf-8')
-        );
+    const clientPrincipal = headers.get('x-ms-client-principal');
+    if (clientPrincipal) {
+        const claimsPrincipalData = JSON.parse(Buffer.from(clientPrincipal, 'base64').toString('utf-8'));
 
         if (claimsPrincipalData['identityProvider']) {
             user = {
@@ -22,9 +23,9 @@ export function extractHttpUserFromHeaders(headers: HttpRequestHeaders): HttpReq
         } else {
             user = {
                 type: 'AppService',
-                id: headers['x-ms-client-principal-id'],
-                username: headers['x-ms-client-principal-name'],
-                identityProvider: headers['x-ms-client-principal-idp'],
+                id: nonNullValue(headers.get('x-ms-client-principal-id'), 'user-id'),
+                username: nonNullValue(headers.get('x-ms-client-principal-name'), 'user-name'),
+                identityProvider: nonNullValue(headers.get('x-ms-client-principal-idp'), 'user-idp'),
                 claimsPrincipalData,
             };
         }

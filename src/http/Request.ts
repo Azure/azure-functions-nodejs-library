@@ -1,43 +1,43 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import {
-    Form,
-    HttpMethod,
-    HttpRequest,
-    HttpRequestHeaders,
-    HttpRequestParams,
-    HttpRequestQuery,
-    HttpRequestUser,
-} from '@azure/functions';
-import { RpcHttpData, RpcTypedData } from '@azure/functions-core';
+import { HttpMethod, HttpRequest, HttpRequestParams, HttpRequestUser } from '@azure/functions';
+import { RpcHttpData } from '@azure/functions-core';
+import { Blob } from 'buffer';
+import { ReadableStream } from 'stream/web';
+import { FormData, Headers, Request as uRequest } from 'undici';
+import { URLSearchParams } from 'url';
 import { HeaderName } from '../constants';
-import { fromTypedData } from '../converters/RpcConverters';
-import { fromNullableMapping, fromRpcHttpBody } from '../converters/RpcHttpConverters';
+import { fromNullableMapping } from '../converters/RpcHttpConverters';
 import { parseForm } from '../parsers/parseForm';
+import { nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
 export class Request implements HttpRequest {
-    method: HttpMethod | null;
+    method: HttpMethod;
     url: string;
-    originalUrl: string;
-    headers: HttpRequestHeaders;
-    query: HttpRequestQuery;
+    headers: Headers;
+    query: URLSearchParams;
     params: HttpRequestParams;
-    body?: any;
-    rawBody?: any;
 
     #cachedUser?: HttpRequestUser | null;
+    #uReq: uRequest;
+    #body?: Buffer;
 
     constructor(rpcHttp: RpcHttpData) {
-        this.method = <HttpMethod>rpcHttp.method;
-        this.url = <string>rpcHttp.url;
-        this.originalUrl = <string>rpcHttp.url;
-        this.headers = fromNullableMapping(rpcHttp.nullableHeaders, rpcHttp.headers);
-        this.query = fromNullableMapping(rpcHttp.nullableQuery, rpcHttp.query);
+        const url = nonNullProp(rpcHttp, 'url');
+        this.#body = rpcHttp.body?.bytes ? Buffer.from(rpcHttp.body?.bytes) : undefined;
+        this.#uReq = new uRequest(url, {
+            body: this.#body,
+            method: nonNullProp(rpcHttp, 'method'),
+            headers: fromNullableMapping(rpcHttp.nullableHeaders, rpcHttp.headers),
+        });
+
+        this.method = <HttpMethod>nonNullProp(rpcHttp, 'method');
+        this.url = url;
+        this.headers = this.#uReq.headers;
+        this.query = new URLSearchParams(fromNullableMapping(rpcHttp.nullableQuery, rpcHttp.query));
         this.params = fromNullableMapping(rpcHttp.nullableParams, rpcHttp.params);
-        this.body = fromTypedData(<RpcTypedData>rpcHttp.body);
-        this.rawBody = fromRpcHttpBody(<RpcTypedData>rpcHttp.body);
     }
 
     get user(): HttpRequestUser | null {
@@ -48,16 +48,41 @@ export class Request implements HttpRequest {
         return this.#cachedUser;
     }
 
-    get(field: string): string | undefined {
-        return this.headers && this.headers[field.toLowerCase()];
+    get body(): ReadableStream<any> | null {
+        return this.#uReq.body;
     }
 
-    parseFormBody(): Form {
-        const contentType = this.get(HeaderName.contentType);
+    get bodyUsed(): boolean {
+        return this.#uReq.bodyUsed;
+    }
+
+    async arrayBuffer(): Promise<ArrayBuffer> {
+        return await this.#uReq.arrayBuffer();
+    }
+
+    async blob(): Promise<Blob> {
+        return await this.#uReq.blob();
+    }
+
+    /**
+     * undici doesn't support this yet, so we'll use our own implementation for now
+     */
+    async formData(): Promise<FormData> {
+        const contentType = this.headers.get(HeaderName.contentType);
         if (!contentType) {
             throw new Error(`"${HeaderName.contentType}" header must be defined.`);
+        } else if (!this.#body) {
+            return new FormData();
         } else {
-            return parseForm(this.body, contentType);
+            return parseForm(this.#body, contentType);
         }
+    }
+
+    async json(): Promise<unknown> {
+        return await this.#uReq.json();
+    }
+
+    async text(): Promise<string> {
+        return await this.#uReq.text();
     }
 }

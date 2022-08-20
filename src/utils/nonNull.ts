@@ -18,7 +18,7 @@ export function nonNullProp<TSource, TKey extends keyof TSource>(
 /**
  * Validates that a given value is not null and not undefined.
  */
-export function nonNullValue<T>(value: T | undefined, propertyNameOrMessage?: string): T {
+export function nonNullValue<T>(value: T | undefined | null, propertyNameOrMessage?: string): T {
     if (value === null || value === undefined) {
         throw new InternalException(
             'Internal error: Expected value to be neither null nor undefined' +

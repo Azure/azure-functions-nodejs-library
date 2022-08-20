@@ -1,6 +1,10 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import { Blob } from 'buffer';
+import { ReadableStream } from 'stream/web';
+import { FormData, Headers } from 'undici';
+import { URLSearchParams } from 'url';
 import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult } from './index';
 import { InvocationContext } from './InvocationContext';
 
@@ -67,7 +71,7 @@ export interface HttpRequest {
     /**
      * HTTP request method used to invoke this function.
      */
-    method: HttpMethod | null;
+    method: HttpMethod;
 
     /**
      * Request URL.
@@ -77,12 +81,12 @@ export interface HttpRequest {
     /**
      * HTTP request headers.
      */
-    headers: HttpRequestHeaders;
+    headers: Headers;
 
     /**
      * Query string parameter keys and values from the URL.
      */
-    query: HttpRequestQuery;
+    query: URLSearchParams;
 
     /**
      * Route parameter keys and values.
@@ -97,31 +101,39 @@ export interface HttpRequest {
     user: HttpRequestUser | null;
 
     /**
-     * The HTTP request body.
+     * Returns the body as a ReadableStream
      */
-    body?: any;
+    readonly body: ReadableStream | null;
 
     /**
-     * The HTTP request body as a UTF-8 string.
+     * Returns whether the body has been read from
      */
-    rawBody?: any;
+    readonly bodyUsed: boolean;
 
     /**
-     * Parses the body and returns an object representing a form
-     * @throws if the content type is not "multipart/form-data" or "application/x-www-form-urlencoded"
+     * Returns a promise fulfilled with the body as an ArrayBuffer
      */
-    parseFormBody(): Form;
-}
+    readonly arrayBuffer: () => Promise<ArrayBuffer>;
 
-export interface HttpRequestHeaders {
-    [name: string]: string;
-}
+    /**
+     * Returns a promise fulfilled with the body as a Blob
+     */
+    readonly blob: () => Promise<Blob>;
 
-/**
- * Query string parameter keys and values from the URL.
- */
-export interface HttpRequestQuery {
-    [name: string]: string;
+    /**
+     * Returns a promise fulfilled with the body as FormData
+     */
+    readonly formData: () => Promise<FormData>;
+
+    /**
+     * Returns a promise fulfilled with the body parsed as JSON
+     */
+    readonly json: () => Promise<unknown>;
+
+    /**
+     * Returns a promise fulfilled with the body as a string
+     */
+    readonly text: () => Promise<string>;
 }
 
 /**
@@ -163,45 +175,6 @@ export interface HttpRequestUser {
     claimsPrincipalData: {
         [key: string]: any;
     };
-}
-
-export interface Form extends Iterable<[string, FormPart]> {
-    /**
-     * Returns the value of the first name-value pair whose name is `name`. If there are no such pairs, `null` is returned.
-     */
-    get(name: string): FormPart | null;
-
-    /**
-     * Returns the values of all name-value pairs whose name is `name`. If there are no such pairs, an empty array is returned.
-     */
-    getAll(name: string): FormPart[];
-
-    /**
-     * Returns `true` if there is at least one name-value pair whose name is `name`.
-     */
-    has(name: string): boolean;
-
-    /**
-     * The number of parts in this form
-     */
-    length: number;
-}
-
-export interface FormPart {
-    /**
-     * The value for this part of the form
-     */
-    value: Buffer;
-
-    /**
-     * The file name for this part of the form, if specified
-     */
-    fileName?: string;
-
-    /**
-     * The content type for this part of the form, assumed to be "text/plain" if not specified
-     */
-    contentType?: string;
 }
 
 /**

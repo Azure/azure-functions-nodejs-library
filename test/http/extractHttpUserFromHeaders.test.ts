@@ -1,9 +1,10 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { HttpRequestHeaders, HttpRequestUser } from '@azure/functions';
+import { HttpRequestUser } from '@azure/functions';
 import { expect } from 'chai';
 import 'mocha';
+import { Headers } from 'undici';
 import { v4 as uuid } from 'uuid';
 import { extractHttpUserFromHeaders } from '../../src/http/extractHttpUserFromHeaders';
 
@@ -32,12 +33,12 @@ describe('Extract Http User Claims Principal from Headers', () => {
             role_typ: 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
         };
 
-        const headers: HttpRequestHeaders = {
+        const headers: Headers = new Headers({
             'x-ms-client-principal-name': username,
             'x-ms-client-principal-id': id,
             'x-ms-client-principal-idp': provider,
             'x-ms-client-principal': Buffer.from(JSON.stringify(claimsPrincipalData)).toString('base64'),
-        };
+        });
 
         const user: HttpRequestUser | null = extractHttpUserFromHeaders(headers);
 
@@ -60,9 +61,9 @@ describe('Extract Http User Claims Principal from Headers', () => {
             userDetails: username,
         };
 
-        const headers: HttpRequestHeaders = {
+        const headers: Headers = new Headers({
             'x-ms-client-principal': Buffer.from(JSON.stringify(claimsPrinicipalData)).toString('base64'),
-        };
+        });
 
         const user: HttpRequestUser | null = extractHttpUserFromHeaders(headers);
 
@@ -75,9 +76,9 @@ describe('Extract Http User Claims Principal from Headers', () => {
     });
 
     it('Correctly returns null on missing header data', () => {
-        const headers: HttpRequestHeaders = {
+        const headers: Headers = new Headers({
             key1: 'val1',
-        };
+        });
 
         const user: HttpRequestUser | null = extractHttpUserFromHeaders(headers);
 

@@ -3,6 +3,7 @@
 
 import { expect } from 'chai';
 import 'mocha';
+import { File } from 'undici';
 import { parseForm } from '../../src/parsers/parseForm';
 
 describe('parseForm', () => {
@@ -22,17 +23,12 @@ Hello
 `);
 
             const parsedForm = parseForm(data, contentType);
-            expect(parsedForm.length).to.equal(2);
 
             expect(parsedForm.has('name')).to.equal(true);
-            expect(parsedForm.get('name')).to.deep.equal({
-                value: Buffer.from('Azure Functions'),
-            });
+            expect(parsedForm.get('name')).to.equal('Azure Functions');
 
             expect(parsedForm.has('greeting')).to.equal(true);
-            expect(parsedForm.get('greeting')).to.deep.equal({
-                value: Buffer.from('Hello'),
-            });
+            expect(parsedForm.get('greeting')).to.equal('Hello');
         });
 
         it('file', async () => {
@@ -46,14 +42,12 @@ world
 `);
 
             const parsedForm = parseForm(data, contentType);
-            expect(parsedForm.length).to.equal(1);
             expect(parsedForm.has('myfile')).to.equal(true);
-            expect(parsedForm.get('myfile')).to.deep.equal({
-                value: Buffer.from(`hello
-world`),
-                fileName: 'test.txt',
-                contentType: 'text/plain',
-            });
+            const file = <File>parsedForm.get('myfile');
+            expect(file.name).to.equal('test.txt');
+            expect(file.type).to.equal('text/plain');
+            expect(await file.text()).to.equal(`hello
+world`);
         });
 
         it('empty field', async () => {
@@ -64,11 +58,8 @@ Content-Disposition: form-data; name="emptyfield"
 `);
 
             const parsedForm = parseForm(data, contentType);
-            expect(parsedForm.length).to.equal(1);
             expect(parsedForm.has('emptyfield')).to.equal(true);
-            expect(parsedForm.get('emptyfield')).to.deep.equal({
-                value: Buffer.from(''),
-            });
+            expect(parsedForm.get('emptyfield')).to.equal('');
         });
 
         it('empty file', async () => {
@@ -80,20 +71,17 @@ Content-Type: text/plain
 `);
 
             const parsedForm = parseForm(data, contentType);
-            expect(parsedForm.length).to.equal(1);
             expect(parsedForm.has('myemptyfile')).to.equal(true);
-            expect(parsedForm.get('myemptyfile')).to.deep.equal({
-                value: Buffer.from(''),
-                fileName: 'emptyTest.txt',
-                contentType: 'text/plain',
-            });
+            const file = <File>parsedForm.get('myemptyfile');
+            expect(file.name).to.equal('emptyTest.txt');
+            expect(file.type).to.equal('text/plain');
+            expect(await file.text()).to.equal('');
         });
 
         it('empty form', async () => {
             const data = Buffer.from('');
 
-            const parsedForm = parseForm(data, contentType);
-            expect(parsedForm.length).to.equal(0);
+            parseForm(data, contentType);
         });
 
         it('duplicate parts', async () => {
@@ -109,20 +97,10 @@ value2
 `);
 
             const parsedForm = parseForm(data, contentType);
-            expect(parsedForm.length).to.equal(2);
             expect(parsedForm.has('dupeField')).to.equal(true);
-            expect(parsedForm.get('dupeField')).to.deep.equal({
-                value: Buffer.from('value1'),
-            });
+            expect(parsedForm.get('dupeField')).to.equal('value1');
 
-            expect(parsedForm.getAll('dupeField')).to.deep.equal([
-                {
-                    value: Buffer.from('value1'),
-                },
-                {
-                    value: Buffer.from('value2'),
-                },
-            ]);
+            expect(parsedForm.getAll('dupeField')).to.deep.equal(['value1', 'value2']);
         });
 
         it('weird casing and whitespace', async () => {
@@ -135,11 +113,10 @@ value2
 `);
             const parsedForm = parseForm(data, contentType);
             expect(parsedForm.has('wEirdCasing')).to.equal(true);
-            expect(parsedForm.get('wEirdCasing')).to.deep.equal({
-                value: Buffer.from('  hello  '),
-                fileName: 'tEsT.txt',
-                contentType: 'texT/plaIn',
-            });
+            const file = <File>parsedForm.get('wEirdCasing');
+            expect(file.name).to.equal('tEsT.txt');
+            expect(file.type).to.equal('text/plain');
+            expect(await file.text()).to.equal('  hello  ');
         });
 
         it('\\n', async () => {
@@ -149,9 +126,7 @@ value2
 
             const parsedForm = parseForm(data, contentType);
             expect(parsedForm.has('hello')).to.equal(true);
-            expect(parsedForm.get('hello')).to.deep.equal({
-                value: Buffer.from('world'),
-            });
+            expect(parsedForm.get('hello')).to.equal('world');
         });
 
         it('\\r\\n', async () => {
@@ -161,9 +136,7 @@ value2
 
             const parsedForm = parseForm(data, contentType);
             expect(parsedForm.has('hello')).to.equal(true);
-            expect(parsedForm.get('hello')).to.deep.equal({
-                value: Buffer.from('world'),
-            });
+            expect(parsedForm.get('hello')).to.equal('world');
         });
 
         it('html file with charset', async () => {
@@ -176,13 +149,11 @@ Content-Type: text/html; charset=UTF-8
 `);
 
             const parsedForm = parseForm(data, contentType);
-            expect(parsedForm.length).to.equal(1);
             expect(parsedForm.has('htmlfile')).to.equal(true);
-            expect(parsedForm.get('htmlfile')).to.deep.equal({
-                value: Buffer.from('<h1>Hi</h1>'),
-                fileName: 'test.html',
-                contentType: 'text/html; charset=UTF-8',
-            });
+            const file = <File>parsedForm.get('htmlfile');
+            expect(file.name).to.equal('test.html');
+            expect(file.type).to.equal('text/html; charset=utf-8');
+            expect(await file.text()).to.equal('<h1>Hi</h1>');
         });
 
         it('Missing content-disposition', async () => {
@@ -217,14 +188,10 @@ Azure Functions
             const parsedForm = parseForm(data, contentType);
 
             expect(parsedForm.has('name')).to.equal(true);
-            expect(parsedForm.get('name')).to.deep.equal({
-                value: Buffer.from('Azure Functions'),
-            });
+            expect(parsedForm.get('name')).to.equal('Azure Functions');
 
             expect(parsedForm.has('greeting')).to.equal(true);
-            expect(parsedForm.get('greeting')).to.deep.equal({
-                value: Buffer.from('Hello'),
-            });
+            expect(parsedForm.get('greeting')).to.equal('Hello');
         });
     });
 
