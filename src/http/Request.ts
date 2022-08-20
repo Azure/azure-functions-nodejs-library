@@ -8,7 +8,7 @@ import { ReadableStream } from 'stream/web';
 import { FormData, Headers, Request as uRequest } from 'undici';
 import { URLSearchParams } from 'url';
 import { HeaderName } from '../constants';
-import { fromNullableMapping } from '../converters/RpcHttpConverters';
+import { fromNullableMapping } from '../converters/fromRpcNullable';
 import { parseForm } from '../parsers/parseForm';
 import { nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';

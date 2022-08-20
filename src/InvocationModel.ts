@@ -14,8 +14,9 @@ import {
 import { format } from 'util';
 import { returnBindingKey } from './constants';
 import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
-import { fromTypedData, toRpcTypedData } from './converters/RpcConverters';
-import { toRpcHttp } from './converters/RpcHttpConverters';
+import { fromRpcTypedData } from './converters/fromRpcTypedData';
+import { toRpcHttp } from './converters/toRpcHttp';
+import { toRpcTypedData } from './converters/toRpcTypedData';
 import { Request } from './http/Request';
 import { InvocationContext } from './InvocationContext';
 import { nonNullProp } from './utils/nonNull';
@@ -51,7 +52,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
                         // TODO: Don't hard code fix for camelCase https://github.com/Azure/azure-functions-nodejs-worker/issues/188
                         input = convertKeysToCamelCase(binding.data);
                     } else {
-                        input = fromTypedData(binding.data);
+                        input = fromRpcTypedData(binding.data);
                     }
 
                     if (bindingType && /trigger/i.test(bindingType)) {

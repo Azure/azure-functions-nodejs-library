@@ -5,7 +5,7 @@ import * as types from '@azure/functions';
 import { RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
 import { RpcInvocationRequest, RpcLog } from '@azure/functions-core';
 import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
-import { fromRpcRetryContext, fromRpcTraceContext } from './converters/RpcConverters';
+import { fromRpcRetryContext, fromRpcTraceContext } from './converters/fromRpcContext';
 
 export class InvocationContext implements types.InvocationContext {
     invocationId: string;

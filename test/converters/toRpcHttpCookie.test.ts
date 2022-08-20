@@ -5,11 +5,10 @@ import { Cookie } from '@azure/functions';
 import { RpcHttpCookie } from '@azure/functions-core';
 import { expect } from 'chai';
 import 'mocha';
-import { toRpcHttp, toRpcHttpCookie } from '../../src/converters/RpcHttpConverters';
+import { toRpcHttpCookie } from '../../src/converters/toRpcHttpCookie';
 
-describe('Rpc Http Converters', () => {
-    /** NullableBool */
-    it('converts http cookies', () => {
+describe('toRpcHttpCookie', () => {
+    it('http cookies', () => {
         const cookieInputs: Cookie[] = [
             {
                 name: 'mycookie',
@@ -44,7 +43,7 @@ describe('Rpc Http Converters', () => {
         expect((<any>rpcCookies[2].expires).value.seconds).to.equal(819199440);
     });
 
-    it('converts http cookie SameSite', () => {
+    it('http cookie SameSite', () => {
         const cookieInputs: Cookie[] = [
             {
                 name: 'none-cookie',
@@ -109,13 +108,5 @@ describe('Rpc Http Converters', () => {
 
             cookieInputs.map(toRpcHttpCookie);
         }).to.throw('');
-    });
-
-    it('throws on string as http response', () => {
-        expect(() => {
-            toRpcHttp('My output string');
-        }).to.throw(
-            'The HTTP response must be an object with optional properties "body", "status", "headers", and "cookies".'
-        );
     });
 });
