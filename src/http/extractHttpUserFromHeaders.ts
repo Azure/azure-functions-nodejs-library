@@ -5,6 +5,9 @@ import { HttpRequestUser } from '@azure/functions';
 import { Headers } from 'undici';
 import { nonNullValue } from '../utils/nonNull';
 
+/* grandfathered in. Should fix when possible */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
+
 export function extractHttpUserFromHeaders(headers: Headers): HttpRequestUser | null {
     let user: HttpRequestUser | null = null;
 

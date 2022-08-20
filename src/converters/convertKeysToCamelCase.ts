@@ -1,6 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+/* grandfathered in. Should fix when possible */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
+
 import { fromRpcTypedData } from './fromRpcTypedData';
 
 // Recursively convert keys of objects to camel case

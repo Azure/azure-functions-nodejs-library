@@ -38,7 +38,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         const context = new InvocationContext(
             this.#functionName,
             this.#coreCtx.request,
-            (level: RpcLog.Level, ...args: any[]) => this.#userLog(level, ...args)
+            (level: RpcLog.Level, ...args: unknown[]) => this.#userLog(level, ...args)
         );
 
         const inputs: any[] = [];
@@ -70,6 +70,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
 
     async invokeFunction(context: InvocationContext, inputs: unknown[], handler: FunctionHandler): Promise<unknown> {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return await Promise.resolve(handler(context, inputs[0]));
         } finally {
             this.#isDone = true;
@@ -105,15 +106,15 @@ export class InvocationModel implements coreTypes.InvocationModel {
         }
     }
 
-    #log(level: RpcLog.Level, logCategory: RpcLog.RpcLogCategory, ...args: any[]): void {
+    #log(level: RpcLog.Level, logCategory: RpcLog.RpcLogCategory, ...args: unknown[]): void {
         this.#coreCtx.log(level, logCategory, format(null, ...args));
     }
 
-    #systemLog(level: RpcLog.Level, ...args: any[]) {
+    #systemLog(level: RpcLog.Level, ...args: unknown[]) {
         this.#log(level, RpcLog.RpcLogCategory.System, ...args);
     }
 
-    #userLog(level: RpcLog.Level, ...args: any[]): void {
+    #userLog(level: RpcLog.Level, ...args: unknown[]): void {
         if (this.#isDone && this.#coreCtx.state !== 'postInvocationHooks') {
             let badAsyncMsg =
                 "Warning: Unexpected call to 'log' on the context object after function execution has completed. Please check for asynchronous calls that are not awaited. ";

@@ -11,6 +11,7 @@ export function fromRpcTypedData(typedData?: RpcTypedData, convertStringToJson =
         if (convertStringToJson) {
             try {
                 if (str != null) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     str = JSON.parse(str);
                 }
             } catch (err) {

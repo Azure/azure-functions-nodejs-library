@@ -41,7 +41,7 @@ export function toNullableDouble(
             value: nullable,
         };
     } else if (typeof nullable === 'string') {
-        if (!isNaN(<any>nullable)) {
+        if (!isNaN(Number(nullable))) {
             const parsedNumber = parseFloat(nullable);
             return <RpcNullableDouble>{
                 value: parsedNumber,

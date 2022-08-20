@@ -32,32 +32,32 @@ export class InvocationContext implements types.InvocationContext {
         this.extraOutputs = new InvocationContextExtraOutputs();
     }
 
-    log(...args: any[]): void {
+    log(...args: unknown[]): void {
         this.#userLogCallback(RpcLog.Level.Information, ...args);
     }
 
-    trace(...args: any[]): void {
+    trace(...args: unknown[]): void {
         this.#userLogCallback(RpcLog.Level.Trace, ...args);
     }
 
-    debug(...args: any[]): void {
+    debug(...args: unknown[]): void {
         this.#userLogCallback(RpcLog.Level.Debug, ...args);
     }
 
-    info(...args: any[]): void {
+    info(...args: unknown[]): void {
         this.#userLogCallback(RpcLog.Level.Information, ...args);
     }
 
-    warn(...args: any[]): void {
+    warn(...args: unknown[]): void {
         this.#userLogCallback(RpcLog.Level.Warning, ...args);
     }
 
-    error(...args: any[]): void {
+    error(...args: unknown[]): void {
         this.#userLogCallback(RpcLog.Level.Error, ...args);
     }
 }
 
-type UserLogCallback = (level: RpcLog.Level, ...args: any[]) => void;
+type UserLogCallback = (level: RpcLog.Level, ...args: unknown[]) => void;
 
 class InvocationContextExtraInputs implements types.InvocationContextExtraInputs {
     #inputs: Record<string, unknown> = {};
