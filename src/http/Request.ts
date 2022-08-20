@@ -67,6 +67,7 @@ export class Request implements HttpRequest {
     /**
      * undici doesn't support this yet, so we'll use our own implementation for now
      */
+    // eslint-disable-next-line @typescript-eslint/require-await
     async formData(): Promise<FormData> {
         const contentType = this.headers.get(HeaderName.contentType);
         if (!contentType) {

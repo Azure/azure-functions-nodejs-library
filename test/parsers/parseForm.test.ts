@@ -10,7 +10,7 @@ describe('parseForm', () => {
     describe('multipart', () => {
         const contentType = 'multipart/form-data; boundary=----WebKitFormBoundaryeJGMO2YP65ZZXRmv';
 
-        it('hello world', async () => {
+        it('hello world', () => {
             const data = Buffer.from(`------WebKitFormBoundaryeJGMO2YP65ZZXRmv
 Content-Disposition: form-data; name="name"
 
@@ -50,7 +50,7 @@ world
 world`);
         });
 
-        it('empty field', async () => {
+        it('empty field', () => {
             const data = Buffer.from(`------WebKitFormBoundaryeJGMO2YP65ZZXRmv
 Content-Disposition: form-data; name="emptyfield"
 
@@ -78,13 +78,13 @@ Content-Type: text/plain
             expect(await file.text()).to.equal('');
         });
 
-        it('empty form', async () => {
+        it('empty form', () => {
             const data = Buffer.from('');
 
             parseForm(data, contentType);
         });
 
-        it('duplicate parts', async () => {
+        it('duplicate parts', () => {
             const data = Buffer.from(`------WebKitFormBoundaryeJGMO2YP65ZZXRmv
 Content-Disposition: form-data; name="dupeField"
 
@@ -119,7 +119,7 @@ value2
             expect(await file.text()).to.equal('  hello  ');
         });
 
-        it('\\n', async () => {
+        it('\\n', () => {
             const data = Buffer.from(
                 `------WebKitFormBoundaryeJGMO2YP65ZZXRmv\nContent-Disposition: form-data; name="hello"\n\nworld\n------WebKitFormBoundaryeJGMO2YP65ZZXRmv--\n`
             );
@@ -129,7 +129,7 @@ value2
             expect(parsedForm.get('hello')).to.equal('world');
         });
 
-        it('\\r\\n', async () => {
+        it('\\r\\n', () => {
             const data = Buffer.from(
                 `------WebKitFormBoundaryeJGMO2YP65ZZXRmv\r\nContent-Disposition: form-data; name="hello"\r\n\r\nworld\r\n------WebKitFormBoundaryeJGMO2YP65ZZXRmv--\r\n`
             );
@@ -156,7 +156,7 @@ Content-Type: text/html; charset=UTF-8
             expect(await file.text()).to.equal('<h1>Hi</h1>');
         });
 
-        it('Missing content-disposition', async () => {
+        it('Missing content-disposition', () => {
             const data = Buffer.from(`------WebKitFormBoundaryeJGMO2YP65ZZXRmv
 Content-oops: form-data; name="name"
 
@@ -167,7 +167,7 @@ Azure Functions
             expect(() => parseForm(data, contentType)).to.throw(/expected.*content-disposition/i);
         });
 
-        it('Missing content-disposition name', async () => {
+        it('Missing content-disposition name', () => {
             const data = Buffer.from(`------WebKitFormBoundaryeJGMO2YP65ZZXRmv
 Content-Disposition: form-data; nameOops="name"
 
@@ -182,7 +182,7 @@ Azure Functions
     describe('urlencoded', () => {
         const contentType = 'application/x-www-form-urlencoded';
 
-        it('hello world', async () => {
+        it('hello world', () => {
             const data = 'name=Azure+Functions&greeting=Hello';
 
             const parsedForm = parseForm(data, contentType);
@@ -195,14 +195,14 @@ Azure Functions
         });
     });
 
-    it('Unsupported content type', async () => {
+    it('Unsupported content type', () => {
         const expectedError = /media type.*does not match/i;
         expect(() => parseForm('', 'application/octet-stream')).to.throw(expectedError);
         expect(() => parseForm('', 'application/json')).to.throw(expectedError);
         expect(() => parseForm('', 'text/plain')).to.throw(expectedError);
     });
 
-    it('Invalid content type', async () => {
+    it('Invalid content type', () => {
         expect(() => parseForm('', 'invalid')).to.throw(/content-type.*format/i);
     });
 });

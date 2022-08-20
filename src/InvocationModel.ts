@@ -33,6 +33,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         this.#bindings = nonNullProp(coreCtx.metadata, 'bindings');
     }
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     async getArguments(): Promise<InvocationArguments> {
         const context = new InvocationContext(
             this.#functionName,
@@ -75,6 +76,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     async getResponse(context: InvocationContext, result: unknown): Promise<RpcInvocationResponse> {
         const response: RpcInvocationResponse = { invocationId: this.#coreCtx.invocationId };
 
