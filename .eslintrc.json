@@ -26,11 +26,8 @@
             2
         ],
         "deprecation/deprecation": "error",
-        "@typescript-eslint/explicit-module-boundary-types": "off",
-        "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-namespace": "off",
-        "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unsafe-argument": "off",
         "@typescript-eslint/no-unsafe-assignment": "off",
         "@typescript-eslint/no-unsafe-call": "off",
@@ -38,13 +35,7 @@
         "@typescript-eslint/no-unsafe-return": "off",
         "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
         "@typescript-eslint/require-await": "off",
-        "@typescript-eslint/restrict-plus-operands": "off",
-        "@typescript-eslint/restrict-template-expressions": "off",
-        "@typescript-eslint/unbound-method": "off",
-        "no-empty": "off",
         "prefer-const": ["error", { "destructuring": "all" }],
-        "prefer-rest-params": "off",
-        "prefer-spread": "off",
         "@typescript-eslint/explicit-member-accessibility": [
             "error", {
                 "accessibility": "no-public"
@@ -55,7 +46,6 @@
         "**/*.js",
         "**/*.mjs",
         "**/*.cjs",
-        "dist",
-        "azure-functions-language-worker-protobuf"
+        "dist"
     ]
 }

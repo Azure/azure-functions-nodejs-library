@@ -30,7 +30,7 @@ npm run updateVersion -- --validate`);
 
 function validateVersion() {
     const packageJson = readJSONSync(packageJsonPath);
-    const packageJsonVersion = packageJson.version;
+    const packageJsonVersion: string = packageJson.version;
 
     const constantsVersion = getVersion(constantsPath, constantsVersionRegex);
 

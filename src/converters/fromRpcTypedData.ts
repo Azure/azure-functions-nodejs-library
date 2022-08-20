@@ -13,7 +13,9 @@ export function fromRpcTypedData(typedData?: RpcTypedData, convertStringToJson =
                 if (str != null) {
                     str = JSON.parse(str);
                 }
-            } catch (err) {}
+            } catch (err) {
+                // ignore
+            }
         }
         return str;
     } else if (typedData.bytes) {
