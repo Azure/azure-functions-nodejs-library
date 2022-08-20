@@ -1,6 +1,65 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult } from './index';
+import { InvocationContext } from './InvocationContext';
+
+export type HttpHandler = (context: InvocationContext, request: HttpRequest) => FunctionResult<HttpResponse>;
+
+export interface HttpFunctionOptions extends HttpInputOptions, Partial<FunctionOptions> {
+    handler: HttpHandler;
+
+    /**
+     * Configuration for the optional primary output of the function. If not set, this will default to a standard http response output
+     * This is the main output that you should set as the return value of the function handler during invocation
+     */
+    return?: FunctionOutput;
+}
+
+export interface HttpInputOptions {
+    /**
+     * The function HTTP authorization level
+     * Defaults to 'anonymous' if not specified
+     */
+    authLevel?: 'anonymous' | 'function' | 'admin';
+
+    /**
+     * An array of the http methods for this http input
+     * Defaults to ["get", "post"] if not specified
+     */
+    methods?: HttpMethod[];
+
+    /**
+     * The route for this http input. If not specified, the function name will be used
+     */
+    route?: string;
+}
+
+export interface HttpInput extends FunctionInput {
+    /**
+     * The function HTTP authorization level.
+     */
+    authLevel: 'anonymous' | 'function' | 'admin';
+
+    /**
+     * An array of the http methods for this http input
+     */
+    methods: HttpMethod[];
+
+    /**
+     * The route for this http input. If not specified, the function name will be used
+     */
+    route?: string;
+}
+
+/**
+ * At this point in time there are no http output specific options
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface HttpOutputOptions {}
+
+export type HttpOutput = FunctionOutput & HttpOutputOptions;
+
 /**
  * HTTP request object. Provided to your function when using HTTP Bindings.
  */

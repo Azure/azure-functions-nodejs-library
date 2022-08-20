@@ -3,7 +3,6 @@
 
 import { Cookie } from '@azure/functions';
 import { RpcHttpCookie, RpcHttpData, RpcNullableString, RpcTypedData } from '@azure/functions-core';
-import { Dict } from '../InvocationContext';
 import {
     fromTypedData,
     toNullableBool,
@@ -31,14 +30,14 @@ export function fromRpcHttpBody(body: RpcTypedData) {
 export function fromNullableMapping(
     nullableMapping: { [k: string]: RpcNullableString } | null | undefined,
     originalMapping?: { [k: string]: string } | null
-): Dict<string> {
+): { [key: string]: string } {
     let converted = {};
     if (nullableMapping && Object.keys(nullableMapping).length > 0) {
         for (const key in nullableMapping) {
             converted[key] = nullableMapping[key].value || '';
         }
     } else if (originalMapping && Object.keys(originalMapping).length > 0) {
-        converted = <Dict<string>>originalMapping;
+        converted = <{ [key: string]: string }>originalMapping;
     }
     return converted;
 }

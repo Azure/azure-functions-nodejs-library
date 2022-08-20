@@ -35,6 +35,7 @@ export async function run(): Promise<void> {
             throw new Error(`${failures} tests failed.`);
         }
     } catch (err) {
+        console.error(err);
         console.error('Test run failed');
         process.exit(1);
     }

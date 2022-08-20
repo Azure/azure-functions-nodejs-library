@@ -11,6 +11,27 @@ declare module '@azure/functions-core' {
     const version: string;
 
     /**
+     * Register a function
+     * This is a preview feature and requires the feature flag `EnableWorkerIndexing` to be set in the app setting `AzureWebJobsFeatureFlags`
+     */
+    function registerFunction(metadata: FunctionMetadata, callback: FunctionCallback): Disposable;
+
+    /**
+     * A slimmed down version of `IRpcFunctionMetadata` that includes the minimum amount of information needed to register a function
+     */
+    interface FunctionMetadata {
+        /**
+         * The function name
+         */
+        name: string;
+
+        /**
+         * A dictionary of binding name to binding info
+         */
+        bindings: { [name: string]: RpcBindingInfo };
+    }
+
+    /**
      * Register a hook to interact with the lifecycle of Azure Functions.
      * Hooks are executed in the order they were registered and will block execution if they throw an error
      */

@@ -14,3 +14,5 @@ export enum MediaType {
     octetStream = 'application/octet-stream',
     json = 'application/json',
 }
+
+export const returnBindingKey = '$return';

@@ -2,69 +2,24 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { ContextBindings, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
-import { RpcInvocationRequest, RpcLog, RpcParameterBinding } from '@azure/functions-core';
+import { RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
+import { RpcInvocationRequest, RpcLog } from '@azure/functions-core';
 import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
-import { fromRpcRetryContext, fromRpcTraceContext, fromTypedData } from './converters/RpcConverters';
-import { FunctionInfo } from './FunctionInfo';
-import { Request } from './http/Request';
-import { Response } from './http/Response';
+import { fromRpcRetryContext, fromRpcTraceContext } from './converters/RpcConverters';
 
-export function CreateContextAndInputs(
-    info: FunctionInfo,
-    request: RpcInvocationRequest,
-    userLogCallback: UserLogCallback
-) {
-    const context = new InvocationContext(info, request, userLogCallback);
-
-    const bindings: ContextBindings = {};
-    const inputs: any[] = [];
-    let httpInput: Request | undefined;
-    for (const binding of <RpcParameterBinding[]>request.inputData) {
-        if (binding.data && binding.name) {
-            let input;
-            if (binding.data && binding.data.http) {
-                input = httpInput = new Request(binding.data.http);
-            } else {
-                // TODO: Don't hard code fix for camelCase https://github.com/Azure/azure-functions-nodejs-worker/issues/188
-                if (info.getTimerTriggerName() === binding.name) {
-                    // v2 worker converts timer trigger object to camelCase
-                    input = convertKeysToCamelCase(binding)['data'];
-                } else {
-                    input = fromTypedData(binding.data);
-                }
-            }
-            bindings[binding.name] = input;
-            inputs.push(input);
-        }
-    }
-
-    context.bindings = bindings;
-    if (httpInput) {
-        context.req = httpInput;
-        context.res = new Response();
-    }
-
-    return {
-        context: <types.InvocationContext>context,
-        inputs: inputs,
-    };
-}
-
-class InvocationContext implements types.InvocationContext {
+export class InvocationContext implements types.InvocationContext {
     invocationId: string;
     functionName: string;
-    bindings: ContextBindings;
     triggerMetadata: TriggerMetadata;
     traceContext?: TraceContext;
     retryContext?: RetryContext;
-    req?: Request;
-    res?: Response;
+    extraInputs: InvocationContextExtraInputs;
+    extraOutputs: InvocationContextExtraOutputs;
     #userLogCallback: UserLogCallback;
 
-    constructor(info: FunctionInfo, request: RpcInvocationRequest, userLogCallback: UserLogCallback) {
+    constructor(functionName: string, request: RpcInvocationRequest, userLogCallback: UserLogCallback) {
         this.invocationId = <string>request.invocationId;
-        this.functionName = info.name;
+        this.functionName = functionName;
         this.triggerMetadata = request.triggerMetadata ? convertKeysToCamelCase(request.triggerMetadata) : {};
         if (request.retryContext) {
             this.retryContext = fromRpcRetryContext(request.retryContext);
@@ -73,8 +28,8 @@ class InvocationContext implements types.InvocationContext {
             this.traceContext = fromRpcTraceContext(request.traceContext);
         }
         this.#userLogCallback = userLogCallback;
-
-        this.bindings = {};
+        this.extraInputs = new InvocationContextExtraInputs();
+        this.extraOutputs = new InvocationContextExtraOutputs();
     }
 
     log(...args: any[]): void {
@@ -102,13 +57,28 @@ class InvocationContext implements types.InvocationContext {
     }
 }
 
-export interface InvocationResult {
-    return: any;
-    bindings: ContextBindings;
+type UserLogCallback = (level: RpcLog.Level, ...args: any[]) => void;
+
+class InvocationContextExtraInputs implements types.InvocationContextExtraInputs {
+    #inputs: { [name: string]: unknown } = {};
+    get(inputOrName: types.FunctionInput | string): any {
+        const name = typeof inputOrName === 'string' ? inputOrName : inputOrName.name;
+        return this.#inputs[name];
+    }
+    set(inputOrName: types.FunctionInput | string, value: unknown): void {
+        const name = typeof inputOrName === 'string' ? inputOrName : inputOrName.name;
+        this.#inputs[name] = value;
+    }
 }
 
-export type UserLogCallback = (level: RpcLog.Level, ...args: any[]) => void;
-
-export interface Dict<T> {
-    [key: string]: T;
+class InvocationContextExtraOutputs implements types.InvocationContextExtraOutputs {
+    #outputs: { [name: string]: unknown } = {};
+    get(outputOrName: types.FunctionOutput | string): unknown {
+        const name = typeof outputOrName === 'string' ? outputOrName : outputOrName.name;
+        return this.#outputs[name];
+    }
+    set(outputOrName: types.FunctionOutput | string, value: unknown): void {
+        const name = typeof outputOrName === 'string' ? outputOrName : outputOrName.name;
+        this.#outputs[name] = value;
+    }
 }

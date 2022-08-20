@@ -1,11 +1,13 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { HttpRequest } from './http';
+import { HttpInput, HttpOutput, HttpRequest, HttpResponse } from './http';
+import { FunctionInput, FunctionOutput } from './index';
+import { StorageBlobInput, StorageBlobOutput, StorageQueueInput, StorageQueueOutput } from './storage';
+import { Timer, TimerInput } from './timer';
 
 /**
- * The context object can be used for writing logs, reading data from bindings, and setting outputs. A context object is passed
- * to your function from the Azure Functions runtime on function invocation.
+ * Contains metadata and helper methods specific to this invocation
  */
 export interface InvocationContext {
     /**
@@ -17,6 +19,16 @@ export interface InvocationContext {
      * The name of the function that is being invoked
      */
     functionName: string;
+
+    /**
+     * An object used to get secondary inputs
+     */
+    extraInputs: InvocationContextExtraInputs;
+
+    /**
+     * An object used to set secondary outputs
+     */
+    extraOutputs: InvocationContextExtraOutputs;
 
     /**
      * The recommended way to log data during invocation.
@@ -69,24 +81,87 @@ export interface InvocationContext {
      * TraceContext information to enable distributed tracing scenarios
      */
     traceContext?: TraceContext;
+}
+
+/**
+ * An object used to get secondary inputs
+ */
+export interface InvocationContextExtraInputs {
+    /**
+     * Get a secondary http request input for this invocation
+     * @input the configuration object for this http input
+     */
+    get(input: HttpInput): HttpRequest;
 
     /**
-     * Input and trigger binding data, as defined in function.json. Properties on this object are dynamically
-     * generated and named based off of the "name" property in function.json.
+     * Get a secondary timer metadata input for this invocation
+     * @input the configuration object for this timer input
      */
-    bindings: ContextBindings;
+    get(input: TimerInput): Timer;
 
     /**
-     * HTTP request object. Provided to your function when using HTTP Bindings.
+     * Get a secondary storage blob entry input for this invocation
+     * @input the configuration object for this storage blob input
      */
-    req?: HttpRequest;
+    get(input: StorageBlobInput): unknown;
 
     /**
-     * HTTP response object. Provided to your function when using HTTP Bindings.
+     * Get a secondary storage queue entry input for this invocation
+     * @input the configuration object for this storage queue input
      */
-    res?: {
-        [key: string]: any;
-    };
+    get(input: StorageQueueInput): unknown;
+
+    /**
+     * Get a secondary generic input for this invocation
+     * @outputOrName the configuration object or name for this input
+     */
+    get(inputOrName: FunctionInput | string): unknown;
+
+    /**
+     * Set a secondary generic input for this invocation
+     * @outputOrName the configuration object or name for this input
+     * @value the input value
+     */
+    set(inputOrName: FunctionInput | string, value: unknown): void;
+}
+
+/**
+ * An object used to set secondary outputs
+ */
+export interface InvocationContextExtraOutputs {
+    /**
+     * Set a secondary http response output for this invocation
+     * @output the configuration object for this http output
+     * @response the http response output value
+     */
+    set(output: HttpOutput, response: HttpResponse): void;
+
+    /**
+     * Set a secondary storage blob entry output for this invocation
+     * @output the configuration object for this storage blob output
+     * @blob the blob output value
+     */
+    set(output: StorageBlobOutput, blob: unknown): void;
+
+    /**
+     * Set a secondary storage queue entry output for this invocation
+     * @output the configuration object for this storage queue output
+     * @queueItem the queue entry output value
+     */
+    set(output: StorageQueueOutput, queueItem: unknown): void;
+
+    /**
+     * Set a secondary generic output for this invocation
+     * @outputOrName the configuration object or name for this output
+     * @value the output value
+     */
+    set(outputOrName: FunctionOutput | string, value: unknown): void;
+
+    /**
+     * Get a secondary generic output for this invocation
+     * @outputOrName the configuration object or name for this output
+     */
+    get(outputOrName: FunctionOutput | string): unknown;
 }
 
 /**
@@ -139,11 +214,4 @@ export interface TraceContext {
      * Holds additional properties being sent as part of request telemetry
      */
     attributes?: { [k: string]: string };
-}
-
-/**
- * Context bindings object. Provided to your function binding data, as defined in function.json.
- */
-export interface ContextBindings {
-    [name: string]: any;
 }
