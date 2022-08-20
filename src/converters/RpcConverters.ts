@@ -78,27 +78,24 @@ export function fromRpcTraceContext(traceContext: RpcTraceContext): TraceContext
     return result;
 }
 
-/**
- * Converts JavaScript type data to 'ITypedData' to be sent through the RPC layer
- * TypedData can be string, json, or bytes
- * @param inputObject A JavaScript object that is a string, Buffer, ArrayBufferView, number, or object.
- */
-export function toTypedData(inputObject): RpcTypedData {
-    if (typeof inputObject === 'string') {
-        return { string: inputObject };
-    } else if (Buffer.isBuffer(inputObject)) {
-        return { bytes: inputObject };
-    } else if (ArrayBuffer.isView(inputObject)) {
-        const bytes = new Uint8Array(inputObject.buffer, inputObject.byteOffset, inputObject.byteLength);
+export function toRpcTypedData(data: unknown): RpcTypedData | null | undefined {
+    if (data === null || data === undefined) {
+        return data;
+    } else if (typeof data === 'string') {
+        return { string: data };
+    } else if (Buffer.isBuffer(data)) {
+        return { bytes: data };
+    } else if (ArrayBuffer.isView(data)) {
+        const bytes = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
         return { bytes: bytes };
-    } else if (typeof inputObject === 'number') {
-        if (Number.isInteger(inputObject)) {
-            return { int: inputObject };
+    } else if (typeof data === 'number') {
+        if (Number.isInteger(data)) {
+            return { int: data };
         } else {
-            return { double: inputObject };
+            return { double: data };
         }
     } else {
-        return { json: JSON.stringify(inputObject) };
+        return { json: JSON.stringify(data) };
     }
 }
 

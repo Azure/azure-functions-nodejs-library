@@ -14,7 +14,7 @@ import {
 import { format } from 'util';
 import { returnBindingKey } from './constants';
 import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
-import { fromTypedData, toTypedData } from './converters/RpcConverters';
+import { fromTypedData, toRpcTypedData } from './converters/RpcConverters';
 import { toRpcHttp } from './converters/RpcHttpConverters';
 import { Request } from './http/Request';
 import { InvocationContext } from './InvocationContext';
@@ -94,11 +94,11 @@ export class InvocationModel implements coreTypes.InvocationModel {
         return response;
     }
 
-    #convertOutput(binding: RpcBindingInfo, value: unknown): RpcTypedData {
+    #convertOutput(binding: RpcBindingInfo, value: unknown): RpcTypedData | null | undefined {
         if (binding.type?.toLowerCase() === 'http') {
             return toRpcHttp(value);
         } else {
-            return toTypedData(value);
+            return toRpcTypedData(value);
         }
     }
 

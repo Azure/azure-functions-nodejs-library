@@ -3,7 +3,7 @@
 
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
-import { FormData, Headers } from 'undici';
+import { FormData, Headers, HeadersInit } from 'undici';
 import { URLSearchParams } from 'url';
 import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult } from './index';
 import { InvocationContext } from './InvocationContext';
@@ -187,129 +187,29 @@ export type HttpMethod = 'GET' | 'POST' | 'DELETE' | 'HEAD' | 'PATCH' | 'PUT' | 
  */
 export type HttpRequestUserType = 'AppService' | 'StaticWebApps';
 
-/**
- * Http response object and methods.
- * This is the default of the res property in the Context object provided to your function when using HTTP triggers.
- */
-export interface HttpResponseFull {
-    /**
-     * HTTP response headers.
-     */
-    headers?: HttpResponseHeaders;
+export type HttpResponseBody = string | Buffer | NodeJS.ArrayBufferView | number | object;
 
+export interface HttpResponse {
     /**
-     *  HTTP response cookies.
+     * HTTP response body
      */
-    cookies?: Cookie[];
-
-    /**
-     * HTTP response body.
-     */
-    body?: any;
-
-    /**
-     * HTTP response status code.
-     * @default 200
-     */
-    statusCode?: number | string;
-
-    /**
-     * Enable content negotiation of response body if true
-     * If false, treat response body as raw
-     * @default false
-     */
-    enableContentNegotiation?: boolean;
-
-    /**
-     * Sets the HTTP response status code
-     * @returns the updated HttpResponseFull instance
-     */
-    status: (statusCode: number | string) => HttpResponseFull;
-
-    /**
-     * Sets a particular header field to a value
-     * @returns the updated HttpResponseFull instance
-     */
-    setHeader(field: string, val: any): HttpResponseFull;
-
-    /**
-     * Has the same functionality as setHeader.
-     * Sets a particular header field to a value
-     * @returns the updated HttpResponseFull instance
-     */
-    header(field: string, val: any): HttpResponseFull;
-
-    /**
-     * Has the same functionality as setHeader.
-     * Sets a particular header field to a value
-     * @returns the updated HttpResponseFull instance
-     */
-    set(field: string, val: any): HttpResponseFull;
-
-    /**
-     * Get the value of a particular header field
-     */
-    getHeader(field: string): any;
-
-    /**
-     * Has the same functionality as getHeader
-     * Get the value of a particular header field
-     */
-    get(field: string): any;
-
-    /**
-     * Removes a particular header field
-     * @returns the updated HttpResponseFull instance
-     */
-    removeHeader(field: string): HttpResponseFull;
-
-    /**
-     * Set the 'Content-Type' header to a particular value
-     * @returns the updated HttpResponseFull instance
-     */
-    type(type: string): HttpResponseFull;
-}
-
-/**
- * HTTP response headers.
- */
-export interface HttpResponseHeaders {
-    [name: string]: string;
-}
-
-/**
- * Http response object.
- * This is not the default on the Context object, but you may replace context.res with an object of this type when using HTTP triggers.
- */
-export interface HttpResponseSimple {
-    /**
-     * HTTP response headers.
-     */
-    headers?: HttpResponseHeaders;
-
-    /**
-     *  HTTP response cookies.
-     */
-    cookies?: Cookie[];
-
-    /**
-     * HTTP response body.
-     */
-    body?: any;
-
-    /**
-     * HTTP response status code.
-     * This property takes precedence over the `status` property
-     * @default 200
-     */
-    statusCode?: number | string;
+    body?: HttpResponseBody;
 
     /**
      * HTTP response status code
-     * The same as `statusCode`. This property is ignored if `statusCode` is set
      * @default 200
      */
-    status?: number | string;
+    status?: number;
+
+    /**
+     * HTTP response headers
+     */
+    headers?: HeadersInit;
+
+    /**
+     *  HTTP response cookies
+     */
+    cookies?: Cookie[];
 
     /**
      * Enable content negotiation of response body if true
@@ -318,11 +218,6 @@ export interface HttpResponseSimple {
      */
     enableContentNegotiation?: boolean;
 }
-
-/**
- * Http response type.
- */
-export type HttpResponse = HttpResponseSimple | HttpResponseFull;
 
 /**
  * Http response cookie object to "Set-Cookie"

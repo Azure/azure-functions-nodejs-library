@@ -5,18 +5,18 @@ import { Cookie } from '@azure/functions';
 import { RpcHttpCookie } from '@azure/functions-core';
 import { expect } from 'chai';
 import 'mocha';
-import { toRpcHttp, toRpcHttpCookieList } from '../../src/converters/RpcHttpConverters';
+import { toRpcHttp, toRpcHttpCookie } from '../../src/converters/RpcHttpConverters';
 
-describe('Rpc Converters', () => {
+describe('Rpc Http Converters', () => {
     /** NullableBool */
     it('converts http cookies', () => {
-        const cookieInputs = [
+        const cookieInputs: Cookie[] = [
             {
                 name: 'mycookie',
                 value: 'myvalue',
                 maxAge: 200000,
             },
-            {
+            <any>{
                 name: 'mycookie2',
                 value: 'myvalue2',
                 path: '/',
@@ -29,7 +29,7 @@ describe('Rpc Converters', () => {
             },
         ];
 
-        const rpcCookies = toRpcHttpCookieList(<Cookie[]>cookieInputs);
+        const rpcCookies = cookieInputs.map(toRpcHttpCookie);
         expect(rpcCookies[0].name).to.equal('mycookie');
         expect(rpcCookies[0].value).to.equal('myvalue');
         expect((<any>rpcCookies[0].maxAge).value).to.equal(200000);
@@ -67,7 +67,7 @@ describe('Rpc Converters', () => {
             },
         ];
 
-        const rpcCookies = toRpcHttpCookieList(cookieInputs);
+        const rpcCookies = cookieInputs.map(toRpcHttpCookie);
         expect(rpcCookies[0].name).to.equal('none-cookie');
         expect(rpcCookies[0].sameSite).to.equal(RpcHttpCookie.SameSite.ExplicitNone);
 
@@ -83,7 +83,7 @@ describe('Rpc Converters', () => {
 
     it('throws on invalid input', () => {
         expect(() => {
-            const cookieInputs = [
+            const cookieInputs: any[] = [
                 {
                     name: 123,
                     value: 'myvalue',
@@ -107,25 +107,15 @@ describe('Rpc Converters', () => {
                 },
             ];
 
-            toRpcHttpCookieList(<Cookie[]>cookieInputs);
+            cookieInputs.map(toRpcHttpCookie);
         }).to.throw('');
-    });
-
-    it('throws on array as http response', () => {
-        expect(() => {
-            const response = ['one', 2, '3'];
-            toRpcHttp(response);
-        }).to.throw(
-            "The HTTP response must be an 'object' type that can include properties such as 'body', 'status', and 'headers'. Learn more: https://go.microsoft.com/fwlink/?linkid=2112563"
-        );
     });
 
     it('throws on string as http response', () => {
         expect(() => {
-            const response = 'My output string';
-            toRpcHttp(response);
+            toRpcHttp('My output string');
         }).to.throw(
-            "The HTTP response must be an 'object' type that can include properties such as 'body', 'status', and 'headers'. Learn more: https://go.microsoft.com/fwlink/?linkid=2112563"
+            'The HTTP response must be an object with optional properties "body", "status", "headers", and "cookies".'
         );
     });
 });
