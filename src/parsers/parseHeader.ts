@@ -77,7 +77,7 @@ function parseHeaderParams(data: string): HeaderParams {
 }
 
 export class HeaderParams {
-    #params: { [name: string]: string } = {};
+    #params: Record<string, string> = {};
     get(name: string): string {
         const result = this.#params[name.toLowerCase()];
         if (result === undefined) {

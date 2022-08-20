@@ -60,7 +60,7 @@ export class InvocationContext implements types.InvocationContext {
 type UserLogCallback = (level: RpcLog.Level, ...args: any[]) => void;
 
 class InvocationContextExtraInputs implements types.InvocationContextExtraInputs {
-    #inputs: { [name: string]: unknown } = {};
+    #inputs: Record<string, unknown> = {};
     get(inputOrName: types.FunctionInput | string): any {
         const name = typeof inputOrName === 'string' ? inputOrName : inputOrName.name;
         return this.#inputs[name];
@@ -72,7 +72,7 @@ class InvocationContextExtraInputs implements types.InvocationContextExtraInputs
 }
 
 class InvocationContextExtraOutputs implements types.InvocationContextExtraOutputs {
-    #outputs: { [name: string]: unknown } = {};
+    #outputs: Record<string, unknown> = {};
     get(outputOrName: types.FunctionOutput | string): unknown {
         const name = typeof outputOrName === 'string' ? outputOrName : outputOrName.name;
         return this.#outputs[name];

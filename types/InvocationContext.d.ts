@@ -213,5 +213,5 @@ export interface TraceContext {
     /**
      * Holds additional properties being sent as part of request telemetry
      */
-    attributes?: { [k: string]: string };
+    attributes?: Record<string, string>;
 }

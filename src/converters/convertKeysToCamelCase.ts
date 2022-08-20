@@ -4,7 +4,7 @@
 import { fromRpcTypedData } from './fromRpcTypedData';
 
 // Recursively convert keys of objects to camel case
-export function convertKeysToCamelCase(obj: any): { [key: string]: any } {
+export function convertKeysToCamelCase(obj: any): Record<string, any> {
     const output = {};
     for (const key in obj) {
         // Only "undefined" will be replaced with original object property. For example:

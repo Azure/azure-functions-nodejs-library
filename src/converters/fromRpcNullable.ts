@@ -4,16 +4,16 @@
 import { RpcNullableString } from '@azure/functions-core';
 
 export function fromNullableMapping(
-    nullableMapping: { [k: string]: RpcNullableString } | null | undefined,
-    originalMapping?: { [k: string]: string } | null
-): { [key: string]: string } {
+    nullableMapping: Record<string, RpcNullableString> | null | undefined,
+    originalMapping?: Record<string, string> | null
+): Record<string, string> {
     let converted = {};
     if (nullableMapping && Object.keys(nullableMapping).length > 0) {
         for (const key in nullableMapping) {
             converted[key] = nullableMapping[key].value || '';
         }
     } else if (originalMapping && Object.keys(originalMapping).length > 0) {
-        converted = <{ [key: string]: string }>originalMapping;
+        converted = originalMapping;
     }
     return converted;
 }

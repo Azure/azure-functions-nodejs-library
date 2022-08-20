@@ -205,7 +205,7 @@ export namespace input {
         };
     }
 
-    export function generic(type: string, options: {}): FunctionInput {
+    export function generic(type: string, options: Record<string, unknown>): FunctionInput {
         return {
             ...options,
             name: getNewInputName(),
@@ -239,7 +239,7 @@ export namespace output {
         };
     }
 
-    export function generic(type: string, options: {}): FunctionOutput {
+    export function generic(type: string, options: Record<string, unknown>): FunctionOutput {
         return {
             ...options,
             name: getNewOutputName(),

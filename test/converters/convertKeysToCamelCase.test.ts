@@ -8,7 +8,7 @@ import { convertKeysToCamelCase } from '../../src/converters/convertKeysToCamelC
 
 describe('convertKeysToCamelCase', () => {
     it('normalizes common trigger metadata for HTTP', () => {
-        const testData: { [k: string]: RpcTypedData } = {
+        const testData: Record<string, RpcTypedData> = {
             Headers: {
                 json: JSON.stringify({ Connection: 'Keep-Alive' }),
             },
@@ -56,7 +56,7 @@ describe('convertKeysToCamelCase', () => {
     });
 
     it('normalizes trigger metadata containing arrays', () => {
-        const testData: { [k: string]: RpcTypedData } = {
+        const testData: Record<string, RpcTypedData> = {
             EnqueuedMessages: {
                 json: JSON.stringify(['Hello 1', 'Hello 2']),
             },

@@ -25,7 +25,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
     #isDone = false;
     #coreCtx: CoreInvocationContext;
     #functionName: string;
-    #bindings: { [key: string]: RpcBindingInfo };
+    #bindings: Record<string, RpcBindingInfo>;
 
     constructor(coreCtx: CoreInvocationContext) {
         this.#coreCtx = coreCtx;
