@@ -107,7 +107,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
     }
 
     #log(level: RpcLog.Level, logCategory: RpcLog.RpcLogCategory, ...args: unknown[]): void {
-        this.#coreCtx.log(level, logCategory, format(null, ...args));
+        this.#coreCtx.log(level, logCategory, format(...args));
     }
 
     #systemLog(level: RpcLog.Level, ...args: unknown[]) {
