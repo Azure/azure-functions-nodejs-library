@@ -20,6 +20,18 @@ import {
 } from './http';
 import { InvocationContext } from './InvocationContext';
 import {
+    ServiceBusQueueFunctionOptions,
+    ServiceBusQueueOutput,
+    ServiceBusQueueOutputOptions,
+    ServiceBusQueueTrigger,
+    ServiceBusQueueTriggerOptions,
+    ServiceBusTopicFunctionOptions,
+    ServiceBusTopicOutput,
+    ServiceBusTopicOutputOptions,
+    ServiceBusTopicTrigger,
+    ServiceBusTopicTriggerOptions,
+} from './serviceBus';
+import {
     StorageBlobFunctionOptions,
     StorageBlobInput,
     StorageBlobInputOptions,
@@ -38,6 +50,7 @@ import { TimerFunctionOptions, TimerTrigger, TimerTriggerOptions } from './timer
 export * from './cosmosDB';
 export * from './http';
 export * from './InvocationContext';
+export * from './serviceBus';
 export * from './storage';
 export * from './timer';
 
@@ -130,18 +143,32 @@ export namespace app {
     export function timer(name: string, options: TimerFunctionOptions): void;
 
     /**
-     * Registers a blob function in your app that will be triggered whenever an item is added to a storage blob path
+     * Registers a function in your app that will be triggered whenever an item is added to a storage blob path
      * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function storageBlob(name: string, options: StorageBlobFunctionOptions): void;
 
     /**
-     * Registers a queue function in your app that will be triggered whenever an item is added to a storage queue
+     * Registers a function in your app that will be triggered whenever an item is added to a storage queue
      * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function storageQueue(name: string, options: StorageQueueFunctionOptions): void;
+
+    /**
+     * Registers a function in your app that will be triggered whenever a message is added to a service bus queue
+     * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+     * @param options Configuration options describing the inputs, outputs, and handler for this function
+     */
+    export function serviceBusQueue(name: string, options: ServiceBusQueueFunctionOptions): void;
+
+    /**
+     * Registers a function in your app that will be triggered whenever a message is added to a service bus topic
+     * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+     * @param options Configuration options describing the inputs, outputs, and handler for this function
+     */
+    export function serviceBusTopic(name: string, options: ServiceBusTopicFunctionOptions): void;
 
     /**
      * Registers a Cosmos DB function in your app that will be triggered whenever inserts and updates occur (not deletions)
@@ -166,6 +193,8 @@ export namespace trigger {
     export function timer(options: TimerTriggerOptions): TimerTrigger;
     export function storageBlob(options: StorageBlobTriggerOptions): StorageBlobTrigger;
     export function storageQueue(options: StorageQueueTriggerOptions): StorageQueueTrigger;
+    export function serviceBusQueue(options: ServiceBusQueueTriggerOptions): ServiceBusQueueTrigger;
+    export function serviceBusTopic(options: ServiceBusTopicTriggerOptions): ServiceBusTopicTrigger;
     export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
     export function generic(options: { type: string }): FunctionTrigger;
 }
@@ -187,6 +216,8 @@ export namespace output {
     export function http(options: HttpOutputOptions): HttpOutput;
     export function storageBlob(options: StorageBlobOutputOptions): StorageBlobOutput;
     export function storageQueue(options: StorageQueueOutputOptions): StorageQueueOutput;
+    export function serviceBusQueue(options: ServiceBusQueueOutputOptions): ServiceBusQueueOutput;
+    export function serviceBusTopic(options: ServiceBusTopicOutputOptions): ServiceBusTopicOutput;
     export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput;
     export function generic(options: { type: string }): FunctionOutput;
 }

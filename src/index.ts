@@ -19,6 +19,16 @@ import {
     HttpOutputOptions,
     HttpTrigger,
     HttpTriggerOptions,
+    ServiceBusQueueFunctionOptions,
+    ServiceBusQueueOutput,
+    ServiceBusQueueOutputOptions,
+    ServiceBusQueueTrigger,
+    ServiceBusQueueTriggerOptions,
+    ServiceBusTopicFunctionOptions,
+    ServiceBusTopicOutput,
+    ServiceBusTopicOutputOptions,
+    ServiceBusTopicTrigger,
+    ServiceBusTopicTriggerOptions,
     StorageBlobFunctionOptions,
     StorageBlobInput,
     StorageBlobInputOptions,
@@ -135,6 +145,29 @@ export namespace app {
         });
     }
 
+    export function serviceBusQueue(name: string, options: ServiceBusQueueFunctionOptions): void {
+        generic(name, {
+            trigger: trigger.serviceBusQueue({
+                connection: options.connection,
+                queueName: options.queueName,
+                isSessionsEnabled: options.isSessionsEnabled,
+            }),
+            ...options,
+        });
+    }
+
+    export function serviceBusTopic(name: string, options: ServiceBusTopicFunctionOptions): void {
+        generic(name, {
+            trigger: trigger.serviceBusTopic({
+                connection: options.connection,
+                topicName: options.topicName,
+                subscriptionName: options.subscriptionName,
+                isSessionsEnabled: options.isSessionsEnabled,
+            }),
+            ...options,
+        });
+    }
+
     export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
         generic(name, {
             trigger: trigger.cosmosDB({
@@ -234,6 +267,22 @@ export namespace trigger {
         };
     }
 
+    export function serviceBusQueue(options: ServiceBusQueueTriggerOptions): ServiceBusQueueTrigger {
+        return {
+            ...options,
+            name: getNewTriggerName(),
+            type: 'serviceBusTrigger',
+        };
+    }
+
+    export function serviceBusTopic(options: ServiceBusTopicTriggerOptions): ServiceBusTopicTrigger {
+        return {
+            ...options,
+            name: getNewTriggerName(),
+            type: 'serviceBusTrigger',
+        };
+    }
+
     export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
         return {
             ...options,
@@ -299,6 +348,22 @@ export namespace output {
             ...options,
             name: getNewOutputName(),
             type: 'queue',
+        };
+    }
+
+    export function serviceBusQueue(options: ServiceBusQueueOutputOptions): ServiceBusQueueOutput {
+        return {
+            ...options,
+            name: getNewOutputName(),
+            type: 'serviceBus',
+        };
+    }
+
+    export function serviceBusTopic(options: ServiceBusTopicOutputOptions): ServiceBusTopicOutput {
+        return {
+            ...options,
+            name: getNewOutputName(),
+            type: 'serviceBus',
         };
     }
 

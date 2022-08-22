@@ -4,6 +4,7 @@
 import { CosmosDBInput, CosmosDBOutput } from './cosmosDB';
 import { HttpOutput, HttpResponse } from './http';
 import { FunctionInput, FunctionOutput } from './index';
+import { ServiceBusQueueOutput, ServiceBusTopicOutput } from './serviceBus';
 import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './storage';
 
 /**
@@ -144,6 +145,20 @@ export interface InvocationContextExtraOutputs {
      * @documents the output documents value
      */
     set(output: CosmosDBOutput, documents: unknown[]): void;
+
+    /**
+     * Set a secondary Service Bus queue output for this invocation
+     * @output the configuration object for this Service Bus output
+     * @message the output message value
+     */
+    set(output: ServiceBusQueueOutput, message: unknown): void;
+
+    /**
+     * Set a secondary Service Bus topic output for this invocation
+     * @output the configuration object for this Service Bus output
+     * @message the output message value
+     */
+    set(output: ServiceBusTopicOutput, message: unknown): void;
 
     /**
      * Set a secondary generic output for this invocation

@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult } from './index';
+import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
 export type CosmosDBHandler = (context: InvocationContext, documents: unknown[]) => FunctionResult;
@@ -89,7 +89,7 @@ export interface CosmosDBTriggerOptions extends CosmosDBInputOptions {
      */
     leaseCollectionPrefix?: string;
 }
-export type CosmosDBTrigger = FunctionInput & CosmosDBTriggerOptions;
+export type CosmosDBTrigger = FunctionTrigger & CosmosDBTriggerOptions;
 
 /**
  * Full docs and examples:
