@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import { CosmosDBInput, CosmosDBOutput } from './cosmosDB';
 import { HttpOutput, HttpResponse } from './http';
 import { FunctionInput, FunctionOutput } from './index';
 import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './storage';
@@ -93,6 +94,12 @@ export interface InvocationContextExtraInputs {
     get(input: StorageBlobInput): unknown;
 
     /**
+     * Get a secondary Cosmos DB documents input for this invocation
+     * @input the configuration object for this Cosmos DB input
+     */
+    get(input: CosmosDBInput): unknown[];
+
+    /**
      * Get a secondary generic input for this invocation
      * @outputOrName the configuration object or name for this input
      */
@@ -130,6 +137,13 @@ export interface InvocationContextExtraOutputs {
      * @queueItem the queue entry output value
      */
     set(output: StorageQueueOutput, queueItem: unknown): void;
+
+    /**
+     * Set a secondary Cosmos DB documents output for this invocation
+     * @output the configuration object for this Cosmos DB output
+     * @documents the output documents value
+     */
+    set(output: CosmosDBOutput, documents: unknown[]): void;
 
     /**
      * Set a secondary generic output for this invocation

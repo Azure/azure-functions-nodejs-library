@@ -2,6 +2,15 @@
 // Licensed under the MIT License.
 
 import {
+    CosmosDBFunctionOptions,
+    CosmosDBInput,
+    CosmosDBInputOptions,
+    CosmosDBOutput,
+    CosmosDBOutputOptions,
+    CosmosDBTrigger,
+    CosmosDBTriggerOptions,
+} from './cosmosDB';
+import {
     HttpFunctionOptions,
     HttpHandler,
     HttpOutput,
@@ -26,6 +35,7 @@ import {
 } from './storage';
 import { TimerFunctionOptions, TimerTrigger, TimerTriggerOptions } from './timer';
 
+export * from './cosmosDB';
 export * from './http';
 export * from './InvocationContext';
 export * from './storage';
@@ -134,6 +144,13 @@ export namespace app {
     export function storageQueue(name: string, options: StorageQueueFunctionOptions): void;
 
     /**
+     * Registers a Cosmos DB function in your app that will be triggered whenever inserts and updates occur (not deletions)
+     * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+     * @param options Configuration options describing the inputs, outputs, and handler for this function
+     */
+    export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
+
+    /**
      * Registers a generic function in your app that will be triggered based on the `triggerType`
      * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
      * @param options Configuration options describing the inputs, outputs, and handler for this function
@@ -149,6 +166,7 @@ export namespace trigger {
     export function timer(options: TimerTriggerOptions): TimerTrigger;
     export function storageBlob(options: StorageBlobTriggerOptions): StorageBlobTrigger;
     export function storageQueue(options: StorageQueueTriggerOptions): StorageQueueTrigger;
+    export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
     export function generic(options: { type: string }): FunctionTrigger;
 }
 
@@ -158,6 +176,7 @@ export namespace trigger {
  */
 export namespace input {
     export function storageBlob(options: StorageBlobInputOptions): StorageBlobInput;
+    export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput;
     export function generic(options: { type: string }): FunctionInput;
 }
 
@@ -168,6 +187,7 @@ export namespace output {
     export function http(options: HttpOutputOptions): HttpOutput;
     export function storageBlob(options: StorageBlobOutputOptions): StorageBlobOutput;
     export function storageQueue(options: StorageQueueOutputOptions): StorageQueueOutput;
+    export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput;
     export function generic(options: { type: string }): FunctionOutput;
 }
 

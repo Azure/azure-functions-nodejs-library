@@ -2,6 +2,13 @@
 // Licensed under the MIT License.
 
 import {
+    CosmosDBFunctionOptions,
+    CosmosDBInput,
+    CosmosDBInputOptions,
+    CosmosDBOutput,
+    CosmosDBOutputOptions,
+    CosmosDBTrigger,
+    CosmosDBTriggerOptions,
     FunctionInput,
     FunctionOptions,
     FunctionOutput,
@@ -88,43 +95,63 @@ export namespace app {
     export function http(name: string, options: HttpFunctionOptions): void {
         options.return ||= output.http({});
         generic(name, {
-            ...options,
             trigger: trigger.http({
                 authLevel: options.authLevel,
                 methods: options.methods,
                 route: options.route,
             }),
+            ...options,
         });
     }
 
     export function timer(name: string, options: TimerFunctionOptions): void {
         generic(name, {
-            ...options,
             trigger: trigger.timer({
                 schedule: options.schedule,
                 runOnStartup: options.runOnStartup,
                 useMonitor: options.useMonitor,
             }),
+            ...options,
         });
     }
 
     export function storageBlob(name: string, options: StorageBlobFunctionOptions): void {
         generic(name, {
-            ...options,
             trigger: trigger.storageBlob({
                 connection: options.connection,
                 path: options.path,
             }),
+            ...options,
         });
     }
 
     export function storageQueue(name: string, options: StorageQueueFunctionOptions): void {
         generic(name, {
-            ...options,
             trigger: trigger.storageQueue({
                 connection: options.connection,
                 queueName: options.queueName,
             }),
+            ...options,
+        });
+    }
+
+    export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
+        generic(name, {
+            trigger: trigger.cosmosDB({
+                collectionName: options.collectionName,
+                connectionStringSetting: options.connectionStringSetting,
+                createLeaseCollectionIfNotExists: options.createLeaseCollectionIfNotExists,
+                databaseName: options.databaseName,
+                id: options.id,
+                leaseCollectionName: options.leaseCollectionName,
+                leaseCollectionPrefix: options.leaseCollectionPrefix,
+                leaseCollectionThroughput: options.leaseCollectionThroughput,
+                leaseConnectionStringSetting: options.leaseConnectionStringSetting,
+                leaseDatabaseName: options.leaseDatabaseName,
+                partitionKey: options.partitionKey,
+                sqlQuery: options.sqlQuery,
+            }),
+            ...options,
         });
     }
 
@@ -207,6 +234,14 @@ export namespace trigger {
         };
     }
 
+    export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
+        return {
+            ...options,
+            name: getNewTriggerName(),
+            type: 'cosmosDBTrigger',
+        };
+    }
+
     export function generic(type: string, options: Record<string, unknown>): FunctionInput {
         return {
             ...options,
@@ -222,6 +257,14 @@ export namespace input {
             ...options,
             name: getNewInputName(),
             type: 'blob',
+        };
+    }
+
+    export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput {
+        return {
+            ...options,
+            name: getNewInputName(),
+            type: 'cosmosDB',
         };
     }
 
@@ -256,6 +299,14 @@ export namespace output {
             ...options,
             name: getNewOutputName(),
             type: 'queue',
+        };
+    }
+
+    export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput {
+        return {
+            ...options,
+            name: getNewOutputName(),
+            type: 'cosmosDB',
         };
     }
 
