@@ -5,13 +5,15 @@ import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
 import { FormData, Headers, HeadersInit } from 'undici';
 import { URLSearchParams } from 'url';
-import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult } from './index';
+import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
 export type HttpHandler = (context: InvocationContext, request: HttpRequest) => FunctionResult<HttpResponse>;
 
-export interface HttpFunctionOptions extends HttpInputOptions, Partial<FunctionOptions> {
+export interface HttpFunctionOptions extends HttpTriggerOptions, Partial<FunctionOptions> {
     handler: HttpHandler;
+
+    trigger?: HttpTrigger;
 
     /**
      * Configuration for the optional primary output of the function. If not set, this will default to a standard http response output
@@ -20,7 +22,11 @@ export interface HttpFunctionOptions extends HttpInputOptions, Partial<FunctionO
     return?: FunctionOutput;
 }
 
-export interface HttpInputOptions {
+/**
+ * Full docs and examples:
+ * https://docs.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-trigger?&pivots=programming-language-javascript
+ */
+export interface HttpTriggerOptions {
     /**
      * The function HTTP authorization level
      * Defaults to 'anonymous' if not specified
@@ -39,7 +45,7 @@ export interface HttpInputOptions {
     route?: string;
 }
 
-export interface HttpInput extends FunctionInput {
+export interface HttpTrigger extends FunctionTrigger {
     /**
      * The function HTTP authorization level.
      */
@@ -57,6 +63,8 @@ export interface HttpInput extends FunctionInput {
 }
 
 /**
+ * Full docs and examples:
+ * https://docs.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-output?&pivots=programming-language-javascript
  * At this point in time there are no http output specific options
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

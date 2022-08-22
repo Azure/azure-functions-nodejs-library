@@ -1,23 +1,31 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { FunctionInput, FunctionOptions, FunctionResult } from './index';
+import { FunctionOptions, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
 export type TimerHandler = (context: InvocationContext, myTimer: Timer) => FunctionResult;
 
-export interface TimerFunctionOptions extends TimerInputOptions, Partial<FunctionOptions> {
+export interface TimerFunctionOptions extends TimerTriggerOptions, Partial<FunctionOptions> {
     handler: TimerHandler;
+
+    trigger?: TimerTrigger;
 }
 
-export interface TimerInputOptions {
+/**
+ * Full docs and examples:
+ * https://docs.microsoft.com/azure/azure-functions/functions-bindings-timer?pivots=programming-language-javascript
+ */
+export interface TimerTriggerOptions {
     /**
-     * A cron expression of the format '{second} {minute} {hour} {day} {month} {day of week}' to specify the schedule
+     * A [cron expression](https://docs.microsoft.com/azure/azure-functions/functions-bindings-timer?pivots=programming-language-javascript#ncrontab-expressions) of the format '{second} {minute} {hour} {day} {month} {day of week}' to specify the schedule
      */
     schedule: string;
 
     /**
-     * When true, your timer function will be invoked immediately after a runtime restart and on-schedule thereafter
+     * If `true`, the function is invoked when the runtime starts.
+     * For example, the runtime starts when the function app wakes up after going idle due to inactivity, when the function app restarts due to function changes, and when the function app scales out.
+     * _Use with caution_. runOnStartup should rarely if ever be set to `true`, especially in production.
      */
     runOnStartup?: boolean;
 
@@ -27,7 +35,7 @@ export interface TimerInputOptions {
     useMonitor?: boolean;
 }
 
-export type TimerInput = FunctionInput & TimerInputOptions;
+export type TimerTrigger = FunctionTrigger & TimerTriggerOptions;
 
 /**
  * Timer schedule information. Provided to your function when using a timer binding.

@@ -1,10 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { HttpInput, HttpOutput, HttpRequest, HttpResponse } from './http';
+import { HttpOutput, HttpResponse } from './http';
 import { FunctionInput, FunctionOutput } from './index';
-import { StorageBlobInput, StorageBlobOutput, StorageQueueInput, StorageQueueOutput } from './storage';
-import { Timer, TimerInput } from './timer';
+import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './storage';
 
 /**
  * Contains metadata and helper methods specific to this invocation
@@ -88,28 +87,10 @@ export interface InvocationContext {
  */
 export interface InvocationContextExtraInputs {
     /**
-     * Get a secondary http request input for this invocation
-     * @input the configuration object for this http input
-     */
-    get(input: HttpInput): HttpRequest;
-
-    /**
-     * Get a secondary timer metadata input for this invocation
-     * @input the configuration object for this timer input
-     */
-    get(input: TimerInput): Timer;
-
-    /**
      * Get a secondary storage blob entry input for this invocation
      * @input the configuration object for this storage blob input
      */
     get(input: StorageBlobInput): unknown;
-
-    /**
-     * Get a secondary storage queue entry input for this invocation
-     * @input the configuration object for this storage queue input
-     */
-    get(input: StorageQueueInput): unknown;
 
     /**
      * Get a secondary generic input for this invocation

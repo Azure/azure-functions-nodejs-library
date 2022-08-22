@@ -7,24 +7,26 @@ import {
     FunctionOutput,
     HttpFunctionOptions,
     HttpHandler,
-    HttpInput,
-    HttpInputOptions,
     HttpMethod,
     HttpOutput,
     HttpOutputOptions,
+    HttpTrigger,
+    HttpTriggerOptions,
     StorageBlobFunctionOptions,
     StorageBlobInput,
     StorageBlobInputOptions,
     StorageBlobOutput,
     StorageBlobOutputOptions,
+    StorageBlobTrigger,
+    StorageBlobTriggerOptions,
     StorageQueueFunctionOptions,
-    StorageQueueInput,
-    StorageQueueInputOptions,
     StorageQueueOutput,
     StorageQueueOutputOptions,
+    StorageQueueTrigger,
+    StorageQueueTriggerOptions,
     TimerFunctionOptions,
-    TimerInput,
-    TimerInputOptions,
+    TimerTrigger,
+    TimerTriggerOptions,
 } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import {
@@ -87,7 +89,7 @@ export namespace app {
         options.return ||= output.http({});
         generic(name, {
             ...options,
-            trigger: input.http({
+            trigger: trigger.http({
                 authLevel: options.authLevel,
                 methods: options.methods,
                 route: options.route,
@@ -98,7 +100,7 @@ export namespace app {
     export function timer(name: string, options: TimerFunctionOptions): void {
         generic(name, {
             ...options,
-            trigger: input.timer({
+            trigger: trigger.timer({
                 schedule: options.schedule,
                 runOnStartup: options.runOnStartup,
                 useMonitor: options.useMonitor,
@@ -109,7 +111,7 @@ export namespace app {
     export function storageBlob(name: string, options: StorageBlobFunctionOptions): void {
         generic(name, {
             ...options,
-            trigger: input.storageBlob({
+            trigger: trigger.storageBlob({
                 connection: options.connection,
                 path: options.path,
             }),
@@ -119,7 +121,7 @@ export namespace app {
     export function storageQueue(name: string, options: StorageQueueFunctionOptions): void {
         generic(name, {
             ...options,
-            trigger: input.storageQueue({
+            trigger: trigger.storageQueue({
                 connection: options.connection,
                 queueName: options.queueName,
             }),
@@ -170,38 +172,56 @@ export namespace app {
     }
 }
 
-export namespace input {
-    export function http(options: HttpInputOptions): HttpInput {
+export namespace trigger {
+    export function http(options: HttpTriggerOptions): HttpTrigger {
         return {
             ...options,
             authLevel: options.authLevel || 'anonymous',
             methods: options.methods || ['GET', 'POST'],
-            name: getNewInputName(),
-            type: 'http',
+            name: getNewTriggerName(),
+            type: 'httpTrigger',
         };
     }
 
-    export function timer(options: TimerInputOptions): TimerInput {
+    export function timer(options: TimerTriggerOptions): TimerTrigger {
         return {
             ...options,
-            name: getNewInputName(),
-            type: 'timer',
+            name: getNewTriggerName(),
+            type: 'timerTrigger',
         };
     }
 
+    export function storageBlob(options: StorageBlobTriggerOptions): StorageBlobTrigger {
+        return {
+            ...options,
+            name: getNewTriggerName(),
+            type: 'blobTrigger',
+        };
+    }
+
+    export function storageQueue(options: StorageQueueTriggerOptions): StorageQueueTrigger {
+        return {
+            ...options,
+            name: getNewTriggerName(),
+            type: 'queueTrigger',
+        };
+    }
+
+    export function generic(type: string, options: Record<string, unknown>): FunctionInput {
+        return {
+            ...options,
+            name: getNewTriggerName(),
+            type,
+        };
+    }
+}
+
+export namespace input {
     export function storageBlob(options: StorageBlobInputOptions): StorageBlobInput {
         return {
             ...options,
             name: getNewInputName(),
             type: 'blob',
-        };
-    }
-
-    export function storageQueue(options: StorageQueueInputOptions): StorageQueueInput {
-        return {
-            ...options,
-            name: getNewInputName(),
-            type: 'queue',
         };
     }
 
@@ -246,6 +266,11 @@ export namespace output {
             type,
         };
     }
+}
+
+function getNewTriggerName(): string {
+    // it has to start with a letter and can't have special characters like hyphens
+    return 'trigger' + getRandomHexString(10);
 }
 
 function getNewInputName(): string {

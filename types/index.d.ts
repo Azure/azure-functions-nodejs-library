@@ -1,7 +1,14 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { HttpFunctionOptions, HttpHandler, HttpInput, HttpInputOptions, HttpOutput, HttpOutputOptions } from './http';
+import {
+    HttpFunctionOptions,
+    HttpHandler,
+    HttpOutput,
+    HttpOutputOptions,
+    HttpTrigger,
+    HttpTriggerOptions,
+} from './http';
 import { InvocationContext } from './InvocationContext';
 import {
     StorageBlobFunctionOptions,
@@ -9,13 +16,15 @@ import {
     StorageBlobInputOptions,
     StorageBlobOutput,
     StorageBlobOutputOptions,
+    StorageBlobTrigger,
+    StorageBlobTriggerOptions,
     StorageQueueFunctionOptions,
-    StorageQueueInput,
-    StorageQueueInputOptions,
     StorageQueueOutput,
     StorageQueueOutputOptions,
+    StorageQueueTrigger,
+    StorageQueueTriggerOptions,
 } from './storage';
-import { TimerFunctionOptions, TimerInput, TimerInputOptions } from './timer';
+import { TimerFunctionOptions, TimerTrigger, TimerTriggerOptions } from './timer';
 
 export * from './http';
 export * from './InvocationContext';
@@ -28,77 +37,77 @@ export * from './timer';
 export namespace app {
     /**
      * Registers an http function in your app that will be triggered by making a request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function http(name: string, options: HttpFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'GET' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param handler The handler for this function
      */
     export function get(name: string, handler: HttpHandler): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'GET' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function get(name: string, options: HttpFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'PUT' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param handler The handler for this function
      */
     export function put(name: string, handler: HttpHandler): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'PUT' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function put(name: string, options: HttpFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'POST' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param handler The handler for this function
      */
     export function post(name: string, handler: HttpHandler): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'POST' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function post(name: string, options: HttpFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'PATCH' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param handler The handler for this function
      */
     export function patch(name: string, handler: HttpHandler): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'PATCH' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function patch(name: string, options: HttpFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'DELETE' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param handler The handler for this function
      */
     export function deleteRequest(name: string, handler: HttpHandler): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'DELETE' request to the function url
-     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpInputOptions`
+     * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function deleteRequest(name: string, options: HttpFunctionOptions): void;
@@ -133,13 +142,22 @@ export namespace app {
 }
 
 /**
- * The root namespace used to help create input configuration
+ * The root namespace used to help create trigger configuration (the primary input)
+ */
+export namespace trigger {
+    export function http(options: HttpTriggerOptions): HttpTrigger;
+    export function timer(options: TimerTriggerOptions): TimerTrigger;
+    export function storageBlob(options: StorageBlobTriggerOptions): StorageBlobTrigger;
+    export function storageQueue(options: StorageQueueTriggerOptions): StorageQueueTrigger;
+    export function generic(options: { type: string }): FunctionTrigger;
+}
+
+/**
+ * The root namespace used to help create secondary input configuration ("trigger" is the primary input)
+ * NOTE: Not all triggers can be used as secondary inputs
  */
 export namespace input {
-    export function http(options: HttpInputOptions): HttpInput;
-    export function timer(options: TimerInputOptions): TimerInput;
     export function storageBlob(options: StorageBlobInputOptions): StorageBlobInput;
-    export function storageQueue(options: StorageQueueInputOptions): StorageQueueInput;
     export function generic(options: { type: string }): FunctionInput;
 }
 
@@ -174,7 +192,7 @@ export interface FunctionOptions {
      * Configuration for the primary input to the function, aka the reason it will be triggered
      * This is the only input that is passed as an argument to the function handler during invocation
      */
-    trigger: FunctionInput;
+    trigger: FunctionTrigger;
 
     /**
      * Configuration for the optional primary output of the function
@@ -195,12 +213,26 @@ export interface FunctionOptions {
     extraOutputs?: FunctionOutput[];
 }
 
-export interface FunctionOutput {
+/**
+ * Full configuration for the primary input to a function
+ */
+export interface FunctionTrigger {
     type: string;
     name: string;
 }
 
+/**
+ * Full configuration for the secondary input to a function ("trigger" is the primary input)
+ */
 export interface FunctionInput {
+    type: string;
+    name: string;
+}
+
+/**
+ * Full configuration for the output to a function
+ */
+export interface FunctionOutput {
     type: string;
     name: string;
 }
