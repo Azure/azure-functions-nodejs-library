@@ -22,10 +22,6 @@ export interface HttpFunctionOptions extends HttpTriggerOptions, Partial<Functio
     return?: FunctionOutput;
 }
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-trigger?&pivots=programming-language-javascript
- */
 export interface HttpTriggerOptions {
     /**
      * The function HTTP authorization level
@@ -63,8 +59,6 @@ export interface HttpTrigger extends FunctionTrigger {
 }
 
 /**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-output?&pivots=programming-language-javascript
  * At this point in time there are no http output specific options
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

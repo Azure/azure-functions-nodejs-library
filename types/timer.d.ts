@@ -12,10 +12,6 @@ export interface TimerFunctionOptions extends TimerTriggerOptions, Partial<Funct
     trigger?: TimerTrigger;
 }
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-timer?pivots=programming-language-javascript
- */
 export interface TimerTriggerOptions {
     /**
      * A [cron expression](https://docs.microsoft.com/azure/azure-functions/functions-bindings-timer?pivots=programming-language-javascript#ncrontab-expressions) of the format '{second} {minute} {hour} {day} {month} {day of week}' to specify the schedule

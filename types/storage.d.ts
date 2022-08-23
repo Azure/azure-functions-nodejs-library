@@ -43,37 +43,17 @@ export interface StorageQueueOptions {
     connection: string;
 }
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-blob-trigger?pivots=programming-language-javascript
- */
 export type StorageBlobTriggerOptions = StorageBlobOptions;
 export type StorageBlobTrigger = FunctionTrigger & StorageBlobTriggerOptions;
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-blob-input?pivots=programming-language-javascript
- */
 export type StorageBlobInputOptions = StorageBlobOptions;
 export type StorageBlobInput = FunctionInput & StorageBlobInputOptions;
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-blob-output?pivots=programming-language-javascript
- */
 export type StorageBlobOutputOptions = StorageBlobOptions;
 export type StorageBlobOutput = FunctionOutput & StorageBlobOutputOptions;
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-queue-trigger?pivots=programming-language-javascript
- */
 export type StorageQueueTriggerOptions = StorageQueueOptions;
 export type StorageQueueTrigger = FunctionTrigger & StorageQueueTriggerOptions;
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-queue-output?pivots=programming-language-javascript
- */
 export type StorageQueueOutputOptions = StorageQueueOptions;
 export type StorageQueueOutput = FunctionOutput & StorageQueueOutputOptions;

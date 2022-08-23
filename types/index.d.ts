@@ -189,13 +189,41 @@ export namespace app {
  * The root namespace used to help create trigger configuration (the primary input)
  */
 export namespace trigger {
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-trigger?&pivots=programming-language-javascript)
+     */
     export function http(options: HttpTriggerOptions): HttpTrigger;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-timer?pivots=programming-language-javascript)
+     */
     export function timer(options: TimerTriggerOptions): TimerTrigger;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-blob-trigger?pivots=programming-language-javascript)
+     */
     export function storageBlob(options: StorageBlobTriggerOptions): StorageBlobTrigger;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-queue-trigger?pivots=programming-language-javascript)
+     */
     export function storageQueue(options: StorageQueueTriggerOptions): StorageQueueTrigger;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-trigger?pivots=programming-language-javascript)
+     */
     export function serviceBusQueue(options: ServiceBusQueueTriggerOptions): ServiceBusQueueTrigger;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-trigger?pivots=programming-language-javascript)
+     */
     export function serviceBusTopic(options: ServiceBusTopicTriggerOptions): ServiceBusTopicTrigger;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger?pivots=programming-language-javascript)
+     */
     export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
+
     export function generic(options: { type: string }): FunctionTrigger;
 }
 
@@ -204,8 +232,16 @@ export namespace trigger {
  * NOTE: Not all triggers can be used as secondary inputs
  */
 export namespace input {
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-blob-input?pivots=programming-language-javascript)
+     */
     export function storageBlob(options: StorageBlobInputOptions): StorageBlobInput;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-input?pivots=programming-language-javascript)
+     */
     export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput;
+
     export function generic(options: { type: string }): FunctionInput;
 }
 
@@ -213,12 +249,36 @@ export namespace input {
  * The root namespace used to help create output configuration
  */
 export namespace output {
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-output?&pivots=programming-language-javascript)
+     */
     export function http(options: HttpOutputOptions): HttpOutput;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-blob-output?pivots=programming-language-javascript)
+     */
     export function storageBlob(options: StorageBlobOutputOptions): StorageBlobOutput;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-queue-output?pivots=programming-language-javascript)
+     */
     export function storageQueue(options: StorageQueueOutputOptions): StorageQueueOutput;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-output?pivots=programming-language-javascript)
+     */
     export function serviceBusQueue(options: ServiceBusQueueOutputOptions): ServiceBusQueueOutput;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-output?pivots=programming-language-javascript)
+     */
     export function serviceBusTopic(options: ServiceBusTopicOutputOptions): ServiceBusTopicOutput;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-output?pivots=programming-language-javascript)
+     */
     export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput;
+
     export function generic(options: { type: string }): FunctionOutput;
 }
 

@@ -12,10 +12,6 @@ export interface CosmosDBFunctionOptions extends CosmosDBTriggerOptions, Partial
     trigger?: CosmosDBTrigger;
 }
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-input?pivots=programming-language-javascript
- */
 export interface CosmosDBInputOptions {
     /**
      * An app setting (or environment variable) with the Cosmos DB connection string
@@ -52,10 +48,6 @@ export interface CosmosDBInputOptions {
 }
 export type CosmosDBInput = FunctionInput & CosmosDBInputOptions;
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger?pivots=programming-language-javascript
- */
 export interface CosmosDBTriggerOptions extends CosmosDBInputOptions {
     /**
      * The name of an app setting that contains the connection string to the service which holds the lease collection.
@@ -91,10 +83,6 @@ export interface CosmosDBTriggerOptions extends CosmosDBInputOptions {
 }
 export type CosmosDBTrigger = FunctionTrigger & CosmosDBTriggerOptions;
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-output?pivots=programming-language-javascript
- */
 export interface CosmosDBOutputOptions {
     /**
      * An app setting (or environment variable) with the Cosmos DB connection string

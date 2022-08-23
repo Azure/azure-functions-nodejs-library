@@ -12,10 +12,6 @@ export interface ServiceBusQueueFunctionOptions extends ServiceBusQueueTriggerOp
     trigger?: ServiceBusQueueTrigger;
 }
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-trigger?pivots=programming-language-javascript
- */
 export interface ServiceBusQueueTriggerOptions {
     /**
      * An app setting (or environment variable) with the service bus connection string
@@ -34,10 +30,6 @@ export interface ServiceBusQueueTriggerOptions {
 }
 export type ServiceBusQueueTrigger = FunctionTrigger & ServiceBusQueueTriggerOptions;
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-output?pivots=programming-language-javascript
- */
 export interface ServiceBusQueueOutputOptions {
     /**
      * An app setting (or environment variable) with the service bus connection string
@@ -59,10 +51,6 @@ export interface ServiceBusTopicFunctionOptions extends ServiceBusTopicTriggerOp
     trigger?: ServiceBusTopicTrigger;
 }
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-trigger?pivots=programming-language-javascript
- */
 export interface ServiceBusTopicTriggerOptions {
     /**
      * An app setting (or environment variable) with the service bus connection string
@@ -86,10 +74,6 @@ export interface ServiceBusTopicTriggerOptions {
 }
 export type ServiceBusTopicTrigger = FunctionTrigger & ServiceBusTopicTriggerOptions;
 
-/**
- * Full docs and examples:
- * https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-output?pivots=programming-language-javascript
- */
 export interface ServiceBusTopicOutputOptions {
     /**
      * An app setting (or environment variable) with the service bus connection string
