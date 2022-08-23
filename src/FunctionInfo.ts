@@ -32,7 +32,7 @@ export class FunctionInfo {
 
             // determine output bindings & assign rpc converter (http has quirks)
             Object.keys(bindings)
-                .filter((name) => bindings[name].direction !== RpcBindingInfo.Direction.in)
+                .filter((name) => bindings[name].direction !== 'in')
                 .forEach((name) => {
                     const type = bindings[name].type;
                     if (type && type.toLowerCase() === 'http') {

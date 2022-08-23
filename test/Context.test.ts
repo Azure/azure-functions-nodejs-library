@@ -44,8 +44,8 @@ describe('Context', () => {
             bindings: {
                 myTimer: {
                     type: 'timerTrigger',
-                    direction: 0,
-                    dataType: 0,
+                    direction: 'in',
+                    dataType: 'undefined',
                 },
             },
         });
@@ -70,8 +70,8 @@ describe('Context', () => {
             bindings: {
                 req: {
                     type: 'http',
-                    direction: 0,
-                    dataType: 1,
+                    direction: 'in',
+                    dataType: 'string',
                 },
             },
         });
@@ -104,8 +104,8 @@ describe('Context', () => {
             bindings: {
                 req: {
                     type: 'http',
-                    direction: 0,
-                    dataType: 1,
+                    direction: 'in',
+                    dataType: 'string',
                 },
             },
         });
@@ -157,8 +157,8 @@ describe('Context', () => {
             bindings: {
                 req: {
                     type: 'http',
-                    direction: 0,
-                    dataType: 1,
+                    direction: 'in',
+                    dataType: 'string',
                 },
             },
         });
@@ -201,8 +201,8 @@ describe('Context', () => {
             bindings: {
                 req: {
                     type: 'http',
-                    direction: 0,
-                    dataType: 1,
+                    direction: 'in',
+                    dataType: 'string',
                 },
             },
         });

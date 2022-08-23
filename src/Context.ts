@@ -10,7 +10,7 @@ import {
     Logger,
     TraceContext,
 } from '@azure/functions';
-import { RpcInvocationRequest, RpcLog, RpcParameterBinding } from '@azure/functions-core';
+import { RpcInvocationRequest, RpcLogLevel, RpcParameterBinding } from '@azure/functions-core';
 import { v4 as uuid } from 'uuid';
 import {
     convertKeysToCamelCase,
@@ -107,11 +107,11 @@ class InvocationContext implements Context {
         this.bindings = {};
 
         // Log message that is tied to function invocation
-        this.log = Object.assign((...args: any[]) => userLogCallback(RpcLog.Level.Information, ...args), {
-            error: (...args: any[]) => userLogCallback(RpcLog.Level.Error, ...args),
-            warn: (...args: any[]) => userLogCallback(RpcLog.Level.Warning, ...args),
-            info: (...args: any[]) => userLogCallback(RpcLog.Level.Information, ...args),
-            verbose: (...args: any[]) => userLogCallback(RpcLog.Level.Trace, ...args),
+        this.log = Object.assign((...args: any[]) => userLogCallback('information', ...args), {
+            error: (...args: any[]) => userLogCallback('error', ...args),
+            warn: (...args: any[]) => userLogCallback('warning', ...args),
+            info: (...args: any[]) => userLogCallback('information', ...args),
+            verbose: (...args: any[]) => userLogCallback('trace', ...args),
         });
 
         this.bindingData = getNormalizedBindingData(request);
@@ -130,7 +130,7 @@ export interface InvocationResult {
 
 export type DoneCallback = (err?: unknown, result?: any) => void;
 
-export type UserLogCallback = (level: RpcLog.Level, ...args: any[]) => void;
+export type UserLogCallback = (level: RpcLogLevel, ...args: any[]) => void;
 
 export interface Dict<T> {
     [key: string]: T;

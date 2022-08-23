@@ -13,13 +13,13 @@ describe('FunctionInfo', () => {
             bindings: {
                 req: {
                     type: 'httpTrigger',
-                    direction: 0,
-                    dataType: 1,
+                    direction: 'in',
+                    dataType: 'string',
                 },
                 $return: {
                     type: 'http',
-                    direction: 1,
-                    dataType: 1,
+                    direction: 'out',
+                    dataType: 'string',
                 },
             },
         };
@@ -33,8 +33,8 @@ describe('FunctionInfo', () => {
             bindings: {
                 req: {
                     type: 'httpTrigger',
-                    direction: 0,
-                    dataType: 1,
+                    direction: 'in',
+                    dataType: 'string',
                 },
             },
         };
@@ -49,13 +49,13 @@ describe('FunctionInfo', () => {
             bindings: {
                 input: {
                     type: 'queue',
-                    direction: 0,
-                    dataType: 1,
+                    direction: 'in',
+                    dataType: 'string',
                 },
                 $return: {
                     type: 'queue',
-                    direction: 1,
-                    dataType: 1,
+                    direction: 'out',
+                    dataType: 'string',
                 },
             },
         };

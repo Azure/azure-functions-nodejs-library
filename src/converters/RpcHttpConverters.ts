@@ -2,7 +2,13 @@
 // Licensed under the MIT License.
 
 import { Cookie } from '@azure/functions';
-import { RpcHttpCookie, RpcHttpData, RpcNullableString, RpcTypedData } from '@azure/functions-core';
+import {
+    RpcHttpCookie,
+    RpcHttpCookieSameSite,
+    RpcHttpData,
+    RpcNullableString,
+    RpcTypedData,
+} from '@azure/functions-core';
 import { Dict } from '../Context';
 import {
     fromTypedData,
@@ -101,15 +107,15 @@ export function toRpcHttpCookieList(inputCookies: Cookie[]): RpcHttpCookie[] {
  */
 function toRpcHttpCookie(inputCookie: Cookie): RpcHttpCookie {
     // Resolve RpcHttpCookie.SameSite enum, a one-off
-    let rpcSameSite: RpcHttpCookie.SameSite = RpcHttpCookie.SameSite.None;
+    let rpcSameSite: RpcHttpCookieSameSite = 'none';
     if (inputCookie && inputCookie.sameSite) {
         const sameSite = inputCookie.sameSite.toLocaleLowerCase();
         if (sameSite === 'lax') {
-            rpcSameSite = RpcHttpCookie.SameSite.Lax;
+            rpcSameSite = 'lax';
         } else if (sameSite === 'strict') {
-            rpcSameSite = RpcHttpCookie.SameSite.Strict;
+            rpcSameSite = 'strict';
         } else if (sameSite === 'none') {
-            rpcSameSite = RpcHttpCookie.SameSite.ExplicitNone;
+            rpcSameSite = 'explicitNone';
         }
     }
 

@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { RpcBindingInfo, RpcFunctionMetadata, RpcInvocationRequest, RpcTypedData } from '@azure/functions-core';
+import { RpcFunctionMetadata, RpcInvocationRequest, RpcTypedData } from '@azure/functions-core';
 import { expect } from 'chai';
 import { fromString } from 'long';
 import 'mocha';
@@ -118,15 +118,15 @@ describe('Binding Converters', () => {
             bindings: {
                 req: {
                     type: 'httpTrigger',
-                    direction: RpcBindingInfo.Direction.in,
+                    direction: 'in',
                 },
                 res: {
                     type: 'http',
-                    direction: RpcBindingInfo.Direction.out,
+                    direction: 'out',
                 },
                 firstQueueOutput: {
                     type: 'queue',
-                    direction: RpcBindingInfo.Direction.out,
+                    direction: 'out',
                 },
                 noDirection: {
                     type: 'queue',
