@@ -11,13 +11,18 @@ declare module '@azure/functions-core' {
     const version: string;
 
     /**
+     * The version of the Functions Host
+     */
+    const hostVersion: string;
+
+    /**
      * Register a function
      * This is a preview feature and requires the feature flag `EnableWorkerIndexing` to be set in the app setting `AzureWebJobsFeatureFlags`
      */
     function registerFunction(metadata: FunctionMetadata, callback: FunctionCallback): Disposable;
 
     /**
-     * A slimmed down version of `IRpcFunctionMetadata` that includes the minimum amount of information needed to register a function
+     * A slimmed down version of `RpcFunctionMetadata` that includes the minimum amount of information needed to register a function
      */
     interface FunctionMetadata {
         /**
@@ -53,12 +58,14 @@ declare module '@azure/functions-core' {
     interface HookContext {
         /**
          * The recommended place to share data between hooks in the same scope (app-level vs invocation-level)
+         * This object is readonly and attempting to overwrite it will throw an error
          */
-        hookData: HookData;
+        readonly hookData: HookData;
         /**
          * The recommended place to share data across scopes for all hooks
+         * This object is readonly and attempting to overwrite it will throw an error
          */
-        appHookData: HookData;
+        readonly appHookData: HookData;
     }
 
     /**
@@ -117,10 +124,6 @@ declare module '@azure/functions-core' {
          * Absolute directory of the function app
          */
         functionAppDirectory: string;
-        /**
-         * The version of the host running the function app
-         */
-        hostVersion: string;
     }
 
     /**
@@ -210,7 +213,7 @@ declare module '@azure/functions-core' {
         /**
          * The recommended way to log information
          */
-        log(level: RpcLog.Level, category: RpcLog.RpcLogCategory, message: string): void;
+        log(level: RpcLogLevel, category: RpcLogCategory, message: string): void;
     }
 
     type InvocationState = 'preInvocationHooks' | 'postInvocationHooks' | 'invocation';
@@ -283,7 +286,7 @@ declare module '@azure/functions-core' {
     }
 
     interface RpcStatusResult {
-        status?: RpcStatusResult.Status | null;
+        status?: RpcStatus | null;
 
         result?: string | null;
 
@@ -292,20 +295,14 @@ declare module '@azure/functions-core' {
         logs?: RpcLog[] | null;
     }
 
-    namespace RpcStatusResult {
-        enum Status {
-            Failure = 0,
-            Success = 1,
-            Cancelled = 2,
-        }
-    }
+    type RpcStatus = 'failure' | 'success' | 'cancelled';
 
     interface RpcLog {
         invocationId?: string | null;
 
         category?: string | null;
 
-        level?: RpcLog.Level | null;
+        level?: RpcLogLevel | null;
 
         message?: string | null;
 
@@ -313,26 +310,12 @@ declare module '@azure/functions-core' {
 
         exception?: RpcException | null;
 
-        logCategory?: RpcLog.RpcLogCategory | null;
+        logCategory?: RpcLogCategory | null;
     }
 
-    namespace RpcLog {
-        enum Level {
-            Trace = 0,
-            Debug = 1,
-            Information = 2,
-            Warning = 3,
-            Error = 4,
-            Critical = 5,
-            None = 6,
-        }
+    type RpcLogLevel = 'trace' | 'debug' | 'information' | 'warning' | 'error' | 'critical' | 'none';
 
-        enum RpcLogCategory {
-            User = 0,
-            System = 1,
-            CustomMetric = 2,
-        }
-    }
+    type RpcLogCategory = 'user' | 'system' | 'customMetric';
 
     interface RpcException {
         source?: string | null;
@@ -345,25 +328,14 @@ declare module '@azure/functions-core' {
     interface RpcBindingInfo {
         type?: string | null;
 
-        direction?: RpcBindingInfo.Direction | null;
+        direction?: RpcBindingDirection | null;
 
-        dataType?: RpcBindingInfo.DataType | null;
+        dataType?: RpcBindingDataType | null;
     }
 
-    namespace RpcBindingInfo {
-        enum Direction {
-            in = 0,
-            out = 1,
-            inout = 2,
-        }
+    type RpcBindingDirection = 'in' | 'out' | 'inout';
 
-        enum DataType {
-            undefined = 0,
-            string = 1,
-            binary = 2,
-            stream = 3,
-        }
-    }
+    type RpcBindingDataType = 'undefined' | 'string' | 'binary' | 'stream';
 
     interface RpcTypedData {
         string?: string | null;
@@ -494,7 +466,7 @@ declare module '@azure/functions-core' {
 
         httpOnly?: RpcNullableBool | null;
 
-        sameSite?: RpcHttpCookie.SameSite | null;
+        sameSite?: RpcHttpCookieSameSite | null;
 
         maxAge?: RpcNullableDouble | null;
     }
@@ -521,13 +493,6 @@ declare module '@azure/functions-core' {
         nanos?: number | null;
     }
 
-    namespace RpcHttpCookie {
-        enum SameSite {
-            None = 0,
-            Lax = 1,
-            Strict = 2,
-            ExplicitNone = 3,
-        }
-    }
+    type RpcHttpCookieSameSite = 'none' | 'lax' | 'strict' | 'explicitNone';
     // #endregion rpc types
 }

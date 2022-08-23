@@ -10,7 +10,12 @@ import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './stora
 /**
  * Contains metadata and helper methods specific to this invocation
  */
-export interface InvocationContext {
+export declare class InvocationContext {
+    /**
+     * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+     */
+    constructor(init: InvocationContextInit);
+
     /**
      * A unique guid specific to this invocation
      */
@@ -177,9 +182,7 @@ export interface InvocationContextExtraOutputs {
 /**
  * Metadata related to the input that triggered your function
  */
-export interface TriggerMetadata {
-    [name: string]: any;
-}
+export type TriggerMetadata = Record<string, unknown>;
 
 export interface RetryContext {
     /**
@@ -225,3 +228,21 @@ export interface TraceContext {
      */
     attributes?: Record<string, string>;
 }
+
+/**
+ * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+ */
+export interface InvocationContextInit {
+    /**
+     * A unique guid for this invocation
+     */
+    invocationId: string;
+
+    functionName: string;
+
+    logHandler: LogHandler;
+}
+
+export type LogHandler = (level: LogLevel, ...args: unknown[]) => void;
+
+export type LogLevel = 'trace' | 'debug' | 'information' | 'warning' | 'error' | 'critical' | 'none';

@@ -4,12 +4,9 @@
 import * as globby from 'globby';
 import * as Mocha from 'mocha';
 import * as path from 'path';
-import { setupTestCoreApi } from './setupTestCoreApi';
 
 export async function run(): Promise<void> {
     try {
-        setupTestCoreApi();
-
         const options: Mocha.MochaOptions = {
             color: true,
             reporter: 'mocha-multi-reporters',

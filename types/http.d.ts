@@ -69,7 +69,12 @@ export type HttpOutput = FunctionOutput & HttpOutputOptions;
 /**
  * HTTP request object. Provided to your function when using HTTP Bindings.
  */
-export interface HttpRequest {
+export declare class HttpRequest {
+    /**
+     * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+     */
+    constructor(httpRequestInit: HttpRequestInit);
+
     /**
      * HTTP request method used to invoke this function.
      */
@@ -141,9 +146,7 @@ export interface HttpRequest {
 /**
  * Route parameter keys and values.
  */
-export interface HttpRequestParams {
-    [name: string]: string;
-}
+export type HttpRequestParams = Record<string, string>;
 
 /**
  *  Object representing logged-in user, either through
@@ -174,9 +177,7 @@ export interface HttpRequestUser {
      * Extra authentication information, dependent on auth type
      * and auth provider
      */
-    claimsPrincipalData: {
-        [key: string]: any;
-    };
+    claimsPrincipalData: Record<string, unknown>;
 }
 
 /**
@@ -265,4 +266,36 @@ export interface Cookie {
      * Number of seconds until the cookie expires. A zero or negative number will expire the cookie immediately.
      */
     maxAge?: number;
+}
+
+/**
+ * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+ */
+export interface HttpRequestInit {
+    method?: HttpMethod;
+
+    url?: string;
+
+    body?: HttpRequestBodyInit;
+
+    headers?: Record<string, string>;
+
+    query?: Record<string, string>;
+
+    params?: Record<string, string>;
+}
+
+/**
+ * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+ */
+export interface HttpRequestBodyInit {
+    /**
+     * The body as a buffer. You only need to specify one of the `bytes` or `string` properties
+     */
+    bytes?: Uint8Array;
+
+    /**
+     * The body as a buffer. You only need to specify one of the `bytes` or `string` properties
+     */
+    string?: string;
 }

@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
-import { RpcInvocationRequest, RpcLog } from '@azure/functions-core';
+import { InvocationContextInit, LogHandler, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
+import { RpcInvocationRequest } from '@azure/functions-core';
 import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
 import { fromRpcRetryContext, fromRpcTraceContext } from './converters/fromRpcContext';
 
@@ -15,49 +15,47 @@ export class InvocationContext implements types.InvocationContext {
     retryContext?: RetryContext;
     extraInputs: InvocationContextExtraInputs;
     extraOutputs: InvocationContextExtraOutputs;
-    #userLogCallback: UserLogCallback;
+    #userLogHandler: LogHandler;
 
-    constructor(functionName: string, request: RpcInvocationRequest, userLogCallback: UserLogCallback) {
-        this.invocationId = <string>request.invocationId;
-        this.functionName = functionName;
-        this.triggerMetadata = request.triggerMetadata ? convertKeysToCamelCase(request.triggerMetadata) : {};
-        if (request.retryContext) {
-            this.retryContext = fromRpcRetryContext(request.retryContext);
+    constructor(init: InvocationContextInit & RpcInvocationRequest) {
+        this.invocationId = init.invocationId;
+        this.functionName = init.functionName;
+        this.triggerMetadata = init.triggerMetadata ? convertKeysToCamelCase(init.triggerMetadata) : {};
+        if (init.retryContext) {
+            this.retryContext = fromRpcRetryContext(init.retryContext);
         }
-        if (request.traceContext) {
-            this.traceContext = fromRpcTraceContext(request.traceContext);
+        if (init.traceContext) {
+            this.traceContext = fromRpcTraceContext(init.traceContext);
         }
-        this.#userLogCallback = userLogCallback;
+        this.#userLogHandler = init.logHandler;
         this.extraInputs = new InvocationContextExtraInputs();
         this.extraOutputs = new InvocationContextExtraOutputs();
     }
 
     log(...args: unknown[]): void {
-        this.#userLogCallback(RpcLog.Level.Information, ...args);
+        this.#userLogHandler('information', ...args);
     }
 
     trace(...args: unknown[]): void {
-        this.#userLogCallback(RpcLog.Level.Trace, ...args);
+        this.#userLogHandler('trace', ...args);
     }
 
     debug(...args: unknown[]): void {
-        this.#userLogCallback(RpcLog.Level.Debug, ...args);
+        this.#userLogHandler('debug', ...args);
     }
 
     info(...args: unknown[]): void {
-        this.#userLogCallback(RpcLog.Level.Information, ...args);
+        this.#userLogHandler('information', ...args);
     }
 
     warn(...args: unknown[]): void {
-        this.#userLogCallback(RpcLog.Level.Warning, ...args);
+        this.#userLogHandler('warning', ...args);
     }
 
     error(...args: unknown[]): void {
-        this.#userLogCallback(RpcLog.Level.Error, ...args);
+        this.#userLogHandler('error', ...args);
     }
 }
-
-type UserLogCallback = (level: RpcLog.Level, ...args: unknown[]) => void;
 
 class InvocationContextExtraInputs implements types.InvocationContextExtraInputs {
     #inputs: Record<string, unknown> = {};

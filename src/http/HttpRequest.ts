@@ -23,11 +23,17 @@ export class HttpRequest implements types.HttpRequest {
 
     #cachedUser?: HttpRequestUser | null;
     #uReq: uRequest;
-    #body?: Buffer;
+    #body?: Buffer | string;
 
     constructor(rpcHttp: RpcHttpData) {
         const url = nonNullProp(rpcHttp, 'url');
-        this.#body = rpcHttp.body?.bytes ? Buffer.from(rpcHttp.body?.bytes) : undefined;
+
+        if (rpcHttp.body?.bytes) {
+            this.#body = Buffer.from(rpcHttp.body?.bytes);
+        } else if (rpcHttp.body?.string) {
+            this.#body = rpcHttp.body.string;
+        }
+
         this.#uReq = new uRequest(url, {
             body: this.#body,
             method: nonNullProp(rpcHttp, 'method'),

@@ -46,16 +46,22 @@ import {
     TimerTriggerOptions,
 } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
-import {
-    CoreInvocationContext,
-    FunctionCallback,
-    registerFunction,
-    RpcBindingInfo,
-    setProgrammingModel,
-} from '@azure/functions-core';
+import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { returnBindingKey, version } from './constants';
 import { InvocationModel } from './InvocationModel';
 import { getRandomHexString } from './utils/getRandomHexString';
+
+export { HttpRequest } from './http/HttpRequest';
+export { InvocationContext } from './InvocationContext';
+
+function tryGetCoreApiLazy(): typeof coreTypes | undefined {
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        return <typeof coreTypes>require('@azure/functions-core');
+    } catch {
+        return undefined;
+    }
+}
 
 class ProgrammingModel implements coreTypes.ProgrammingModel {
     name = '@azure/functions';
@@ -67,7 +73,14 @@ class ProgrammingModel implements coreTypes.ProgrammingModel {
 
 let hasSetup = false;
 function setup() {
-    setProgrammingModel(new ProgrammingModel());
+    const coreApi = tryGetCoreApiLazy();
+    if (!coreApi) {
+        console.warn(
+            'WARNING: Failed to detect the Azure Functions runtime. Switching "@azure/functions" package to test mode - not all features are supported.'
+        );
+    } else {
+        coreApi.setProgrammingModel(new ProgrammingModel());
+    }
     hasSetup = true;
 }
 
@@ -193,12 +206,12 @@ export namespace app {
             setup();
         }
 
-        const bindings = {};
+        const bindings: Record<string, coreTypes.RpcBindingInfo> = {};
 
         const trigger = options.trigger;
         bindings[trigger.name] = {
             ...trigger,
-            direction: RpcBindingInfo.Direction.in,
+            direction: 'in',
             type: /trigger$/i.test(trigger.type) ? trigger.type : trigger.type + 'Trigger',
         };
 
@@ -206,7 +219,7 @@ export namespace app {
             for (const input of options.extraInputs) {
                 bindings[input.name] = {
                     ...input,
-                    direction: RpcBindingInfo.Direction.in,
+                    direction: 'in',
                 };
             }
         }
@@ -215,7 +228,7 @@ export namespace app {
             options.return.name = returnBindingKey;
             bindings[options.return.name] = {
                 ...options.return,
-                direction: RpcBindingInfo.Direction.out,
+                direction: 'out',
             };
         }
 
@@ -223,12 +236,19 @@ export namespace app {
             for (const output of options.extraOutputs) {
                 bindings[output.name] = {
                     ...output,
-                    direction: RpcBindingInfo.Direction.out,
+                    direction: 'out',
                 };
             }
         }
 
-        registerFunction({ name, bindings }, <FunctionCallback>options.handler);
+        const coreApi = tryGetCoreApiLazy();
+        if (!coreApi) {
+            console.warn(
+                `WARNING: Skipping call to register function "${name}" because the "@azure/functions" package is in test mode.`
+            );
+        } else {
+            coreApi.registerFunction({ name, bindings }, <FunctionCallback>options.handler);
+        }
     }
 }
 

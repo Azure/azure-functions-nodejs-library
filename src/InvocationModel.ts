@@ -8,7 +8,8 @@ import {
     InvocationArguments,
     RpcBindingInfo,
     RpcInvocationResponse,
-    RpcLog,
+    RpcLogCategory,
+    RpcLogLevel,
     RpcTypedData,
 } from '@azure/functions-core';
 import { format } from 'util';
@@ -35,11 +36,12 @@ export class InvocationModel implements coreTypes.InvocationModel {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     async getArguments(): Promise<InvocationArguments> {
-        const context = new InvocationContext(
-            this.#functionName,
-            this.#coreCtx.request,
-            (level: RpcLog.Level, ...args: unknown[]) => this.#userLog(level, ...args)
-        );
+        const context = new InvocationContext({
+            ...this.#coreCtx.request,
+            invocationId: nonNullProp(this.#coreCtx, 'invocationId'),
+            functionName: this.#functionName,
+            logHandler: (level: RpcLogLevel, ...args: unknown[]) => this.#userLog(level, ...args),
+        });
 
         const inputs: any[] = [];
         if (this.#coreCtx.request.inputData) {
@@ -83,7 +85,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
 
         response.outputData = [];
         for (const [name, binding] of Object.entries(this.#bindings)) {
-            if (binding.direction === RpcBindingInfo.Direction.out) {
+            if (binding.direction === 'out') {
                 if (name === returnBindingKey) {
                     response.returnValue = this.#convertOutput(binding, result);
                 } else {
@@ -106,21 +108,21 @@ export class InvocationModel implements coreTypes.InvocationModel {
         }
     }
 
-    #log(level: RpcLog.Level, logCategory: RpcLog.RpcLogCategory, ...args: unknown[]): void {
+    #log(level: RpcLogLevel, logCategory: RpcLogCategory, ...args: unknown[]): void {
         this.#coreCtx.log(level, logCategory, format(...args));
     }
 
-    #systemLog(level: RpcLog.Level, ...args: unknown[]) {
-        this.#log(level, RpcLog.RpcLogCategory.System, ...args);
+    #systemLog(level: RpcLogLevel, ...args: unknown[]) {
+        this.#log(level, 'system', ...args);
     }
 
-    #userLog(level: RpcLog.Level, ...args: unknown[]): void {
+    #userLog(level: RpcLogLevel, ...args: unknown[]): void {
         if (this.#isDone && this.#coreCtx.state !== 'postInvocationHooks') {
             let badAsyncMsg =
                 "Warning: Unexpected call to 'log' on the context object after function execution has completed. Please check for asynchronous calls that are not awaited. ";
             badAsyncMsg += `Function name: ${this.#functionName}. Invocation Id: ${this.#coreCtx.invocationId}.`;
-            this.#systemLog(RpcLog.Level.Warning, badAsyncMsg);
+            this.#systemLog('warning', badAsyncMsg);
         }
-        this.#log(level, RpcLog.RpcLogCategory.User, ...args);
+        this.#log(level, 'user', ...args);
     }
 }
