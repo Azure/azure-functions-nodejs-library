@@ -11,6 +11,32 @@ declare module '@azure/functions-core' {
     const version: string;
 
     /**
+     * The version of the Functions Host
+     */
+    const hostVersion: string;
+
+    /**
+     * Register a function
+     * This is a preview feature and requires the feature flag `EnableWorkerIndexing` to be set in the app setting `AzureWebJobsFeatureFlags`
+     */
+    function registerFunction(metadata: FunctionMetadata, callback: FunctionCallback): Disposable;
+
+    /**
+     * A slimmed down version of `RpcFunctionMetadata` that includes the minimum amount of information needed to register a function
+     */
+    interface FunctionMetadata {
+        /**
+         * The function name
+         */
+        name: string;
+
+        /**
+         * A dictionary of binding name to binding info
+         */
+        bindings: { [name: string]: RpcBindingInfo };
+    }
+
+    /**
      * Register a hook to interact with the lifecycle of Azure Functions.
      * Hooks are executed in the order they were registered and will block execution if they throw an error
      */
@@ -32,12 +58,14 @@ declare module '@azure/functions-core' {
     interface HookContext {
         /**
          * The recommended place to share data between hooks in the same scope (app-level vs invocation-level)
+         * This object is readonly and attempting to overwrite it will throw an error
          */
-        hookData: HookData;
+        readonly hookData: HookData;
         /**
          * The recommended place to share data across scopes for all hooks
+         * This object is readonly and attempting to overwrite it will throw an error
          */
-        appHookData: HookData;
+        readonly appHookData: HookData;
     }
 
     /**
@@ -96,10 +124,6 @@ declare module '@azure/functions-core' {
          * Absolute directory of the function app
          */
         functionAppDirectory: string;
-        /**
-         * The version of the host running the function app
-         */
-        hostVersion: string;
     }
 
     /**
