@@ -10,6 +10,7 @@ export enum HeaderName {
 
 export enum MediaType {
     multipartForm = 'multipart/form-data',
+    multipartPrefix = 'multipart/',
     urlEncodedForm = 'application/x-www-form-urlencoded',
     octetStream = 'application/octet-stream',
     json = 'application/json',

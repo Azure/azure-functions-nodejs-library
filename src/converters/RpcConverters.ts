@@ -19,7 +19,7 @@ import { InternalException } from '../utils/InternalException';
  * @param typedData ITypedData object containing one of a string, json, or bytes property
  * @param convertStringToJson Optionally parse the string input type as JSON
  */
-export function fromTypedData(typedData?: RpcTypedData, convertStringToJson = true) {
+export function fromTypedData(typedData?: RpcTypedData | null, convertStringToJson = true) {
     typedData = typedData || {};
     let str = typedData.string || typedData.json;
     if (str !== undefined) {

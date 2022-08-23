@@ -91,12 +91,22 @@ export interface HttpRequest {
     user: HttpRequestUser | null;
     /**
      * The HTTP request body.
+     * If the media type is 'application/octet-stream' or 'multipart/*', this will be a Buffer
+     * If the value is a JSON parse-able string, this will be the parsed object
+     * Otherwise, this will be a string
      */
     body?: any;
+
     /**
-     * The HTTP request body as a UTF-8 string.
+     * The HTTP request body as a UTF-8 string. In this case, the name "raw" is used because the string will never be parsed to an object even if it is json.
+     * Improvements to the naming are tracked in https://github.com/Azure/azure-functions-nodejs-worker/issues/294
      */
     rawBody?: any;
+
+    /**
+     * The raw Buffer representing the body before any decoding or parsing has been done
+     */
+    bufferBody?: Buffer;
 
     /**
      * Parses the body and returns an object representing a form

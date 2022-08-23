@@ -40,7 +40,8 @@
     "dependencies": {
         "fs-extra": "^10.0.1",
         "long": "^4.0.0",
-        "uuid": "^8.3.0"
+        "uuid": "^8.3.0",
+        "iconv-lite": "^0.6.3"
     },
     "devDependencies": {
         "@types/chai": "^4.2.22",
