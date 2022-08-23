@@ -17,7 +17,7 @@ import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
 import { fromRpcTypedData } from './converters/fromRpcTypedData';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
-import { Request } from './http/Request';
+import { HttpRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
 import { nonNullProp } from './utils/nonNull';
 
@@ -48,7 +48,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
                     let input: any;
                     const bindingType = this.#bindings[binding.name].type?.toLowerCase();
                     if (binding.data.http) {
-                        input = new Request(binding.data.http);
+                        input = new HttpRequest(binding.data.http);
                     } else if (bindingType === 'timertrigger') {
                         // TODO: Don't hard code fix for camelCase https://github.com/Azure/azure-functions-nodejs-worker/issues/188
                         input = convertKeysToCamelCase(binding.data);

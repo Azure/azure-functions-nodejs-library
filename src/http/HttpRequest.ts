@@ -1,7 +1,8 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { HttpMethod, HttpRequest, HttpRequestParams, HttpRequestUser } from '@azure/functions';
+import * as types from '@azure/functions';
+import { HttpMethod, HttpRequestParams, HttpRequestUser } from '@azure/functions';
 import { RpcHttpData } from '@azure/functions-core';
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
@@ -13,7 +14,7 @@ import { parseForm } from '../parsers/parseForm';
 import { nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
-export class Request implements HttpRequest {
+export class HttpRequest implements types.HttpRequest {
     method: HttpMethod;
     url: string;
     headers: Headers;
