@@ -13,9 +13,9 @@ describe('fromRpcContext', () => {
                 traceState: 'testState',
                 attributes: { a: 'b' },
             });
-            expect(traceContext.traceParent).to.equal('testParent');
-            expect(traceContext.traceState).to.equal('testState');
-            expect(traceContext.attributes).to.deep.equal({ a: 'b' });
+            expect(traceContext?.traceParent).to.equal('testParent');
+            expect(traceContext?.traceState).to.equal('testState');
+            expect(traceContext?.attributes).to.deep.equal({ a: 'b' });
         });
 
         it('Converts null to undefined', () => {
@@ -24,9 +24,9 @@ describe('fromRpcContext', () => {
                 traceState: null,
                 attributes: null,
             });
-            expect(traceContext.attributes).to.be.undefined;
-            expect(traceContext.traceParent).to.be.undefined;
-            expect(traceContext.traceState).to.be.undefined;
+            expect(traceContext?.attributes).to.be.undefined;
+            expect(traceContext?.traceParent).to.be.undefined;
+            expect(traceContext?.traceState).to.be.undefined;
         });
 
         it('Leaves undefined as-is', () => {
@@ -35,9 +35,9 @@ describe('fromRpcContext', () => {
                 traceState: undefined,
                 attributes: undefined,
             });
-            expect(traceContext.attributes).to.be.undefined;
-            expect(traceContext.traceParent).to.be.undefined;
-            expect(traceContext.traceState).to.be.undefined;
+            expect(traceContext?.attributes).to.be.undefined;
+            expect(traceContext?.traceParent).to.be.undefined;
+            expect(traceContext?.traceState).to.be.undefined;
         });
     });
 
@@ -48,9 +48,9 @@ describe('fromRpcContext', () => {
                 maxRetryCount: 2,
                 exception: undefined,
             });
-            expect(traceContext.retryCount).to.equal(1);
-            expect(traceContext.maxRetryCount).to.equal(2);
-            expect(traceContext.exception).to.be.undefined;
+            expect(traceContext?.retryCount).to.equal(1);
+            expect(traceContext?.maxRetryCount).to.equal(2);
+            expect(traceContext?.exception).to.be.undefined;
         });
 
         it('Copies defined values with exception', () => {
@@ -63,9 +63,9 @@ describe('fromRpcContext', () => {
                     stackTrace: '3',
                 },
             });
-            expect(traceContext.retryCount).to.equal(1);
-            expect(traceContext.maxRetryCount).to.equal(2);
-            expect(traceContext.exception).to.deep.equal({
+            expect(traceContext?.retryCount).to.equal(1);
+            expect(traceContext?.maxRetryCount).to.equal(2);
+            expect(traceContext?.exception).to.deep.equal({
                 message: '1',
                 source: '2',
                 stackTrace: '3',

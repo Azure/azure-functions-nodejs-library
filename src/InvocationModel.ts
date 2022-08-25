@@ -14,55 +14,62 @@ import {
 } from '@azure/functions-core';
 import { format } from 'util';
 import { returnBindingKey } from './constants';
-import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
+import { fromRpcRetryContext, fromRpcTraceContext } from './converters/fromRpcContext';
+import { fromRpcTriggerMetadata } from './converters/fromRpcTriggerMetadata';
 import { fromRpcTypedData } from './converters/fromRpcTypedData';
+import { toCamelCaseValue } from './converters/toCamelCase';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
-import { HttpRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
-import { nonNullProp } from './utils/nonNull';
+import { isTimerTrigger, isTrigger } from './utils/isTrigger';
+import { nonNullProp, nonNullValue } from './utils/nonNull';
 
 export class InvocationModel implements coreTypes.InvocationModel {
     #isDone = false;
     #coreCtx: CoreInvocationContext;
     #functionName: string;
     #bindings: Record<string, RpcBindingInfo>;
+    #triggerType: string;
 
     constructor(coreCtx: CoreInvocationContext) {
         this.#coreCtx = coreCtx;
         this.#functionName = nonNullProp(coreCtx.metadata, 'name');
         this.#bindings = nonNullProp(coreCtx.metadata, 'bindings');
+        const triggerBinding = nonNullValue(
+            Object.values(this.#bindings).find((b) => isTrigger(b.type)),
+            'triggerBinding'
+        );
+        this.#triggerType = nonNullProp(triggerBinding, 'type');
     }
 
     // eslint-disable-next-line @typescript-eslint/require-await
     async getArguments(): Promise<InvocationArguments> {
+        const req = this.#coreCtx.request;
+
         const context = new InvocationContext({
-            ...this.#coreCtx.request,
             invocationId: nonNullProp(this.#coreCtx, 'invocationId'),
             functionName: this.#functionName,
             logHandler: (level: RpcLogLevel, ...args: unknown[]) => this.#userLog(level, ...args),
+            retryContext: fromRpcRetryContext(req.retryContext),
+            traceContext: fromRpcTraceContext(req.traceContext),
+            triggerMetadata: fromRpcTriggerMetadata(req.triggerMetadata, this.#triggerType),
         });
 
-        const inputs: any[] = [];
-        if (this.#coreCtx.request.inputData) {
-            for (const binding of this.#coreCtx.request.inputData) {
-                if (binding.data && binding.name) {
-                    let input: any;
-                    const bindingType = this.#bindings[binding.name].type?.toLowerCase();
-                    if (binding.data.http) {
-                        input = new HttpRequest(binding.data.http);
-                    } else if (bindingType === 'timertrigger') {
-                        // TODO: Don't hard code fix for camelCase https://github.com/Azure/azure-functions-nodejs-worker/issues/188
-                        input = convertKeysToCamelCase(binding.data);
-                    } else {
-                        input = fromRpcTypedData(binding.data);
-                    }
+        const inputs: unknown[] = [];
+        if (req.inputData) {
+            for (const binding of req.inputData) {
+                const bindingName = nonNullProp(binding, 'name');
+                let input: unknown = fromRpcTypedData(binding.data);
 
-                    if (bindingType && /trigger/i.test(bindingType)) {
-                        inputs.push(input);
-                    } else {
-                        context.extraInputs.set(binding.name, input);
-                    }
+                const bindingType = this.#bindings[bindingName].type;
+                if (isTimerTrigger(bindingType)) {
+                    input = toCamelCaseValue(input);
+                }
+
+                if (isTrigger(bindingType)) {
+                    inputs.push(input);
+                } else {
+                    context.extraInputs.set(bindingName, input);
                 }
             }
         }

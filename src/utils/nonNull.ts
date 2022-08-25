@@ -34,3 +34,7 @@ export function copyPropIfDefined<TData, TKey extends keyof TData>(source: TData
         destination[key] = source[key];
     }
 }
+
+export function isDefined<T>(data: T | undefined | null): data is T {
+    return data !== null && data !== undefined;
+}

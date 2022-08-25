@@ -50,6 +50,7 @@ import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { returnBindingKey, version } from './constants';
 import { InvocationModel } from './InvocationModel';
 import { getRandomHexString } from './utils/getRandomHexString';
+import { isTrigger } from './utils/isTrigger';
 
 export { HttpRequest } from './http/HttpRequest';
 export { InvocationContext } from './InvocationContext';
@@ -212,7 +213,7 @@ export namespace app {
         bindings[trigger.name] = {
             ...trigger,
             direction: 'in',
-            type: /trigger$/i.test(trigger.type) ? trigger.type : trigger.type + 'Trigger',
+            type: isTrigger(trigger.type) ? trigger.type : trigger.type + 'Trigger',
         };
 
         if (options.extraInputs) {

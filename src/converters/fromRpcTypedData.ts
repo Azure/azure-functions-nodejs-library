@@ -2,34 +2,43 @@
 // Licensed under the MIT License.
 
 import { RpcTypedData } from '@azure/functions-core';
-import { isLong } from 'long';
+import { HttpRequest } from '../http/HttpRequest';
+import { isDefined } from '../utils/nonNull';
 
-export function fromRpcTypedData(typedData?: RpcTypedData, convertStringToJson = true) {
-    typedData = typedData || {};
-    let str = typedData.string || typedData.json;
-    if (str !== undefined) {
-        if (convertStringToJson) {
-            try {
-                if (str != null) {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    str = JSON.parse(str);
-                }
-            } catch (err) {
-                // ignore
-            }
-        }
-        return str;
-    } else if (typedData.bytes) {
-        return Buffer.from(<Buffer>typedData.bytes);
-    } else if (typedData.collectionBytes && typedData.collectionBytes.bytes) {
-        const byteCollection = typedData.collectionBytes.bytes;
-        return byteCollection.map((element) => Buffer.from(<Buffer>element));
-    } else if (typedData.collectionString && typedData.collectionString.string) {
-        return typedData.collectionString.string;
-    } else if (typedData.collectionDouble && typedData.collectionDouble.double) {
-        return typedData.collectionDouble.double;
-    } else if (typedData.collectionSint64 && typedData.collectionSint64.sint64) {
-        const longCollection = typedData.collectionSint64.sint64;
-        return longCollection.map((element) => (isLong(element) ? element.toString() : element));
+export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown {
+    if (!data) {
+        return undefined;
+    } else if (isDefined(data.string)) {
+        return tryJsonParse(data.string);
+    } else if (isDefined(data.json)) {
+        return JSON.parse(data.json);
+    } else if (isDefined(data.bytes)) {
+        return Buffer.from(data.bytes);
+    } else if (isDefined(data.stream)) {
+        return Buffer.from(data.stream);
+    } else if (isDefined(data.http)) {
+        return new HttpRequest(data.http);
+    } else if (isDefined(data.int)) {
+        return data.int;
+    } else if (isDefined(data.double)) {
+        return data.double;
+    } else if (data.collectionBytes && isDefined(data.collectionBytes.bytes)) {
+        return data.collectionBytes.bytes.map((d) => Buffer.from(d));
+    } else if (data.collectionString && isDefined(data.collectionString.string)) {
+        return data.collectionString.string.map(tryJsonParse);
+    } else if (data.collectionDouble && isDefined(data.collectionDouble.double)) {
+        return data.collectionDouble.double;
+    } else if (data.collectionSint64 && isDefined(data.collectionSint64.sint64)) {
+        return data.collectionSint64.sint64;
+    } else {
+        return undefined;
+    }
+}
+
+function tryJsonParse(data: string): unknown {
+    try {
+        return JSON.parse(data);
+    } catch {
+        return data;
     }
 }

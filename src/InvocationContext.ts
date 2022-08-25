@@ -3,33 +3,26 @@
 
 import * as types from '@azure/functions';
 import { InvocationContextInit, LogHandler, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
-import { RpcInvocationRequest } from '@azure/functions-core';
-import { convertKeysToCamelCase } from './converters/convertKeysToCamelCase';
-import { fromRpcRetryContext, fromRpcTraceContext } from './converters/fromRpcContext';
 
 export class InvocationContext implements types.InvocationContext {
     invocationId: string;
     functionName: string;
-    triggerMetadata: TriggerMetadata;
-    traceContext?: TraceContext;
-    retryContext?: RetryContext;
     extraInputs: InvocationContextExtraInputs;
     extraOutputs: InvocationContextExtraOutputs;
+    retryContext?: RetryContext;
+    traceContext?: TraceContext;
+    triggerMetadata?: TriggerMetadata;
     #userLogHandler: LogHandler;
 
-    constructor(init: InvocationContextInit & RpcInvocationRequest) {
+    constructor(init: InvocationContextInit) {
         this.invocationId = init.invocationId;
         this.functionName = init.functionName;
-        this.triggerMetadata = init.triggerMetadata ? convertKeysToCamelCase(init.triggerMetadata) : {};
-        if (init.retryContext) {
-            this.retryContext = fromRpcRetryContext(init.retryContext);
-        }
-        if (init.traceContext) {
-            this.traceContext = fromRpcTraceContext(init.traceContext);
-        }
-        this.#userLogHandler = init.logHandler;
         this.extraInputs = new InvocationContextExtraInputs();
         this.extraOutputs = new InvocationContextExtraOutputs();
+        this.retryContext = init.retryContext;
+        this.traceContext = init.traceContext;
+        this.triggerMetadata = init.triggerMetadata;
+        this.#userLogHandler = init.logHandler;
     }
 
     log(...args: unknown[]): void {

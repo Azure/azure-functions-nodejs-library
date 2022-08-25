@@ -74,11 +74,6 @@ export declare class InvocationContext {
     error(...args: any[]): void;
 
     /**
-     * Trigger metadata
-     */
-    triggerMetadata: TriggerMetadata;
-
-    /**
      * The retry context of the current function execution if the retry policy is defined
      */
     retryContext?: RetryContext;
@@ -87,6 +82,12 @@ export declare class InvocationContext {
      * TraceContext information to enable distributed tracing scenarios
      */
     traceContext?: TraceContext;
+
+    /**
+     * Metadata about the trigger or undefined if the metadata is already represented elsewhere
+     * For example, this will be undefined for http and timer triggers because you can find that information on the request & timer object instead
+     */
+    triggerMetadata?: TriggerMetadata;
 }
 
 /**
@@ -241,6 +242,12 @@ export interface InvocationContextInit {
     functionName: string;
 
     logHandler: LogHandler;
+
+    traceContext?: TraceContext;
+
+    retryContext?: RetryContext;
+
+    triggerMetadata?: TriggerMetadata;
 }
 
 export type LogHandler = (level: LogLevel, ...args: unknown[]) => void;
