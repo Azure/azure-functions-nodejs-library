@@ -15,6 +15,7 @@ import { decode } from 'iconv-lite';
 import { HeaderName, MediaType } from '../constants';
 import { fromTypedData } from '../converters/RpcConverters';
 import { fromNullableMapping, fromRpcHttpBody } from '../converters/RpcHttpConverters';
+import { AzFuncSystemError } from '../errors';
 import { parseForm } from '../parsers/parseForm';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
@@ -80,7 +81,7 @@ export class Request implements HttpRequest {
     parseFormBody(): Form {
         const contentType = this.get(HeaderName.contentType);
         if (!contentType) {
-            throw new Error(`"${HeaderName.contentType}" header must be defined.`);
+            throw new AzFuncSystemError(`"${HeaderName.contentType}" header must be defined.`);
         } else {
             return parseForm(this.body, contentType);
         }

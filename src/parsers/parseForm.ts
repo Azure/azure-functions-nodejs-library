@@ -3,6 +3,7 @@
 
 import * as types from '@azure/functions';
 import { MediaType } from '../constants';
+import { AzFuncSystemError } from '../errors';
 import { parseContentType } from './parseHeader';
 import { parseMultipartForm } from './parseMultipartForm';
 
@@ -26,7 +27,7 @@ export function parseForm(data: Buffer | string, contentType: string): Form {
             return new Form(parts);
         }
         default:
-            throw new Error(
+            throw new AzFuncSystemError(
                 `Media type "${mediaType}" does not match types supported for form parsing: "${MediaType.multipartForm}", "${MediaType.urlEncodedForm}".`
             );
     }
