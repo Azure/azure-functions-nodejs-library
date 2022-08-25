@@ -22,6 +22,7 @@ const runHttp: AzureFunction = async function (context: Context, req: HttpReques
         context.log("This is a 'GET' method");
     }
 
+    context.log(`Header: ${req.get('X-CUSTOM-HEADER')}`);
     context.log('JavaScript HTTP trigger function processed a request.');
     if (req.query.name || (req.body && req.body.name)) {
         context.res = {
