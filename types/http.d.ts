@@ -109,6 +109,11 @@ export interface HttpRequest {
     bufferBody?: Buffer;
 
     /**
+     * Get the value of a particular header field
+     */
+    get(field: string): string | undefined;
+
+    /**
      * Parses the body and returns an object representing a form
      * @throws if the content type is not "multipart/form-data" or "application/x-www-form-urlencoded"
      */
