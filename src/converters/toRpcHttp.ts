@@ -4,7 +4,7 @@
 import { HttpResponse } from '@azure/functions';
 import { RpcHttpData, RpcTypedData } from '@azure/functions-core';
 import { Headers } from 'undici';
-import { InternalException } from '../utils/InternalException';
+import { AzFuncSystemError } from '../errors';
 import { toRpcHttpCookie } from './toRpcHttpCookie';
 import { toRpcTypedData } from './toRpcTypedData';
 
@@ -12,7 +12,7 @@ export function toRpcHttp(data: unknown): RpcTypedData | null | undefined {
     if (data === null || data === undefined) {
         return data;
     } else if (typeof data !== 'object') {
-        throw new InternalException(
+        throw new AzFuncSystemError(
             'The HTTP response must be an object with optional properties "body", "status", "headers", and "cookies".'
         );
     }
@@ -22,7 +22,7 @@ export function toRpcHttp(data: unknown): RpcTypedData | null | undefined {
     rpcResponse.body = toRpcTypedData(response.body);
     if (response.status !== null && response.status !== undefined) {
         if (typeof response.status !== 'string' && typeof response.status !== 'number') {
-            throw new InternalException('The HTTP response "status" property must be of type "number" or "string".');
+            throw new AzFuncSystemError('The HTTP response "status" property must be of type "number" or "string".');
         } else {
             rpcResponse.statusCode = response.status.toString();
         }

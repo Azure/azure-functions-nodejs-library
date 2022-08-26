@@ -4,6 +4,7 @@
 import { Blob } from 'buffer';
 import { FormData } from 'undici';
 import { HeaderName } from '../constants';
+import { AzFuncSystemError } from '../errors';
 import { getHeaderValue, parseContentDisposition } from './parseHeader';
 
 const carriageReturn = Buffer.from('\r')[0];
@@ -62,7 +63,7 @@ export function parseMultipartForm(chunk: Buffer, boundary: string): FormData {
                 // A blank line means we're done with the headers for this part
                 inHeaders = false;
                 if (!currentName) {
-                    throw new Error(
+                    throw new AzFuncSystemError(
                         `Expected part to have header "${HeaderName.contentDisposition}" with parameter "name".`
                     );
                 } else {

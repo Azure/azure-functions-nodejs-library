@@ -3,7 +3,7 @@
 
 import { expect } from 'chai';
 import 'mocha';
-import { ensureErrorType } from '../../src/utils/ensureErrorType';
+import { ensureErrorType } from '../src/errors';
 
 describe('ensureErrorType', () => {
     it('null', () => {

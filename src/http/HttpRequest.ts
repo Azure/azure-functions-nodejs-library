@@ -10,6 +10,7 @@ import { FormData, Headers, Request as uRequest } from 'undici';
 import { URLSearchParams } from 'url';
 import { HeaderName } from '../constants';
 import { fromNullableMapping } from '../converters/fromRpcNullable';
+import { AzFuncSystemError } from '../errors';
 import { parseForm } from '../parsers/parseForm';
 import { nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
@@ -78,7 +79,7 @@ export class HttpRequest implements types.HttpRequest {
     async formData(): Promise<FormData> {
         const contentType = this.headers.get(HeaderName.contentType);
         if (!contentType) {
-            throw new Error(`"${HeaderName.contentType}" header must be defined.`);
+            throw new AzFuncSystemError(`"${HeaderName.contentType}" header must be defined.`);
         } else if (!this.#body) {
             return new FormData();
         } else {

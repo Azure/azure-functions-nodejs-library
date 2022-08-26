@@ -3,6 +3,7 @@
 
 import { FormData } from 'undici';
 import { MediaType } from '../constants';
+import { AzFuncSystemError } from '../errors';
 import { parseContentType } from './parseHeader';
 import { parseMultipartForm } from './parseMultipartForm';
 
@@ -25,7 +26,7 @@ export function parseForm(data: Buffer | string, contentType: string): FormData 
             return result;
         }
         default:
-            throw new Error(
+            throw new AzFuncSystemError(
                 `Media type "${mediaType}" does not match types supported for form parsing: "${MediaType.multipartForm}", "${MediaType.urlEncodedForm}".`
             );
     }

@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { RpcNullableBool, RpcNullableDouble, RpcNullableString, RpcNullableTimestamp } from '@azure/functions-core';
-import { InternalException } from '../utils/InternalException';
+import { AzFuncSystemError } from '../errors';
 
 /**
  * Converts boolean input to an 'INullableBool' to be sent through the RPC layer.
@@ -18,7 +18,7 @@ export function toNullableBool(nullable: boolean | undefined, propertyName: stri
     }
 
     if (nullable != null) {
-        throw new InternalException(
+        throw new AzFuncSystemError(
             `A 'boolean' type was expected instead of a '${typeof nullable}' type. Cannot parse value of '${propertyName}'.`
         );
     }
@@ -50,7 +50,7 @@ export function toNullableDouble(
     }
 
     if (nullable != null) {
-        throw new InternalException(
+        throw new AzFuncSystemError(
             `A 'number' type was expected instead of a '${typeof nullable}' type. Cannot parse value of '${propertyName}'.`
         );
     }
@@ -70,7 +70,7 @@ export function toRpcString(nullable: string | undefined, propertyName: string):
     }
 
     if (nullable != null) {
-        throw new InternalException(
+        throw new AzFuncSystemError(
             `A 'string' type was expected instead of a '${typeof nullable}' type. Cannot parse value of '${propertyName}'.`
         );
     }
@@ -92,7 +92,7 @@ export function toNullableString(nullable: string | undefined, propertyName: str
     }
 
     if (nullable != null) {
-        throw new InternalException(
+        throw new AzFuncSystemError(
             `A 'string' type was expected instead of a '${typeof nullable}' type. Cannot parse value of '${propertyName}'.`
         );
     }
@@ -122,7 +122,7 @@ export function toNullableTimestamp(
                 };
             }
         } catch {
-            throw new InternalException(
+            throw new AzFuncSystemError(
                 `A 'number' or 'Date' input was expected instead of a '${typeof dateTime}'. Cannot parse value of '${propertyName}'.`
             );
         }
