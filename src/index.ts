@@ -60,13 +60,17 @@ import { isTrigger } from './utils/isTrigger';
 export { HttpRequest } from './http/HttpRequest';
 export { InvocationContext } from './InvocationContext';
 
-function tryGetCoreApiLazy(): typeof coreTypes | undefined {
-    try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        return <typeof coreTypes>require('@azure/functions-core');
-    } catch {
-        return undefined;
+let coreApi: typeof coreTypes | undefined | null;
+function tryGetCoreApiLazy(): typeof coreTypes | null {
+    if (coreApi === undefined) {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            coreApi = <typeof coreTypes>require('@azure/functions-core');
+        } catch {
+            coreApi = null;
+        }
     }
+    return coreApi;
 }
 
 class ProgrammingModel implements coreTypes.ProgrammingModel {
