@@ -110,6 +110,23 @@ describe('Binding Converters', () => {
         expect(bindingData.sys.UtcNow).to.be.undefined;
     });
 
+    it('normalizes binding trigger metadata with bytes as number', () => {
+        // Test to cover this bug:
+        // https://github.com/Azure/azure-functions-nodejs-worker/issues/607
+        const request: RpcInvocationRequest = <RpcInvocationRequest>{
+            triggerMetadata: {
+                A: {
+                    data: 'json',
+                    json: '{"B":{"bytes":4}}',
+                },
+            },
+            invocationId: '12341',
+        };
+
+        const bindingData = getNormalizedBindingData(request);
+        expect(bindingData.a).to.deep.equal({ b: { bytes: 4 } });
+    });
+
     it('catologues binding definitions', () => {
         const functionMetaData: RpcFunctionMetadata = <RpcFunctionMetadata>{
             name: 'MyFunction',

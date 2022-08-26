@@ -37,18 +37,23 @@ export function getNormalizedBindingData(request: RpcInvocationRequest): Context
 export function convertKeysToCamelCase(obj: any) {
     const output = {};
     for (const key in obj) {
-        // Only "undefined" will be replaced with original object property. For example:
-        //{ string : "0" } -> 0
-        //{ string : "false" } -> false
-        //"test" -> "test" (undefined returned from fromTypedData)
-        const valueFromDataType = fromTypedData(obj[key]);
-        const value = valueFromDataType === undefined ? obj[key] : valueFromDataType;
         const camelCasedKey = key.charAt(0).toLocaleLowerCase() + key.slice(1);
-        // If the value is a JSON object (and not array and not http, which is already cased), convert keys to camel case
-        if (!Array.isArray(value) && typeof value === 'object' && value && value.http == undefined) {
-            output[camelCasedKey] = convertKeysToCamelCase(value);
-        } else {
-            output[camelCasedKey] = value;
+        try {
+            // Only "undefined" will be replaced with original object property. For example:
+            //{ string : "0" } -> 0
+            //{ string : "false" } -> false
+            //"test" -> "test" (undefined returned from fromTypedData)
+            const valueFromDataType = fromTypedData(obj[key]);
+            const value = valueFromDataType === undefined ? obj[key] : valueFromDataType;
+            // If the value is a JSON object (and not array and not http, which is already cased), convert keys to camel case
+            if (!Array.isArray(value) && typeof value === 'object' && value && value.http == undefined) {
+                output[camelCasedKey] = convertKeysToCamelCase(value);
+            } else {
+                output[camelCasedKey] = value;
+            }
+        } catch {
+            // Just use the original value if we failed to recursively convert for any reason
+            output[camelCasedKey] = obj[key];
         }
     }
     return output;
