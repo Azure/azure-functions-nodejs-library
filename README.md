@@ -13,6 +13,8 @@ npm install @azure/functions
 
 ## Usage
 
+_**UPDATE**_: **See here for important information on v4 of the Azure Functions Node.js Framework: https://aka.ms/AzFuncNodeV4**
+
 Prior to version 3.5.0, this package only contained TypeScript type definitions. Starting with version 3.5.0 it _also_ contains the underlying Azure Functions Framework for Node.js. This framework package is included by default in [v4.x of the Azure Functions runtime](https://docs.microsoft.com/azure/azure-functions/functions-versions?pivots=programming-language-javascript), meaning you do _not_ need to include the package in your app. However, there may be cases where you want a specific version of the package, so you can override the default shipped in Azure with the below steps.
 
 ### TypeScript:
