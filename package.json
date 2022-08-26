@@ -28,6 +28,9 @@
         "NOTICE.html",
         "_manifest"
     ],
+    "engines": {
+        "node": ">=18.0"
+    },
     "scripts": {
         "build": "node ./node_modules/typescript/bin/tsc",
         "test": "node ./dist/test/index.js",
