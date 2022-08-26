@@ -2,11 +2,9 @@
 // Licensed under the MIT License.
 
 import { BindingDefinition, ContextBindingData } from '@azure/functions';
-import { RpcBindingInfo, RpcInvocationRequest } from '@azure/functions-core';
+import { RpcInvocationRequest } from '@azure/functions-core';
 import { FunctionInfo } from '../FunctionInfo';
 import { fromTypedData } from './RpcConverters';
-
-type BindingDirection = 'in' | 'out' | 'inout' | undefined;
 
 export function getBindingDefinitions(info: FunctionInfo): BindingDefinition[] {
     const bindings = info.bindings;
@@ -18,7 +16,7 @@ export function getBindingDefinitions(info: FunctionInfo): BindingDefinition[] {
         return {
             name: name,
             type: bindings[name].type || '',
-            direction: getDirectionName(bindings[name].direction),
+            direction: bindings[name].direction || undefined,
         };
     });
 }
@@ -33,15 +31,6 @@ export function getNormalizedBindingData(request: RpcInvocationRequest): Context
         Object.assign(bindingData, convertKeysToCamelCase(request.triggerMetadata));
     }
     return bindingData;
-}
-
-function getDirectionName(direction: RpcBindingInfo.Direction | null | undefined): BindingDirection {
-    const directionName = Object.keys(RpcBindingInfo.Direction).find((k) => RpcBindingInfo.Direction[k] === direction);
-    return isBindingDirection(directionName) ? (directionName as BindingDirection) : undefined;
-}
-
-function isBindingDirection(input: string | undefined): boolean {
-    return input == 'in' || input == 'out' || input == 'inout';
 }
 
 // Recursively convert keys of objects to camel case

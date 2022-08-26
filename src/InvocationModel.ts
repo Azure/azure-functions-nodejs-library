@@ -7,7 +7,8 @@ import {
     CoreInvocationContext,
     InvocationArguments,
     RpcInvocationResponse,
-    RpcLog,
+    RpcLogCategory,
+    RpcLogLevel,
     RpcParameterBinding,
 } from '@azure/functions-core';
 import { format } from 'util';
@@ -35,7 +36,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         const { context, inputs } = CreateContextAndInputs(
             this.#funcInfo,
             this.#coreCtx.request,
-            (level: RpcLog.Level, ...args: any[]) => this.#userLog(level, ...args),
+            (level: RpcLogLevel, ...args: any[]) => this.#userLog(level, ...args),
             this.#doneEmitter
         );
         return { context, inputs };
@@ -142,23 +143,23 @@ export class InvocationModel implements coreTypes.InvocationModel {
         return response;
     }
 
-    #log(level: RpcLog.Level, logCategory: RpcLog.RpcLogCategory, ...args: any[]): void {
+    #log(level: RpcLogLevel, logCategory: RpcLogCategory, ...args: any[]): void {
         this.#coreCtx.log(level, logCategory, format.apply(null, <[any, any[]]>args));
     }
 
-    #systemLog(level: RpcLog.Level, ...args: any[]) {
-        this.#log(level, RpcLog.RpcLogCategory.System, ...args);
+    #systemLog(level: RpcLogLevel, ...args: any[]) {
+        this.#log(level, 'system', ...args);
     }
 
-    #userLog(level: RpcLog.Level, ...args: any[]): void {
+    #userLog(level: RpcLogLevel, ...args: any[]): void {
         if (this.#isDone && this.#coreCtx.state !== 'postInvocationHooks') {
             let badAsyncMsg =
                 "Warning: Unexpected call to 'log' on the context object after function execution has completed. Please check for asynchronous calls that are not awaited or calls to 'done' made before function execution completes. ";
             badAsyncMsg += `Function name: ${this.#funcInfo.name}. Invocation Id: ${this.#coreCtx.invocationId}. `;
             badAsyncMsg += `Learn more: ${asyncDoneLearnMoreLink}`;
-            this.#systemLog(RpcLog.Level.Warning, badAsyncMsg);
+            this.#systemLog('warning', badAsyncMsg);
         }
-        this.#log(level, RpcLog.RpcLogCategory.User, ...args);
+        this.#log(level, 'user', ...args);
     }
 
     #onDone(): void {
@@ -166,7 +167,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
             const message = this.#resultIsPromise
                 ? `Error: Choose either to return a promise or call 'done'. Do not use both in your script. Learn more: ${asyncDoneLearnMoreLink}`
                 : "Error: 'done' has already been called. Please check your script for extraneous calls to 'done'.";
-            this.#systemLog(RpcLog.Level.Error, message);
+            this.#systemLog('error', message);
         }
         this.#isDone = true;
     }
