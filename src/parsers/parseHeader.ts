@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { HeaderName } from '../constants';
+import { AzFuncSystemError } from '../errors';
 
 const space = ' ';
 // See "LEXICAL TOKENS" section for definition of ctl chars and quoted string: https://www.w3.org/Protocols/rfc822/3_Lexical.html
@@ -35,7 +36,7 @@ export function getHeaderValue(data: string, headerName: string): string | null 
 export function parseContentType(data: string): [string, HeaderParams] {
     const match = new RegExp(`${start}(${token}\\/${token})${semicolonEnd}`, 'i').exec(data);
     if (!match) {
-        throw new Error(`${HeaderName.contentType} must begin with format "type/subtype".`);
+        throw new AzFuncSystemError(`${HeaderName.contentType} must begin with format "type/subtype".`);
     } else {
         return [match[1], parseHeaderParams(match[2])];
     }
@@ -48,7 +49,7 @@ export function parseContentType(data: string): [string, HeaderParams] {
 export function parseContentDisposition(data: string): [string, HeaderParams] {
     const match = new RegExp(`${start}(${token})${semicolonEnd}`, 'i').exec(data);
     if (!match) {
-        throw new Error(`${HeaderName.contentDisposition} must begin with disposition type.`);
+        throw new AzFuncSystemError(`${HeaderName.contentDisposition} must begin with disposition type.`);
     } else {
         return [match[1], parseHeaderParams(match[2])];
     }
@@ -81,7 +82,7 @@ export class HeaderParams {
     get(name: string): string {
         const result = this.#params[name.toLowerCase()];
         if (result === undefined) {
-            throw new Error(`Failed to find parameter with name "${name}".`);
+            throw new AzFuncSystemError(`Failed to find parameter with name "${name}".`);
         } else {
             return result;
         }

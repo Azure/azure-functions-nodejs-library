@@ -14,8 +14,8 @@ import {
 import { format } from 'util';
 import { CreateContextAndInputs } from './Context';
 import { toTypedData } from './converters/RpcConverters';
+import { isError } from './errors';
 import { FunctionInfo } from './FunctionInfo';
-import { isError } from './utils/ensureErrorType';
 import EventEmitter = require('events');
 
 const asyncDoneLearnMoreLink = 'https://go.microsoft.com/fwlink/?linkid=2097909';

@@ -3,6 +3,7 @@
 
 import { FormPart } from '@azure/functions';
 import { HeaderName } from '../constants';
+import { AzFuncSystemError } from '../errors';
 import { getHeaderValue, parseContentDisposition } from './parseHeader';
 
 const carriageReturn = Buffer.from('\r')[0];
@@ -50,7 +51,7 @@ export function parseMultipartForm(chunk: Buffer, boundary: string): [string, Fo
             inHeaders = true;
         } else if (inHeaders) {
             if (!currentPart) {
-                throw new Error(`Expected form data to start with boundary "${boundary}".`);
+                throw new AzFuncSystemError(`Expected form data to start with boundary "${boundary}".`);
             }
 
             const lineAsString = line.toString();
@@ -58,7 +59,7 @@ export function parseMultipartForm(chunk: Buffer, boundary: string): [string, Fo
                 // A blank line means we're done with the headers for this part
                 inHeaders = false;
                 if (!currentName) {
-                    throw new Error(
+                    throw new AzFuncSystemError(
                         `Expected part to have header "${HeaderName.contentDisposition}" with parameter "name".`
                     );
                 } else {

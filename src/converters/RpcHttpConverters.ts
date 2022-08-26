@@ -10,6 +10,7 @@ import {
     RpcTypedData,
 } from '@azure/functions-core';
 import { Dict } from '../Context';
+import { AzFuncSystemError } from '../errors';
 import {
     fromTypedData,
     toNullableBool,
@@ -57,7 +58,7 @@ export function fromNullableMapping(
 export function toRpcHttp(inputMessage): RpcTypedData {
     // Check if we will fail to find any of these
     if (typeof inputMessage !== 'object' || Array.isArray(inputMessage)) {
-        throw new Error(
+        throw new AzFuncSystemError(
             "The HTTP response must be an 'object' type that can include properties such as 'body', 'status', and 'headers'. Learn more: https://go.microsoft.com/fwlink/?linkid=2112563"
         );
     }
