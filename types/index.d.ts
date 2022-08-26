@@ -11,6 +11,13 @@ import {
     CosmosDBTriggerOptions,
 } from './cosmosDB';
 import {
+    EventHubFunctionOptions,
+    EventHubOutput,
+    EventHubOutputOptions,
+    EventHubTrigger,
+    EventHubTriggerOptions,
+} from './eventHub';
+import {
     HttpFunctionOptions,
     HttpHandler,
     HttpOutput,
@@ -48,6 +55,7 @@ import {
 import { TimerFunctionOptions, TimerTrigger, TimerTriggerOptions } from './timer';
 
 export * from './cosmosDB';
+export * from './eventHub';
 export * from './http';
 export * from './InvocationContext';
 export * from './serviceBus';
@@ -171,6 +179,13 @@ export namespace app {
     export function serviceBusTopic(name: string, options: ServiceBusTopicFunctionOptions): void;
 
     /**
+     * Registers a function in your app that will be triggered whenever a message is added to an event hub
+     * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+     * @param options Configuration options describing the inputs, outputs, and handler for this function
+     */
+    export function eventHub(name: string, options: EventHubFunctionOptions): void;
+
+    /**
      * Registers a Cosmos DB function in your app that will be triggered whenever inserts and updates occur (not deletions)
      * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
      * @param options Configuration options describing the inputs, outputs, and handler for this function
@@ -218,6 +233,11 @@ export namespace trigger {
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-trigger?pivots=programming-language-javascript)
      */
     export function serviceBusTopic(options: ServiceBusTopicTriggerOptions): ServiceBusTopicTrigger;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-hubs-trigger?pivots=programming-language-javascript)
+     */
+    export function eventHub(options: EventHubTriggerOptions): EventHubTrigger;
 
     /**
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger?pivots=programming-language-javascript)
@@ -273,6 +293,11 @@ export namespace output {
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-service-bus-output?pivots=programming-language-javascript)
      */
     export function serviceBusTopic(options: ServiceBusTopicOutputOptions): ServiceBusTopicOutput;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-hubs-output?pivots=programming-language-javascript)
+     */
+    export function eventHub(options: EventHubOutputOptions): EventHubOutput;
 
     /**
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-output?pivots=programming-language-javascript)

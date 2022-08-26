@@ -9,6 +9,11 @@ import {
     CosmosDBOutputOptions,
     CosmosDBTrigger,
     CosmosDBTriggerOptions,
+    EventHubFunctionOptions,
+    EventHubOutput,
+    EventHubOutputOptions,
+    EventHubTrigger,
+    EventHubTriggerOptions,
     FunctionInput,
     FunctionOptions,
     FunctionOutput,
@@ -182,6 +187,18 @@ export namespace app {
         });
     }
 
+    export function eventHub(name: string, options: EventHubFunctionOptions): void {
+        generic(name, {
+            trigger: trigger.eventHub({
+                connection: options.connection,
+                eventHubName: options.eventHubName,
+                cardinality: options.cardinality,
+                consumerGroup: options.consumerGroup,
+            }),
+            ...options,
+        });
+    }
+
     export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
         generic(name, {
             trigger: trigger.cosmosDB({
@@ -304,6 +321,14 @@ export namespace trigger {
         };
     }
 
+    export function eventHub(options: EventHubTriggerOptions): EventHubTrigger {
+        return {
+            ...options,
+            name: getNewTriggerName(),
+            type: 'eventHubTrigger',
+        };
+    }
+
     export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
         return {
             ...options,
@@ -385,6 +410,14 @@ export namespace output {
             ...options,
             name: getNewOutputName(),
             type: 'serviceBus',
+        };
+    }
+
+    export function eventHub(options: EventHubOutputOptions): EventHubOutput {
+        return {
+            ...options,
+            name: getNewOutputName(),
+            type: 'eventHub',
         };
     }
 

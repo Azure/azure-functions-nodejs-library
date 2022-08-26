@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { CosmosDBInput, CosmosDBOutput } from './cosmosDB';
+import { EventHubOutput } from './eventHub';
 import { HttpOutput, HttpResponse } from './http';
 import { FunctionInput, FunctionOutput } from './index';
 import { ServiceBusQueueOutput, ServiceBusTopicOutput } from './serviceBus';
@@ -165,6 +166,13 @@ export interface InvocationContextExtraOutputs {
      * @message the output message value
      */
     set(output: ServiceBusTopicOutput, message: unknown): void;
+
+    /**
+     * Set a secondary Event Hub output for this invocation
+     * @output the configuration object for this EventHub output
+     * @message the output messages value
+     */
+    set(output: EventHubOutput, messages: unknown): void;
 
     /**
      * Set a secondary generic output for this invocation
