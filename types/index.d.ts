@@ -11,6 +11,13 @@ import {
     CosmosDBTriggerOptions,
 } from './cosmosDB';
 import {
+    EventGridFunctionOptions,
+    EventGridOutput,
+    EventGridOutputOptions,
+    EventGridTrigger,
+    EventGridTriggerOptions,
+} from './eventGrid';
+import {
     EventHubFunctionOptions,
     EventHubOutput,
     EventHubOutputOptions,
@@ -56,6 +63,7 @@ import {
 import { TimerFunctionOptions, TimerTrigger, TimerTriggerOptions } from './timer';
 
 export * from './cosmosDB';
+export * from './eventGrid';
 export * from './eventHub';
 export * from './generic';
 export * from './http';
@@ -188,6 +196,13 @@ export namespace app {
     export function eventHub(name: string, options: EventHubFunctionOptions): void;
 
     /**
+     * Registers a function in your app that will be triggered whenever an event is sent by an event grid source
+     * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+     * @param options Configuration options describing the inputs, outputs, and handler for this function
+     */
+    export function eventGrid(name: string, options: EventGridFunctionOptions): void;
+
+    /**
      * Registers a Cosmos DB function in your app that will be triggered whenever inserts and updates occur (not deletions)
      * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
      * @param options Configuration options describing the inputs, outputs, and handler for this function
@@ -242,6 +257,11 @@ export namespace trigger {
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-hubs-trigger?pivots=programming-language-javascript)
      */
     export function eventHub(options: EventHubTriggerOptions): EventHubTrigger;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-grid-trigger?pivots=programming-language-javascript)
+     */
+    export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger;
 
     /**
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger?pivots=programming-language-javascript)
@@ -312,6 +332,11 @@ export namespace output {
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-hubs-output?pivots=programming-language-javascript)
      */
     export function eventHub(options: EventHubOutputOptions): EventHubOutput;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-grid-output?pivots=programming-language-javascript)
+     */
+    export function eventGrid(options: EventGridOutputOptions): EventGridOutput;
 
     /**
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-output?pivots=programming-language-javascript)
