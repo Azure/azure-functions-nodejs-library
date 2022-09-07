@@ -17,6 +17,10 @@ import {
     FunctionInput,
     FunctionOptions,
     FunctionOutput,
+    FunctionTrigger,
+    GenericInputOptions,
+    GenericOutputOptions,
+    GenericTriggerOptions,
     HttpFunctionOptions,
     HttpHandler,
     HttpMethod,
@@ -341,11 +345,10 @@ export namespace trigger {
         };
     }
 
-    export function generic(type: string, options: Record<string, unknown>): FunctionInput {
+    export function generic(options: GenericTriggerOptions): FunctionTrigger {
         return {
             ...options,
             name: getNewTriggerName(),
-            type,
         };
     }
 }
@@ -367,11 +370,10 @@ export namespace input {
         };
     }
 
-    export function generic(type: string, options: Record<string, unknown>): FunctionInput {
+    export function generic(options: GenericInputOptions): FunctionInput {
         return {
             ...options,
             name: getNewInputName(),
-            type,
         };
     }
 }
@@ -433,11 +435,10 @@ export namespace output {
         };
     }
 
-    export function generic(type: string, options: Record<string, unknown>): FunctionOutput {
+    export function generic(options: GenericOutputOptions): FunctionOutput {
         return {
             ...options,
             name: getNewOutputName(),
-            type,
         };
     }
 }

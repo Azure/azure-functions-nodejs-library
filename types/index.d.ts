@@ -17,6 +17,7 @@ import {
     EventHubTrigger,
     EventHubTriggerOptions,
 } from './eventHub';
+import { GenericInputOptions, GenericOutputOptions, GenericTriggerOptions } from './generic';
 import {
     HttpFunctionOptions,
     HttpHandler,
@@ -56,6 +57,7 @@ import { TimerFunctionOptions, TimerTrigger, TimerTriggerOptions } from './timer
 
 export * from './cosmosDB';
 export * from './eventHub';
+export * from './generic';
 export * from './http';
 export * from './InvocationContext';
 export * from './serviceBus';
@@ -193,15 +195,17 @@ export namespace app {
     export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
 
     /**
-     * Registers a generic function in your app that will be triggered based on the `triggerType`
+     * Registers a generic function in your app that will be triggered based on the type specified in `options.trigger.type`
+     * Use this method if your desired trigger type does not already have its own method
      * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function generic(triggerType: string, name: string, options: FunctionOptions): void;
+    export function generic(name: string, options: FunctionOptions): void;
 }
 
 /**
  * The root namespace used to help create trigger configuration (the primary input)
+ * You can create trigger config without this namespace, but it provides features like autocomplete, better build errors, and it will set the `name` property for you
  */
 export namespace trigger {
     /**
@@ -244,11 +248,16 @@ export namespace trigger {
      */
     export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
 
-    export function generic(options: { type: string }): FunctionTrigger;
+    /**
+     * A generic option that can be used for any trigger type
+     * Use this method if your desired trigger type does not already have its own method
+     */
+    export function generic(options: GenericTriggerOptions): FunctionTrigger;
 }
 
 /**
  * The root namespace used to help create secondary input configuration ("trigger" is the primary input)
+ * You can create input config without this namespace, but it provides features like autocomplete, better build errors, and it will set the `name` property for you
  * NOTE: Not all triggers can be used as secondary inputs
  */
 export namespace input {
@@ -262,11 +271,16 @@ export namespace input {
      */
     export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput;
 
-    export function generic(options: { type: string }): FunctionInput;
+    /**
+     * A generic option that can be used for any input type
+     * Use this method if your desired input type does not already have its own method
+     */
+    export function generic(options: GenericInputOptions): FunctionInput;
 }
 
 /**
  * The root namespace used to help create output configuration
+ * You can create output config without this namespace, but it provides features like autocomplete, better build errors, and it will set the `name` property for you
  */
 export namespace output {
     /**
@@ -304,7 +318,11 @@ export namespace output {
      */
     export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput;
 
-    export function generic(options: { type: string }): FunctionOutput;
+    /**
+     * A generic option that can be used for any output type
+     * Use this method if your desired output type does not already have its own method
+     */
+    export function generic(options: GenericOutputOptions): FunctionOutput;
 }
 
 /**
@@ -352,23 +370,51 @@ export interface FunctionOptions {
 /**
  * Full configuration for the primary input to a function
  */
-export interface FunctionTrigger {
+export interface FunctionTrigger extends Record<string, unknown> {
+    /**
+     * The type for this trigger ('httpTrigger', 'timerTrigger', etc.)
+     * If using the `trigger` namespace to create this object, the type will be set for you
+     */
     type: string;
+
+    /**
+     * Must be unique within this function.
+     * If using the `trigger` namespace to create this object, the name will be auto-generated for you
+     */
     name: string;
 }
 
 /**
  * Full configuration for the secondary input to a function ("trigger" is the primary input)
+ * NOTE: Not all triggers can be used as secondary inputs
  */
-export interface FunctionInput {
+export interface FunctionInput extends Record<string, unknown> {
+    /**
+     * The type for this trigger ('blob', 'cosmosDB', etc.)
+     * If using the `input` namespace to create this object, the type will be set for you
+     */
     type: string;
+
+    /**
+     * Must be unique within this function.
+     * If using the `input` namespace to create this object, the name will be auto-generated for you
+     */
     name: string;
 }
 
 /**
  * Full configuration for the output to a function
  */
-export interface FunctionOutput {
+export interface FunctionOutput extends Record<string, unknown> {
+    /**
+     * The type for this output ('http', 'blob', 'queue', etc.)
+     * If using the `output` namespace to create this object, the type will be set for you
+     */
     type: string;
+
+    /**
+     * Must be unique within this function.
+     * If using the `output` namespace to create this object, the name will be auto-generated for you
+     */
     name: string;
 }
