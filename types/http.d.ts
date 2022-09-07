@@ -61,7 +61,6 @@ export interface HttpTrigger extends FunctionTrigger {
 /**
  * At this point in time there are no http output specific options
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface HttpOutputOptions {}
 
 export type HttpOutput = FunctionOutput & HttpOutputOptions;
