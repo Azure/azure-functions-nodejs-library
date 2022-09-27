@@ -5,7 +5,7 @@
         "noImplicitAny": false,
         "strict": true,
         "noUnusedLocals": true,
-        "outDir": "dist",
+        "outDir": "out",
         "sourceMap": true,
         "baseUrl": "./",
         "paths": {
