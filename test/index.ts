@@ -9,11 +9,12 @@ export async function run(): Promise<void> {
     try {
         const options: Mocha.MochaOptions = {
             color: true,
+            require: ['ts-node/register'],
             reporter: 'mocha-multi-reporters',
             reporterOptions: {
                 reporterEnabled: 'spec, mocha-junit-reporter',
                 mochaJunitReporterReporterOptions: {
-                    mochaFile: path.resolve(__dirname, '..', '..', 'test', 'unit-test-results.xml'),
+                    mochaFile: path.resolve(__dirname, '..', 'test', 'unit-test-results.xml'),
                 },
             },
         };
@@ -23,7 +24,7 @@ export async function run(): Promise<void> {
 
         const mocha = new Mocha(options);
 
-        const files: string[] = await globby('**/**.test.js', { cwd: __dirname });
+        const files: string[] = await globby('**/**.test.ts', { cwd: __dirname });
 
         files.forEach((f) => mocha.addFile(path.resolve(__dirname, f)));
 

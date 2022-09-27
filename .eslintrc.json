@@ -57,6 +57,7 @@
         "**/*.mjs",
         "**/*.cjs",
         "dist",
+        "out",
         "azure-functions-language-worker-protobuf"
     ]
 }

@@ -21,14 +21,15 @@ jobs:
     displayName: 'npm ci'
   - script: npm run build
     displayName: 'npm run build'
-  - script: npm run webpack
-    displayName: 'npm run webpack'
+  - script: npm run minify
+    displayName: 'npm run minify'
   - task: CopyFiles@2
     displayName: 'Copy files to staging'
     inputs:
       sourceFolder: '$(Build.SourcesDirectory)'
       contents: |
-        dist/src/index-bundle.js
+        dist/**
+        src/**
         types/**
         LICENSE
         NOTICE.html
