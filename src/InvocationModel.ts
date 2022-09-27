@@ -104,6 +104,10 @@ export class InvocationModel implements coreTypes.InvocationModel {
             }
         }
 
+        if (!response.returnValue && response.outputData.length == 0 /* && !info.hasHttpTrigger*/) {
+            response.returnValue = toRpcTypedData(result);
+        }
+
         return response;
     }
 
