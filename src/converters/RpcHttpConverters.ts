@@ -55,14 +55,15 @@ export function fromNullableMapping(
  * 'http' types are a special case from other 'ITypedData' types, which come from primitive types.
  * @param inputMessage  An HTTP response object
  */
-export function toRpcHttp(inputMessage: HttpResponse): RpcTypedData {
+export function toRpcHttp(data: unknown): RpcTypedData {
     // Check if we will fail to find any of these
-    if (typeof inputMessage !== 'object' || Array.isArray(inputMessage)) {
+    if (typeof data !== 'object' || Array.isArray(data)) {
         throw new AzFuncSystemError(
             "The HTTP response must be an 'object' type that can include properties such as 'body', 'status', and 'headers'. Learn more: https://go.microsoft.com/fwlink/?linkid=2112563"
         );
     }
 
+    const inputMessage: HttpResponse = data || {};
     let status = inputMessage.statusCode;
     if (typeof inputMessage.status !== 'function') {
         status ||= inputMessage.status;
