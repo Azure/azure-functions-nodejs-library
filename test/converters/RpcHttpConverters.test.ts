@@ -114,7 +114,6 @@ describe('Rpc Converters', () => {
     it('throws on array as http response', () => {
         expect(() => {
             const response = ['one', 2, '3'];
-            // @ts-expect-error: passing wrong type
             toRpcHttp(response);
         }).to.throw(
             "The HTTP response must be an 'object' type that can include properties such as 'body', 'status', and 'headers'. Learn more: https://go.microsoft.com/fwlink/?linkid=2112563"
@@ -124,7 +123,6 @@ describe('Rpc Converters', () => {
     it('throws on string as http response', () => {
         expect(() => {
             const response = 'My output string';
-            // @ts-expect-error: passing wrong type
             toRpcHttp(response);
         }).to.throw(
             "The HTTP response must be an 'object' type that can include properties such as 'body', 'status', and 'headers'. Learn more: https://go.microsoft.com/fwlink/?linkid=2112563"
