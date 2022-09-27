@@ -7,12 +7,11 @@ import { fromString } from 'long';
 import 'mocha';
 import { getBindingDefinitions, getNormalizedBindingData } from '../../src/converters/BindingConverters';
 import { fromTypedData } from '../../src/converters/RpcConverters';
-import { toRpcHttp } from '../../src/converters/RpcHttpConverters';
 import { FunctionInfo } from '../../src/FunctionInfo';
 
 describe('Binding Converters', () => {
     it('normalizes binding trigger metadata for HTTP', () => {
-        const mockRequest: RpcTypedData = toRpcHttp({ url: 'https://mock' });
+        const mockRequest: RpcTypedData = { http: { url: 'https://mock' } };
         const triggerDataMock: { [k: string]: RpcTypedData } = {
             Headers: {
                 json: JSON.stringify({ Connection: 'Keep-Alive' }),

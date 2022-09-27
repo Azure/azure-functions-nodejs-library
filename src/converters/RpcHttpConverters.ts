@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { Cookie } from '@azure/functions';
+import { Cookie, HttpResponse } from '@azure/functions';
 import {
     RpcHttpCookie,
     RpcHttpCookieSameSite,
@@ -55,23 +55,27 @@ export function fromNullableMapping(
  * 'http' types are a special case from other 'ITypedData' types, which come from primitive types.
  * @param inputMessage  An HTTP response object
  */
-export function toRpcHttp(inputMessage): RpcTypedData {
+export function toRpcHttp(data: unknown): RpcTypedData {
     // Check if we will fail to find any of these
-    if (typeof inputMessage !== 'object' || Array.isArray(inputMessage)) {
+    if (typeof data !== 'object' || Array.isArray(data)) {
         throw new AzFuncSystemError(
             "The HTTP response must be an 'object' type that can include properties such as 'body', 'status', and 'headers'. Learn more: https://go.microsoft.com/fwlink/?linkid=2112563"
         );
     }
 
-    const httpMessage: RpcHttpData = inputMessage;
-    httpMessage.headers = toRpcHttpHeaders(inputMessage.headers);
-    httpMessage.cookies = toRpcHttpCookieList(inputMessage.cookies || []);
+    const inputMessage: HttpResponse = data || {};
     let status = inputMessage.statusCode;
     if (typeof inputMessage.status !== 'function') {
         status ||= inputMessage.status;
     }
-    httpMessage.statusCode = status && status.toString();
-    httpMessage.body = toTypedData(inputMessage.body);
+    const httpMessage: RpcHttpData = {
+        ...inputMessage,
+        statusCode: status?.toString() || null,
+        headers: toRpcHttpHeaders(inputMessage.headers),
+        cookies: toRpcHttpCookieList(inputMessage.cookies || []),
+        body: toTypedData(inputMessage.body),
+    };
+
     return { http: httpMessage };
 }
 
@@ -79,11 +83,13 @@ export function toRpcHttp(inputMessage): RpcTypedData {
  * Convert HTTP headers to a string/string mapping.
  * @param inputHeaders
  */
-function toRpcHttpHeaders(inputHeaders: RpcTypedData) {
+function toRpcHttpHeaders(inputHeaders: RpcTypedData | undefined) {
     const rpcHttpHeaders: { [key: string]: string } = {};
-    for (const key in inputHeaders) {
-        if (inputHeaders[key] != null) {
-            rpcHttpHeaders[key] = inputHeaders[key].toString();
+    if (inputHeaders) {
+        for (const key in inputHeaders) {
+            if (inputHeaders[key] != null) {
+                rpcHttpHeaders[key] = inputHeaders[key].toString();
+            }
         }
     }
     return rpcHttpHeaders;

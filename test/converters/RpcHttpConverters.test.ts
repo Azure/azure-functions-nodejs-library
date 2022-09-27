@@ -1,9 +1,10 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { Cookie } from '@azure/functions';
+import { Cookie, HttpResponse } from '@azure/functions';
 import { expect } from 'chai';
 import 'mocha';
+import { toTypedData } from '../../src/converters/RpcConverters';
 import { toRpcHttp, toRpcHttpCookieList } from '../../src/converters/RpcHttpConverters';
 
 describe('Rpc Converters', () => {
@@ -126,5 +127,14 @@ describe('Rpc Converters', () => {
         }).to.throw(
             "The HTTP response must be an 'object' type that can include properties such as 'body', 'status', and 'headers'. Learn more: https://go.microsoft.com/fwlink/?linkid=2112563"
         );
+    });
+
+    it('copies by value', () => {
+        const response: HttpResponse = {
+            body: 'before',
+        };
+        const converted = toRpcHttp(response);
+        response.body = 'after';
+        expect(converted.http?.body).to.deep.equal(toTypedData('before'));
     });
 });
