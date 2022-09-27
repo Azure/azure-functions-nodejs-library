@@ -38,6 +38,7 @@ jspm_packages
 azure-functions-language-worker-protobuf/*
 
 dist
+out
 pkg
 *.tgz
 
