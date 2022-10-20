@@ -63,7 +63,6 @@ import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { returnBindingKey, version } from './constants';
 import { InvocationModel } from './InvocationModel';
-import { getRandomHexString } from './utils/getRandomHexString';
 import { isTrigger } from './utils/isTrigger';
 
 export { HttpRequest } from './http/HttpRequest';
@@ -292,196 +291,188 @@ export namespace app {
 
 export namespace trigger {
     export function http(options: HttpTriggerOptions): HttpTrigger {
-        return {
+        return addTriggerBindingName({
             ...options,
             authLevel: options.authLevel || 'anonymous',
             methods: options.methods || ['GET', 'POST'],
-            name: getNewTriggerName(),
             type: 'httpTrigger',
-        };
+        });
     }
 
     export function timer(options: TimerTriggerOptions): TimerTrigger {
-        return {
+        return addTriggerBindingName({
             ...options,
-            name: getNewTriggerName(),
             type: 'timerTrigger',
-        };
+        });
     }
 
     export function storageBlob(options: StorageBlobTriggerOptions): StorageBlobTrigger {
-        return {
+        return addTriggerBindingName({
             ...options,
-            name: getNewTriggerName(),
             type: 'blobTrigger',
-        };
+        });
     }
 
     export function storageQueue(options: StorageQueueTriggerOptions): StorageQueueTrigger {
-        return {
+        return addTriggerBindingName({
             ...options,
-            name: getNewTriggerName(),
             type: 'queueTrigger',
-        };
+        });
     }
 
     export function serviceBusQueue(options: ServiceBusQueueTriggerOptions): ServiceBusQueueTrigger {
-        return {
+        return addTriggerBindingName({
             ...options,
-            name: getNewTriggerName(),
             type: 'serviceBusTrigger',
-        };
+        });
     }
 
     export function serviceBusTopic(options: ServiceBusTopicTriggerOptions): ServiceBusTopicTrigger {
-        return {
+        return addTriggerBindingName({
             ...options,
-            name: getNewTriggerName(),
             type: 'serviceBusTrigger',
-        };
+        });
     }
 
     export function eventHub(options: EventHubTriggerOptions): EventHubTrigger {
-        return {
+        return addTriggerBindingName({
             ...options,
-            name: getNewTriggerName(),
             type: 'eventHubTrigger',
-        };
+        });
     }
 
     export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger {
-        return {
+        return addTriggerBindingName({
             ...options,
-            name: getNewTriggerName(),
             type: 'eventGridTrigger',
-        };
+        });
     }
 
     export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
-        return {
+        return addTriggerBindingName({
             ...options,
-            name: getNewTriggerName(),
             type: 'cosmosDBTrigger',
-        };
+        });
     }
 
     export function generic(options: GenericTriggerOptions): FunctionTrigger {
-        return {
-            ...options,
-            name: getNewTriggerName(),
-        };
+        return addTriggerBindingName(options);
     }
 }
 
 export namespace input {
     export function storageBlob(options: StorageBlobInputOptions): StorageBlobInput {
-        return {
+        return addInputBindingName({
             ...options,
-            name: getNewInputName(),
             type: 'blob',
-        };
+        });
     }
 
     export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput {
-        return {
+        return addInputBindingName({
             ...options,
-            name: getNewInputName(),
             type: 'cosmosDB',
-        };
+        });
     }
 
     export function generic(options: GenericInputOptions): FunctionInput {
-        return {
-            ...options,
-            name: getNewInputName(),
-        };
+        return addInputBindingName(options);
     }
 }
 
 export namespace output {
     export function http(options: HttpOutputOptions): HttpOutput {
-        return {
+        return addOutputBindingName({
             ...options,
-            name: getNewOutputName(),
             type: 'http',
-        };
+        });
     }
 
     export function storageBlob(options: StorageBlobOutputOptions): StorageBlobOutput {
-        return {
+        return addOutputBindingName({
             ...options,
-            name: getNewOutputName(),
             type: 'blob',
-        };
+        });
     }
 
     export function storageQueue(options: StorageQueueOutputOptions): StorageQueueOutput {
-        return {
+        return addOutputBindingName({
             ...options,
-            name: getNewOutputName(),
             type: 'queue',
-        };
+        });
     }
 
     export function serviceBusQueue(options: ServiceBusQueueOutputOptions): ServiceBusQueueOutput {
-        return {
+        return addOutputBindingName({
             ...options,
-            name: getNewOutputName(),
             type: 'serviceBus',
-        };
+        });
     }
 
     export function serviceBusTopic(options: ServiceBusTopicOutputOptions): ServiceBusTopicOutput {
-        return {
+        return addOutputBindingName({
             ...options,
-            name: getNewOutputName(),
             type: 'serviceBus',
-        };
+        });
     }
 
     export function eventHub(options: EventHubOutputOptions): EventHubOutput {
-        return {
+        return addOutputBindingName({
             ...options,
-            name: getNewOutputName(),
             type: 'eventHub',
-        };
+        });
     }
 
     export function eventGrid(options: EventGridOutputOptions): EventGridOutput {
-        return {
+        return addOutputBindingName({
             ...options,
-            name: getNewOutputName(),
             type: 'eventGrid',
-        };
+        });
     }
 
     export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput {
-        return {
+        return addOutputBindingName({
             ...options,
-            name: getNewOutputName(),
             type: 'cosmosDB',
-        };
+        });
     }
 
     export function generic(options: GenericOutputOptions): FunctionOutput {
-        return {
-            ...options,
-            name: getNewOutputName(),
-        };
+        return addOutputBindingName(options);
     }
 }
 
-function getNewTriggerName(): string {
-    // it has to start with a letter and can't have special characters like hyphens
-    return 'trigger' + getRandomHexString(10);
+function addInputBindingName<T extends { type: string; name?: string }>(binding: T): T & { name: string } {
+    return addBindingName(binding, 'Input');
 }
 
-function getNewInputName(): string {
-    // it has to start with a letter and can't have special characters like hyphens
-    return 'input' + getRandomHexString(10);
+function addTriggerBindingName<T extends { type: string; name?: string }>(binding: T): T & { name: string } {
+    return addBindingName(binding, 'Trigger');
 }
 
-function getNewOutputName(): string {
-    // it has to start with a letter and can't have special characters like hyphens
-    return 'output' + getRandomHexString(10);
+function addOutputBindingName<T extends { type: string; name?: string }>(binding: T): T & { name: string } {
+    return addBindingName(binding, 'Output');
+}
+
+const bindingCounts: Record<string, number> = {};
+/**
+ * If the host spawns multiple workers, it expects the metadata (including binding name) to be the same accross workers
+ * That means we need to generate binding names in a deterministic fashion, so we'll do that using a count
+ * There's a tiny risk users register bindings in a non-deterministic order (i.e. async race conditions), but it's okay considering the following:
+ * 1. We will track the count individually for each binding type. This makes the names more readable and reduces the chances a race condition will matter
+ * 2. Users can manually specify the name themselves (aka if they're doing weird async stuff) and we will respect that
+ * More info here: https://github.com/Azure/azure-functions-nodejs-worker/issues/638
+ */
+function addBindingName<T extends { type: string; name?: string }>(binding: T, suffix: string): T & { name: string } {
+    if (!binding.name) {
+        let bindingType = binding.type;
+        if (!bindingType.toLowerCase().endsWith(suffix.toLowerCase())) {
+            bindingType += suffix;
+        }
+        let count = bindingCounts[bindingType] || 0;
+        count += 1;
+        bindingCounts[bindingType] = count;
+        binding.name = bindingType + count.toString();
+    }
+    return <T & { name: string }>binding;
 }
