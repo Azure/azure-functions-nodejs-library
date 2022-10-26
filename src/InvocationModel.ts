@@ -36,7 +36,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         const { context, inputs } = CreateContextAndInputs(
             this.#funcInfo,
             this.#coreCtx.request,
-            (level: RpcLogLevel, ...args: any[]) => this.#userLog(level, ...args),
+            (level: RpcLogLevel, ...args: any[]) => this.#userLog(level, context.suppressBadPatternWarning, ...args),
             this.#doneEmitter
         );
         return { context, inputs };
@@ -45,7 +45,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
     async invokeFunction(context: Context, inputs: unknown[], functionCallback: AzureFunction): Promise<unknown> {
         const legacyDoneTask = new Promise((resolve, reject) => {
             this.#doneEmitter.on('done', (err?: unknown, result?: unknown) => {
-                this.#onDone();
+                this.#onDone(context.suppressBadPatternWarning);
                 if (isError(err)) {
                     reject(err);
                 } else {
@@ -60,7 +60,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
             let resultTask: Promise<any>;
             if (this.#resultIsPromise) {
                 rawResult = Promise.resolve(rawResult).then((r) => {
-                    this.#onDone();
+                    this.#onDone(context.suppressBadPatternWarning);
                     return r;
                 });
                 resultTask = Promise.race([rawResult, legacyDoneTask]);
@@ -151,8 +151,8 @@ export class InvocationModel implements coreTypes.InvocationModel {
         this.#log(level, 'system', ...args);
     }
 
-    #userLog(level: RpcLogLevel, ...args: any[]): void {
-        if (this.#isDone && this.#coreCtx.state !== 'postInvocationHooks') {
+    #userLog(level: RpcLogLevel, suppressBadPatternWarning: boolean | undefined, ...args: any[]): void {
+        if (this.#isDone && this.#coreCtx.state !== 'postInvocationHooks' && !suppressBadPatternWarning) {
             let badAsyncMsg =
                 "Warning: Unexpected call to 'log' on the context object after function execution has completed. Please check for asynchronous calls that are not awaited or calls to 'done' made before function execution completes. ";
             badAsyncMsg += `Function name: ${this.#funcInfo.name}. Invocation Id: ${this.#coreCtx.invocationId}. `;
@@ -162,8 +162,8 @@ export class InvocationModel implements coreTypes.InvocationModel {
         this.#log(level, 'user', ...args);
     }
 
-    #onDone(): void {
-        if (this.#isDone) {
+    #onDone(suppressBadPatternWarning = false): void {
+        if (this.#isDone && !suppressBadPatternWarning) {
             const message = this.#resultIsPromise
                 ? `Error: Choose either to return a promise or call 'done'. Do not use both in your script. Learn more: ${asyncDoneLearnMoreLink}`
                 : "Error: 'done' has already been called. Please check your script for extraneous calls to 'done'.";

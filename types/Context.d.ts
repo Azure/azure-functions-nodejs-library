@@ -51,7 +51,7 @@ export interface Context {
      * @deprecated Use of sync functions with `context.done()` is not recommended. Use async/await and pass the response as the return value instead.
      * See the docs here for more information: https://aka.ms/functions-js-async-await
      */
-    done(err?: Error | string | null, result?: any): void;
+    done(err?: Error | string | null, result?: any, suppressBadPatternWarning?: boolean): void;
     /**
      * HTTP request object. Provided to your function when using HTTP Bindings.
      */
@@ -62,6 +62,12 @@ export interface Context {
     res?: {
         [key: string]: any;
     };
+    /**
+     * If this flag is set to true in your function, warning logs for unrecommended `context.done()` patterns
+     * (e.g., using `context.done()` with `async`/`await`, calling `context.done()` twice) are suppressed.
+     * @default false
+     */
+    suppressBadPatternWarning?: boolean;
 }
 
 /**
