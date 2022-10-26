@@ -131,12 +131,10 @@ describe('InvocationModel', () => {
             context.suppressBadPatternError = true;
             // eslint-disable-next-line deprecation/deprecation
             context.done(null, 'result');
-            context.log('bad log');
         };
 
         void (await invocationModel.invokeFunction(context as Context, inputs, functionCallback));
 
-        expect(coreLogger.callCount).to.equal(1);
-        expect(coreLogger.args).to.deep.equal([['information', 'user', 'bad log']]);
+        expect(coreLogger.called).to.be.false;
     });
 });

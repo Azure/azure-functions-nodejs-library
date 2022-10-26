@@ -36,7 +36,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         const { context, inputs } = CreateContextAndInputs(
             this.#funcInfo,
             this.#coreCtx.request,
-            (level: RpcLogLevel, ...args: any[]) => this.#userLog(level, context, ...args),
+            (level: RpcLogLevel, ...args: any[]) => this.#userLog(level, ...args),
             this.#doneEmitter
         );
         return { context, inputs };
@@ -151,8 +151,8 @@ export class InvocationModel implements coreTypes.InvocationModel {
         this.#log(level, 'system', ...args);
     }
 
-    #userLog(level: RpcLogLevel, context: Context, ...args: any[]): void {
-        if (this.#isDone && this.#coreCtx.state !== 'postInvocationHooks' && !context.suppressBadPatternError) {
+    #userLog(level: RpcLogLevel, ...args: any[]): void {
+        if (this.#isDone && this.#coreCtx.state !== 'postInvocationHooks') {
             let badAsyncMsg =
                 "Warning: Unexpected call to 'log' on the context object after function execution has completed. Please check for asynchronous calls that are not awaited or calls to 'done' made before function execution completes. ";
             badAsyncMsg += `Function name: ${this.#funcInfo.name}. Invocation Id: ${this.#coreCtx.invocationId}. `;
