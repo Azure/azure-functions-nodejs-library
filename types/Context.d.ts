@@ -63,11 +63,11 @@ export interface Context {
         [key: string]: any;
     };
     /**
-     * If this flag is set to true in your function, error/warning logs for unrecommended `context.done()` patterns
-     * (e.g., using `context.done()` with `async`/`await`, calling `context.done()` twice) are suppressed.
+     * If this flag is set to true in your function, the error for calling `context.done()` within
+     * an async function will not be logged. More info: https://go.microsoft.com/fwlink/?linkid=2097909
      * @default false
      */
-    suppressBadPatternError?: boolean;
+    suppressAsyncDoneError?: boolean;
 }
 
 /**

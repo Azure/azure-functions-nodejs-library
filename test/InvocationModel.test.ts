@@ -128,7 +128,7 @@ describe('InvocationModel', () => {
         const { context, inputs } = await invocationModel.getArguments();
 
         const functionCallback: AzureFunction = async (context: Context) => {
-            context.suppressBadPatternError = true;
+            context.suppressAsyncDoneError = true;
             // eslint-disable-next-line deprecation/deprecation
             context.done(null, 'result');
         };

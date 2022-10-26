@@ -45,7 +45,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
     async invokeFunction(context: Context, inputs: unknown[], functionCallback: AzureFunction): Promise<unknown> {
         const legacyDoneTask = new Promise((resolve, reject) => {
             this.#doneEmitter.on('done', (err?: unknown, result?: unknown) => {
-                this.#onDone(context.suppressBadPatternError);
+                this.#onDone(context.suppressAsyncDoneError);
                 if (isError(err)) {
                     reject(err);
                 } else {
@@ -60,7 +60,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
             let resultTask: Promise<any>;
             if (this.#resultIsPromise) {
                 rawResult = Promise.resolve(rawResult).then((r) => {
-                    this.#onDone(context.suppressBadPatternError);
+                    this.#onDone(context.suppressAsyncDoneError);
                     return r;
                 });
                 resultTask = Promise.race([rawResult, legacyDoneTask]);
@@ -162,8 +162,12 @@ export class InvocationModel implements coreTypes.InvocationModel {
         this.#log(level, 'user', ...args);
     }
 
-    #onDone(suppressBadPatternError = false): void {
-        if (this.#isDone && !suppressBadPatternError) {
+    #onDone(suppressAsyncDoneError = false): void {
+        if (this.#isDone) {
+            if (this.#resultIsPromise && suppressAsyncDoneError) {
+                return;
+            }
+
             const message = this.#resultIsPromise
                 ? `Error: Choose either to return a promise or call 'done'. Do not use both in your script. Learn more: ${asyncDoneLearnMoreLink}`
                 : "Error: 'done' has already been called. Please check your script for extraneous calls to 'done'.";
