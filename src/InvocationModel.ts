@@ -104,6 +104,10 @@ export class InvocationModel implements coreTypes.InvocationModel {
             }
         }
 
+        // This piece of code allows the return value of non-HTTP triggered functions to be passed back
+        // to the host, even if no explicit output binding is set mapping to the return value.
+        // E.g., this is used in Durable to pass orchestrator state back to the Durable extension, w/o
+        // an explicit output binding. See here for more details: https://github.com/Azure/azure-functions-nodejs-library/pull/25
         if (!response.returnValue && response.outputData.length == 0 && !isHttpTrigger(this.#triggerType)) {
             response.returnValue = toRpcTypedData(result);
         }
