@@ -21,7 +21,7 @@ import { toCamelCaseValue } from './converters/toCamelCase';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
 import { InvocationContext } from './InvocationContext';
-import { isTimerTrigger, isTrigger } from './utils/isTrigger';
+import { isHttpTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
 import { nonNullProp, nonNullValue } from './utils/nonNull';
 
 export class InvocationModel implements coreTypes.InvocationModel {
@@ -104,7 +104,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
             }
         }
 
-        if (!response.returnValue && response.outputData.length == 0) {
+        if (!response.returnValue && response.outputData.length == 0 && !isHttpTrigger(this.#triggerType)) {
             response.returnValue = toRpcTypedData(result);
         }
 
