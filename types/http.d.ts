@@ -22,6 +22,8 @@ export interface HttpFunctionOptions extends HttpTriggerOptions, Partial<Functio
     return?: FunctionOutput;
 }
 
+export type HttpMethodFunctionOptions = Omit<HttpFunctionOptions, 'methods'>;
+
 export interface HttpTriggerOptions {
     /**
      * The function HTTP authorization level

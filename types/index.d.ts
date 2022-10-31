@@ -32,6 +32,7 @@ import {
     HttpOutputOptions,
     HttpTrigger,
     HttpTriggerOptions,
+    HttpMethodFunctionOptions,
 } from './http';
 import { InvocationContext } from './InvocationContext';
 import {
@@ -95,7 +96,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function get(name: string, options: HttpFunctionOptions): void;
+    export function get(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'PUT' request to the function url
@@ -109,7 +110,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function put(name: string, options: HttpFunctionOptions): void;
+    export function put(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'POST' request to the function url
@@ -123,7 +124,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function post(name: string, options: HttpFunctionOptions): void;
+    export function post(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'PATCH' request to the function url
@@ -137,7 +138,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function patch(name: string, options: HttpFunctionOptions): void;
+    export function patch(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'DELETE' request to the function url
@@ -151,7 +152,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function deleteRequest(name: string, options: HttpFunctionOptions): void;
+    export function deleteRequest(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers a timer function in your app that will be triggered on a schedule

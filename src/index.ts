@@ -29,6 +29,7 @@ import {
     HttpFunctionOptions,
     HttpHandler,
     HttpMethod,
+    HttpMethodFunctionOptions,
     HttpOutput,
     HttpOutputOptions,
     HttpTrigger,
@@ -113,23 +114,23 @@ function convertToHttpOptions(
 }
 
 export namespace app {
-    export function get(name: string, optionsOrHandler: HttpFunctionOptions | HttpHandler): void {
+    export function get(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
         http(name, convertToHttpOptions(optionsOrHandler, 'GET'));
     }
 
-    export function put(name: string, optionsOrHandler: HttpFunctionOptions | HttpHandler): void {
+    export function put(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
         http(name, convertToHttpOptions(optionsOrHandler, 'PUT'));
     }
 
-    export function post(name: string, optionsOrHandler: HttpFunctionOptions | HttpHandler): void {
+    export function post(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
         http(name, convertToHttpOptions(optionsOrHandler, 'POST'));
     }
 
-    export function patch(name: string, optionsOrHandler: HttpFunctionOptions | HttpHandler): void {
+    export function patch(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
         http(name, convertToHttpOptions(optionsOrHandler, 'PATCH'));
     }
 
-    export function deleteRequest(name: string, optionsOrHandler: HttpFunctionOptions | HttpHandler): void {
+    export function deleteRequest(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
         http(name, convertToHttpOptions(optionsOrHandler, 'DELETE'));
     }
 
