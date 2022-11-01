@@ -110,13 +110,13 @@ export interface InvocationContextExtraInputs {
 
     /**
      * Get a secondary generic input for this invocation
-     * @outputOrName the configuration object or name for this input
+     * @inputOrName the configuration object or name for this input
      */
     get(inputOrName: FunctionInput | string): unknown;
 
     /**
      * Set a secondary generic input for this invocation
-     * @outputOrName the configuration object or name for this input
+     * @inputOrName the configuration object or name for this input
      * @value the input value
      */
     set(inputOrName: FunctionInput | string, value: unknown): void;
