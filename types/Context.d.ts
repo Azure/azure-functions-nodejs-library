@@ -62,6 +62,12 @@ export interface Context {
     res?: {
         [key: string]: any;
     };
+    /**
+     * If this flag is set to true in your function, the error for calling `context.done()` within
+     * an async function will not be logged. More info: https://go.microsoft.com/fwlink/?linkid=2097909
+     * @default false
+     */
+    suppressAsyncDoneError?: boolean;
 }
 
 /**
