@@ -17,7 +17,7 @@ describe('Public TypeScript types', () => {
 });
 
 async function runTsBuild(tsVersion: string): Promise<number> {
-    const repoRoot = path.join(__dirname, '..', '..');
+    const repoRoot = path.join(__dirname, '..');
     const tscPath = path.join(repoRoot, 'node_modules', `typescript${tsVersion}`, 'bin', 'tsc');
     const projectFile = path.join(repoRoot, 'test', 'types', 'tsconfig.json');
     return new Promise<number>((resolve, reject) => {

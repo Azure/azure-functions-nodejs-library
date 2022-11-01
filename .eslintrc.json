@@ -31,5 +31,11 @@
             }
         ]
     },
-    "ignorePatterns": ["**/*.js", "**/*.mjs", "**/*.cjs", "dist"]
+    "ignorePatterns": [
+        "**/*.js",
+        "**/*.mjs",
+        "**/*.cjs",
+        "out",
+        "dist"
+    ]
 }

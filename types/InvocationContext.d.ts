@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { CosmosDBInput, CosmosDBOutput } from './cosmosDB';
+import { EventGridOutput, EventGridPartialEvent } from './eventGrid';
 import { EventHubOutput } from './eventHub';
 import { HttpOutput, HttpResponse } from './http';
 import { FunctionInput, FunctionOutput } from './index';
@@ -173,6 +174,13 @@ export interface InvocationContextExtraOutputs {
      * @message the output messages value
      */
     set(output: EventHubOutput, messages: unknown): void;
+
+    /**
+     * Set a secondary Event Grid output for this invocation
+     * @output the configuration object for this Event Grid output
+     * @message the output event(s) value
+     */
+    set(output: EventGridOutput, events: EventGridPartialEvent | EventGridPartialEvent[]): void;
 
     /**
      * Set a secondary generic output for this invocation

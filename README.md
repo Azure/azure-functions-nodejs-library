@@ -69,7 +69,7 @@ For more documentation, see the [JavaScript developer guide](https://docs.micros
       > 💡 Tip: Set `logging__logLevel__Worker` to `debug` if you want to view worker-specific logs in the output of `func start`
   - Start the app (i.e. run `func start` or press <kbd>F5</kbd>)
 - Back in the framework repository, press <kbd>F5</kbd> and select the process for your running function app
-- Before you submit a PR, run `npm run lint` and `npm test` and fix any issues. If you want to debug the tests, switch your [launch profile](https://code.visualstudio.com/docs/editor/debugging) in VS Code to "Launch Unit Tests" and press <kbd>F5</kbd>.
+- Before you submit a PR, run `npm test` and fix any issues. If you want to debug the tests, switch your [launch profile](https://code.visualstudio.com/docs/editor/debugging) in VS Code to "Launch Unit Tests" and press <kbd>F5</kbd>.
 
 ### Code of Conduct
 

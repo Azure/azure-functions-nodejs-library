@@ -11,6 +11,13 @@ import {
     CosmosDBTriggerOptions,
 } from './cosmosDB';
 import {
+    EventGridFunctionOptions,
+    EventGridOutput,
+    EventGridOutputOptions,
+    EventGridTrigger,
+    EventGridTriggerOptions,
+} from './eventGrid';
+import {
     EventHubFunctionOptions,
     EventHubOutput,
     EventHubOutputOptions,
@@ -25,6 +32,7 @@ import {
     HttpOutputOptions,
     HttpTrigger,
     HttpTriggerOptions,
+    HttpMethodFunctionOptions,
 } from './http';
 import { InvocationContext } from './InvocationContext';
 import {
@@ -56,6 +64,7 @@ import {
 import { TimerFunctionOptions, TimerTrigger, TimerTriggerOptions } from './timer';
 
 export * from './cosmosDB';
+export * from './eventGrid';
 export * from './eventHub';
 export * from './generic';
 export * from './http';
@@ -87,7 +96,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function get(name: string, options: HttpFunctionOptions): void;
+    export function get(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'PUT' request to the function url
@@ -101,7 +110,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function put(name: string, options: HttpFunctionOptions): void;
+    export function put(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'POST' request to the function url
@@ -115,7 +124,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function post(name: string, options: HttpFunctionOptions): void;
+    export function post(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'PATCH' request to the function url
@@ -129,7 +138,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function patch(name: string, options: HttpFunctionOptions): void;
+    export function patch(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers an http function in your app that will be triggered by making a 'DELETE' request to the function url
@@ -143,7 +152,7 @@ export namespace app {
      * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
-    export function deleteRequest(name: string, options: HttpFunctionOptions): void;
+    export function deleteRequest(name: string, options: HttpMethodFunctionOptions): void;
 
     /**
      * Registers a timer function in your app that will be triggered on a schedule
@@ -186,6 +195,13 @@ export namespace app {
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function eventHub(name: string, options: EventHubFunctionOptions): void;
+
+    /**
+     * Registers a function in your app that will be triggered whenever an event is sent by an event grid source
+     * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+     * @param options Configuration options describing the inputs, outputs, and handler for this function
+     */
+    export function eventGrid(name: string, options: EventGridFunctionOptions): void;
 
     /**
      * Registers a Cosmos DB function in your app that will be triggered whenever inserts and updates occur (not deletions)
@@ -242,6 +258,11 @@ export namespace trigger {
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-hubs-trigger?pivots=programming-language-javascript)
      */
     export function eventHub(options: EventHubTriggerOptions): EventHubTrigger;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-grid-trigger?pivots=programming-language-javascript)
+     */
+    export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger;
 
     /**
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger?pivots=programming-language-javascript)
@@ -312,6 +333,11 @@ export namespace output {
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-hubs-output?pivots=programming-language-javascript)
      */
     export function eventHub(options: EventHubOutputOptions): EventHubOutput;
+
+    /**
+     * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-event-grid-output?pivots=programming-language-javascript)
+     */
+    export function eventGrid(options: EventGridOutputOptions): EventGridOutput;
 
     /**
      * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-output?pivots=programming-language-javascript)

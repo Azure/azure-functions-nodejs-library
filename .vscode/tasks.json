@@ -9,7 +9,7 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": "$tsc-watch",
+            "problemMatcher": ["$ts-checker-webpack-watch"],
             "isBackground": true,
             "presentation": {
                 "reveal": "never"
