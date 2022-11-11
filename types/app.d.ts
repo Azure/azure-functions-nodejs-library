@@ -1,6 +1,14 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import {
+    AppStartCallback,
+    AppTerminateCallback,
+    Disposable,
+    HookCallback,
+    PostInvocationCallback,
+    PreInvocationCallback,
+} from '@azure/functions-core';
 import { CosmosDBFunctionOptions } from './cosmosDB';
 import { EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
@@ -150,3 +158,9 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function generic(name: string, options: FunctionOptions): void;
+
+export function onTerminate(callback: AppTerminateCallback): Disposable;
+export function onStart(callback: AppStartCallback): Disposable;
+export function onPreInvocation(functions: string[], callback: PreInvocationCallback): Disposable;
+export function onPostInvocation(functions: string[], callback: PostInvocationCallback): Disposable;
+export function on(hookName: string, callback: HookCallback): Disposable;
