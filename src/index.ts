@@ -34,6 +34,7 @@ import {
     HttpOutputOptions,
     HttpTrigger,
     HttpTriggerOptions,
+    InvocationContext,
     ServiceBusQueueFunctionOptions,
     ServiceBusQueueOutput,
     ServiceBusQueueOutputOptions,
@@ -287,6 +288,44 @@ export namespace app {
         } else {
             coreApi.registerFunction({ name, bindings }, <FunctionCallback>options.handler);
         }
+    }
+
+    export function onTerminate(callback: coreTypes.AppTerminateCallback): coreTypes.Disposable {
+        return coreTypes.registerHook('appTerminate', callback);
+    }
+
+    export function onStart(callback: coreTypes.AppStartCallback): coreTypes.Disposable {
+        return coreTypes.registerHook('appStart', callback);
+    }
+
+    export function on(hookName: string, callback: coreTypes.HookCallback): coreTypes.Disposable {
+        return coreTypes.registerHook(hookName, callback);
+    }
+
+    export function onPreInvocation(
+        functions: string[],
+        callback: coreTypes.PreInvocationCallback
+    ): coreTypes.Disposable {
+        const newCallback: coreTypes.PreInvocationCallback = (context: coreTypes.PreInvocationContext) => {
+            const invocContext = context.invocationContext as InvocationContext;
+            if (functions.includes(invocContext.functionName) || functions.length === 0) {
+                return callback(context);
+            }
+        };
+        return coreTypes.registerHook('preInvocation', newCallback);
+    }
+
+    export function onPostInvocation(
+        functions: string[],
+        callback: coreTypes.PostInvocationCallback
+    ): coreTypes.Disposable {
+        const newCallback: coreTypes.PostInvocationCallback = (context: coreTypes.PostInvocationContext) => {
+            const invocContext: InvocationContext = context.invocationContext as InvocationContext;
+            if (functions.includes(invocContext.functionName) || functions.length === 0) {
+                return callback(context);
+            }
+        };
+        return coreTypes.registerHook('postInvocation', newCallback);
     }
 }
 

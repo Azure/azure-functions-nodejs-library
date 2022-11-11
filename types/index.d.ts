@@ -2,6 +2,14 @@
 // Licensed under the MIT License.
 
 import {
+    AppStartCallback,
+    AppTerminateCallback,
+    Disposable,
+    HookCallback,
+    PostInvocationCallback,
+    PreInvocationCallback,
+} from '@azure/functions-core';
+import {
     CosmosDBFunctionOptions,
     CosmosDBInput,
     CosmosDBInputOptions,
@@ -28,11 +36,11 @@ import { GenericInputOptions, GenericOutputOptions, GenericTriggerOptions } from
 import {
     HttpFunctionOptions,
     HttpHandler,
+    HttpMethodFunctionOptions,
     HttpOutput,
     HttpOutputOptions,
     HttpTrigger,
     HttpTriggerOptions,
-    HttpMethodFunctionOptions,
 } from './http';
 import { InvocationContext } from './InvocationContext';
 import {
@@ -217,6 +225,12 @@ export namespace app {
      * @param options Configuration options describing the inputs, outputs, and handler for this function
      */
     export function generic(name: string, options: FunctionOptions): void;
+
+    export function onTerminate(callback: AppTerminateCallback): Disposable;
+    export function onStart(callback: AppStartCallback): Disposable;
+    export function onPreInvocation(functions: string[], callback: PreInvocationCallback): Disposable;
+    export function onPostInvocation(functions: string[], callback: PostInvocationCallback): Disposable;
+    export function on(hookName: string, callback: HookCallback): Disposable;
 }
 
 /**
