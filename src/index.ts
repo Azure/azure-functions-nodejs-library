@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 import {
+    AppStartCallback,
+    AppTerminateCallback,
     CosmosDBFunctionOptions,
     CosmosDBInput,
     CosmosDBInputOptions,
@@ -9,6 +11,7 @@ import {
     CosmosDBOutputOptions,
     CosmosDBTrigger,
     CosmosDBTriggerOptions,
+    Disposable,
     EventGridFunctionOptions,
     EventGridOutput,
     EventGridOutputOptions,
@@ -26,6 +29,7 @@ import {
     GenericInputOptions,
     GenericOutputOptions,
     GenericTriggerOptions,
+    HookCallback,
     HttpFunctionOptions,
     HttpHandler,
     HttpMethod,
@@ -35,6 +39,7 @@ import {
     HttpTrigger,
     HttpTriggerOptions,
     InvocationContext,
+    PreInvocationCallback,
     ServiceBusQueueFunctionOptions,
     ServiceBusQueueOutput,
     ServiceBusQueueOutputOptions,
@@ -290,26 +295,28 @@ export namespace app {
         }
     }
 
-    export function onTerminate(callback: coreTypes.AppTerminateCallback): coreTypes.Disposable {
+    export function onTerminate(callback: AppTerminateCallback): Disposable {
         return coreTypes.registerHook('appTerminate', callback);
     }
 
-    export function onStart(callback: coreTypes.AppStartCallback): coreTypes.Disposable {
+    export function onStart(callback: AppStartCallback): Disposable {
         return coreTypes.registerHook('appStart', callback);
     }
 
-    export function on(hookName: string, callback: coreTypes.HookCallback): coreTypes.Disposable {
+    export function on(hookName: string, callback: HookCallback): Disposable {
         return coreTypes.registerHook(hookName, callback);
     }
 
-    export function onPreInvocation(
-        functions: string[],
-        callback: coreTypes.PreInvocationCallback
-    ): coreTypes.Disposable {
+    export function onPreInvocation(functions: string[], callback: PreInvocationCallback): coreTypes.Disposable {
         const newCallback: coreTypes.PreInvocationCallback = (context: coreTypes.PreInvocationContext) => {
             const invocContext = context.invocationContext as InvocationContext;
             if (functions.includes(invocContext.functionName) || functions.length === 0) {
-                return callback(context);
+                const newContext = {
+                    ...context,
+                    args: context.inputs,
+                    invocationContext: context.invocationContext as InvocationContext,
+                };
+                return callback(newContext);
             }
         };
         return coreTypes.registerHook('preInvocation', newCallback);
@@ -322,7 +329,12 @@ export namespace app {
         const newCallback: coreTypes.PostInvocationCallback = (context: coreTypes.PostInvocationContext) => {
             const invocContext: InvocationContext = context.invocationContext as InvocationContext;
             if (functions.includes(invocContext.functionName) || functions.length === 0) {
-                return callback(context);
+                const newContext = {
+                    ...context,
+                    args: context.inputs,
+                    invocationContext: context.invocationContext,
+                };
+                return callback(newContext);
             }
         };
         return coreTypes.registerHook('postInvocation', newCallback);

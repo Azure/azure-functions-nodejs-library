@@ -2,14 +2,6 @@
 // Licensed under the MIT License.
 
 import {
-    AppStartCallback,
-    AppTerminateCallback,
-    Disposable,
-    HookCallback,
-    PostInvocationCallback,
-    PreInvocationCallback,
-} from '@azure/functions-core';
-import {
     CosmosDBFunctionOptions,
     CosmosDBInput,
     CosmosDBInputOptions,
@@ -33,6 +25,14 @@ import {
     EventHubTriggerOptions,
 } from './eventHub';
 import { GenericInputOptions, GenericOutputOptions, GenericTriggerOptions } from './generic';
+import {
+    AppStartCallback,
+    AppTerminateCallback,
+    Disposable,
+    HookCallback,
+    PostInvocationCallback,
+    PreInvocationCallback,
+} from './hooks';
 import {
     HttpFunctionOptions,
     HttpHandler,
@@ -75,6 +75,7 @@ export * from './cosmosDB';
 export * from './eventGrid';
 export * from './eventHub';
 export * from './generic';
+export * from './hooks';
 export * from './http';
 export * from './InvocationContext';
 export * from './serviceBus';
