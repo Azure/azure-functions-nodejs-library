@@ -152,7 +152,7 @@ Content-Type: text/html; charset=UTF-8
             expect(parsedForm.has('htmlfile')).to.equal(true);
             const file = <File>parsedForm.get('htmlfile');
             expect(file.name).to.equal('test.html');
-            expect(file.type).to.equal('text/html; charset=utf-8');
+            expect(file.type).to.equal('text/html;charset=utf-8');
             expect(await file.text()).to.equal('<h1>Hi</h1>');
         });
 
