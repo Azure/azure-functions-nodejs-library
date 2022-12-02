@@ -4,7 +4,7 @@
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type EventGridHandler = (context: InvocationContext, event: EventGridEvent) => FunctionResult;
+export type EventGridHandler = (event: EventGridEvent, context: InvocationContext) => FunctionResult;
 
 export interface EventGridFunctionOptions extends EventGridTriggerOptions, Partial<FunctionOptions> {
     handler: EventGridHandler;

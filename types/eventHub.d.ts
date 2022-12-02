@@ -4,7 +4,7 @@
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type EventHubHandler = (context: InvocationContext, messages: unknown) => FunctionResult;
+export type EventHubHandler = (messages: unknown, context: InvocationContext) => FunctionResult;
 
 export interface EventHubFunctionOptions extends EventHubTriggerOptions, Partial<FunctionOptions> {
     handler: EventHubHandler;

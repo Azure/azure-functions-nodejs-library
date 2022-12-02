@@ -28,11 +28,11 @@ import { GenericInputOptions, GenericOutputOptions, GenericTriggerOptions } from
 import {
     HttpFunctionOptions,
     HttpHandler,
+    HttpMethodFunctionOptions,
     HttpOutput,
     HttpOutputOptions,
     HttpTrigger,
     HttpTriggerOptions,
-    HttpMethodFunctionOptions,
 } from './http';
 import { InvocationContext } from './InvocationContext';
 import {
@@ -357,7 +357,7 @@ export namespace output {
  */
 export type FunctionResult<T = unknown> = T | Promise<T>;
 
-export type FunctionHandler = (context: InvocationContext, triggerInput: any) => FunctionResult<any>;
+export type FunctionHandler = (triggerInput: any, context: InvocationContext) => FunctionResult<any>;
 
 /**
  * Configures the inputs, outputs, and handler for an Azure Function

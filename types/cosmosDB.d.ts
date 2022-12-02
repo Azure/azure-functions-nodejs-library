@@ -4,7 +4,7 @@
 import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type CosmosDBHandler = (context: InvocationContext, documents: unknown[]) => FunctionResult;
+export type CosmosDBHandler = (documents: unknown[], context: InvocationContext) => FunctionResult;
 
 export interface CosmosDBFunctionOptions extends CosmosDBTriggerOptions, Partial<FunctionOptions> {
     handler: CosmosDBHandler;
