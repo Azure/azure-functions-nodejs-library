@@ -42,7 +42,7 @@
     },
     "dependencies": {
         "long": "^4.0.0",
-        "undici": "~5.10.0"
+        "undici": "^5.13.0"
     },
     "devDependencies": {
         "@types/chai": "^4.2.22",
