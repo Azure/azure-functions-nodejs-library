@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-export const version = '3.5.0-alpha.5';
+export const version = '3.5.0';
 
 export enum HeaderName {
     contentType = 'content-type',
