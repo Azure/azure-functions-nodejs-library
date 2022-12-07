@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { HttpMethod, HttpRequestParams, HttpRequestUser } from '@azure/functions';
+import { HttpRequestParams, HttpRequestUser } from '@azure/functions';
 import { RpcHttpData } from '@azure/functions-core';
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
@@ -13,11 +13,8 @@ import { nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
 export class HttpRequest implements types.HttpRequest {
-    method: HttpMethod;
-    url: string;
-    headers: Headers;
-    query: URLSearchParams;
-    params: HttpRequestParams;
+    readonly query: URLSearchParams;
+    readonly params: HttpRequestParams;
 
     #cachedUser?: HttpRequestUser | null;
     #uReq: uRequest;
@@ -38,11 +35,20 @@ export class HttpRequest implements types.HttpRequest {
             headers: fromNullableMapping(rpcHttp.nullableHeaders, rpcHttp.headers),
         });
 
-        this.method = <HttpMethod>nonNullProp(rpcHttp, 'method');
-        this.url = url;
-        this.headers = this.#uReq.headers;
         this.query = new URLSearchParams(fromNullableMapping(rpcHttp.nullableQuery, rpcHttp.query));
         this.params = fromNullableMapping(rpcHttp.nullableParams, rpcHttp.params);
+    }
+
+    get url(): string {
+        return this.#uReq.url;
+    }
+
+    get method(): string {
+        return this.#uReq.method;
+    }
+
+    get headers(): Headers {
+        return this.#uReq.headers;
     }
 
     get user(): HttpRequestUser | null {

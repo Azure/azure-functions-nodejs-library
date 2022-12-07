@@ -59,7 +59,7 @@ describe('fromRpcTypedData', () => {
         });
         expect(result).to.be.instanceOf(HttpRequest);
         expect(await result.text()).to.equal('test');
-        expect(result.url).to.equal('http://microsoft.com');
+        expect(result.url).to.equal('http://microsoft.com/');
     });
 
     it('int', () => {
