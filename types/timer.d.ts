@@ -4,7 +4,7 @@
 import { FunctionOptions, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type TimerHandler = (context: InvocationContext, myTimer: Timer) => FunctionResult;
+export type TimerHandler = (myTimer: Timer, context: InvocationContext) => FunctionResult;
 
 export interface TimerFunctionOptions extends TimerTriggerOptions, Partial<FunctionOptions> {
     handler: TimerHandler;

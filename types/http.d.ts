@@ -8,7 +8,7 @@ import { URLSearchParams } from 'url';
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type HttpHandler = (context: InvocationContext, request: HttpRequest) => FunctionResult<HttpResponse>;
+export type HttpHandler = (request: HttpRequest, context: InvocationContext) => FunctionResult<HttpResponse>;
 
 export interface HttpFunctionOptions extends HttpTriggerOptions, Partial<FunctionOptions> {
     handler: HttpHandler;

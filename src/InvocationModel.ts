@@ -80,7 +80,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
     async invokeFunction(context: InvocationContext, inputs: unknown[], handler: FunctionHandler): Promise<unknown> {
         try {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return await Promise.resolve(handler(context, inputs[0]));
+            return await Promise.resolve(handler(inputs[0], context));
         } finally {
             this.#isDone = true;
         }
