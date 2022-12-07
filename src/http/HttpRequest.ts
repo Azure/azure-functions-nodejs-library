@@ -8,10 +8,7 @@ import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
 import { FormData, Headers, Request as uRequest } from 'undici';
 import { URLSearchParams } from 'url';
-import { HeaderName } from '../constants';
 import { fromNullableMapping } from '../converters/fromRpcNullable';
-import { AzFuncSystemError } from '../errors';
-import { parseForm } from '../parsers/parseForm';
 import { nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
@@ -72,19 +69,8 @@ export class HttpRequest implements types.HttpRequest {
         return await this.#uReq.blob();
     }
 
-    /**
-     * undici doesn't support this yet, so we'll use our own implementation for now
-     */
-    // eslint-disable-next-line @typescript-eslint/require-await
     async formData(): Promise<FormData> {
-        const contentType = this.headers.get(HeaderName.contentType);
-        if (!contentType) {
-            throw new AzFuncSystemError(`"${HeaderName.contentType}" header must be defined.`);
-        } else if (!this.#body) {
-            return new FormData();
-        } else {
-            return parseForm(this.#body, contentType);
-        }
+        return await this.#uReq.formData();
     }
 
     async json(): Promise<unknown> {
