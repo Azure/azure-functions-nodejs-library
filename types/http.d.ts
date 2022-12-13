@@ -79,34 +79,34 @@ export declare class HttpRequest {
     /**
      * HTTP request method used to invoke this function.
      */
-    method: HttpMethod;
+    readonly method: string;
 
     /**
      * Request URL.
      */
-    url: string;
+    readonly url: string;
 
     /**
      * HTTP request headers.
      */
-    headers: Headers;
+    readonly headers: Headers;
 
     /**
      * Query string parameter keys and values from the URL.
      */
-    query: URLSearchParams;
+    readonly query: URLSearchParams;
 
     /**
      * Route parameter keys and values.
      */
-    params: HttpRequestParams;
+    readonly params: HttpRequestParams;
 
     /**
      *  Object representing logged-in user, either through
      *  AppService/Functions authentication, or SWA Authentication
      *  null when no such user is logged in.
      */
-    user: HttpRequestUser | null;
+    readonly user: HttpRequestUser | null;
 
     /**
      * Returns the body as a ReadableStream
@@ -273,7 +273,7 @@ export interface Cookie {
  * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
  */
 export interface HttpRequestInit {
-    method?: HttpMethod;
+    method?: string;
 
     url?: string;
 
