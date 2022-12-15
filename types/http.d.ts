@@ -3,12 +3,15 @@
 
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
-import { FormData, Headers, HeadersInit } from 'undici';
+import { BodyInit, FormData, Headers, HeadersInit } from 'undici';
 import { URLSearchParams } from 'url';
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type HttpHandler = (request: HttpRequest, context: InvocationContext) => FunctionResult<HttpResponse>;
+export type HttpHandler = (
+    request: HttpRequest,
+    context: InvocationContext
+) => FunctionResult<HttpResponseInit | HttpResponse>;
 
 export interface HttpFunctionOptions extends HttpTriggerOptions, Partial<FunctionOptions> {
     handler: HttpHandler;
@@ -191,13 +194,17 @@ export type HttpMethod = 'GET' | 'POST' | 'DELETE' | 'HEAD' | 'PATCH' | 'PUT' | 
  */
 export type HttpRequestUserType = 'AppService' | 'StaticWebApps';
 
-export type HttpResponseBody = string | Buffer | NodeJS.ArrayBufferView | number | object;
-
-export interface HttpResponse {
+export interface HttpResponseInit {
     /**
      * HTTP response body
      */
-    body?: HttpResponseBody;
+    body?: BodyInit;
+
+    /**
+     * A JSON-serializable HTTP Response body.
+     * If set, the `HttpResponseInit.body` property will be ignored in favor of this property
+     */
+    jsonBody?: any;
 
     /**
      * HTTP response status code
@@ -211,7 +218,7 @@ export interface HttpResponse {
     headers?: HeadersInit;
 
     /**
-     *  HTTP response cookies
+     * HTTP response cookies
      */
     cookies?: Cookie[];
 
@@ -221,6 +228,71 @@ export interface HttpResponse {
      * @default false
      */
     enableContentNegotiation?: boolean;
+}
+
+/**
+ * HTTP response class
+ */
+export declare class HttpResponse {
+    constructor(responseInit?: HttpResponseInit);
+
+    /**
+     * HTTP response status code
+     * @default 200
+     */
+    readonly status: number;
+
+    /**
+     * HTTP response headers.
+     */
+    readonly headers: Headers;
+
+    /**
+     * HTTP response cookies
+     */
+    readonly cookies: Cookie[];
+
+    /**
+     * Enable content negotiation of response body if true
+     * If false, treat response body as raw
+     * @default false
+     */
+    readonly enableContentNegotiation: boolean;
+
+    /**
+     * Returns the body as a ReadableStream
+     */
+    readonly body: ReadableStream | null;
+
+    /**
+     * Returns whether the body has been read from
+     */
+    readonly bodyUsed: boolean;
+
+    /**
+     * Returns a promise fulfilled with the body as an ArrayBuffer
+     */
+    readonly arrayBuffer: () => Promise<ArrayBuffer>;
+
+    /**
+     * Returns a promise fulfilled with the body as a Blob
+     */
+    readonly blob: () => Promise<Blob>;
+
+    /**
+     * Returns a promise fulfilled with the body as FormData
+     */
+    readonly formData: () => Promise<FormData>;
+
+    /**
+     * Returns a promise fulfilled with the body parsed as JSON
+     */
+    readonly json: () => Promise<unknown>;
+
+    /**
+     * Returns a promise fulfilled with the body as a string
+     */
+    readonly text: () => Promise<string>;
 }
 
 /**

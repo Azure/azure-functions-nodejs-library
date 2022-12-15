@@ -86,7 +86,6 @@ export class InvocationModel implements coreTypes.InvocationModel {
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/require-await
     async getResponse(context: InvocationContext, result: unknown): Promise<RpcInvocationResponse> {
         const response: RpcInvocationResponse = { invocationId: this.#coreCtx.invocationId };
 
@@ -94,11 +93,11 @@ export class InvocationModel implements coreTypes.InvocationModel {
         for (const [name, binding] of Object.entries(this.#bindings)) {
             if (binding.direction === 'out') {
                 if (name === returnBindingKey) {
-                    response.returnValue = this.#convertOutput(binding, result);
+                    response.returnValue = await this.#convertOutput(binding, result);
                 } else {
                     response.outputData.push({
                         name,
-                        data: this.#convertOutput(binding, context.extraOutputs.get(name)),
+                        data: await this.#convertOutput(binding, context.extraOutputs.get(name)),
                     });
                 }
             }
@@ -115,9 +114,9 @@ export class InvocationModel implements coreTypes.InvocationModel {
         return response;
     }
 
-    #convertOutput(binding: RpcBindingInfo, value: unknown): RpcTypedData | null | undefined {
+    async #convertOutput(binding: RpcBindingInfo, value: unknown): Promise<RpcTypedData | null | undefined> {
         if (binding.type?.toLowerCase() === 'http') {
-            return toRpcHttp(value);
+            return await toRpcHttp(value);
         } else {
             return toRpcTypedData(value);
         }

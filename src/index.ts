@@ -67,6 +67,7 @@ import { InvocationModel } from './InvocationModel';
 import { isTrigger } from './utils/isTrigger';
 
 export { HttpRequest } from './http/HttpRequest';
+export { HttpResponse } from './http/HttpResponse';
 export { InvocationContext } from './InvocationContext';
 
 let coreApi: typeof coreTypes | undefined | null;

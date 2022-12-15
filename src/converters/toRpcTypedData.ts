@@ -13,6 +13,9 @@ export function toRpcTypedData(data: unknown): RpcTypedData | null | undefined {
     } else if (ArrayBuffer.isView(data)) {
         const bytes = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
         return { bytes: bytes };
+    } else if (data instanceof ArrayBuffer) {
+        const bytes = new Uint8Array(data);
+        return { bytes: bytes };
     } else if (typeof data === 'number') {
         if (Number.isInteger(data)) {
             return { int: data };
