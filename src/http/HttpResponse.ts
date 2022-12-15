@@ -43,22 +43,22 @@ export class HttpResponse implements types.HttpResponse {
     }
 
     async arrayBuffer(): Promise<ArrayBuffer> {
-        return await this.#uRes.arrayBuffer();
+        return this.#uRes.arrayBuffer();
     }
 
     async blob(): Promise<Blob> {
-        return await this.#uRes.blob();
+        return this.#uRes.blob();
     }
 
     async formData(): Promise<FormData> {
-        return await this.#uRes.formData();
+        return this.#uRes.formData();
     }
 
     async json(): Promise<unknown> {
-        return await this.#uRes.json();
+        return this.#uRes.json();
     }
 
     async text(): Promise<string> {
-        return await this.#uRes.text();
+        return this.#uRes.text();
     }
 }

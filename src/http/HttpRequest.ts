@@ -68,22 +68,22 @@ export class HttpRequest implements types.HttpRequest {
     }
 
     async arrayBuffer(): Promise<ArrayBuffer> {
-        return await this.#uReq.arrayBuffer();
+        return this.#uReq.arrayBuffer();
     }
 
     async blob(): Promise<Blob> {
-        return await this.#uReq.blob();
+        return this.#uReq.blob();
     }
 
     async formData(): Promise<FormData> {
-        return await this.#uReq.formData();
+        return this.#uReq.formData();
     }
 
     async json(): Promise<unknown> {
-        return await this.#uReq.json();
+        return this.#uReq.json();
     }
 
     async text(): Promise<string> {
-        return await this.#uReq.text();
+        return this.#uReq.text();
     }
 }

@@ -116,7 +116,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
 
     async #convertOutput(binding: RpcBindingInfo, value: unknown): Promise<RpcTypedData | null | undefined> {
         if (binding.type?.toLowerCase() === 'http') {
-            return await toRpcHttp(value);
+            return toRpcHttp(value);
         } else {
             return toRpcTypedData(value);
         }
