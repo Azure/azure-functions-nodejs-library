@@ -50,7 +50,9 @@
             "error", {
                 "accessibility": "no-public"
             }
-        ]
+        ],
+        "no-return-await": "off",
+        "@typescript-eslint/return-await": "error"
     },
     "ignorePatterns": [
         "**/*.js",
