@@ -3,19 +3,19 @@
 
 import { InvocationContext } from './InvocationContext';
 
-export * from './app';
+export * as app from './app';
 export * from './cosmosDB';
 export * from './eventGrid';
 export * from './eventHub';
 export * from './generic';
 export * from './http';
-export * from './input';
+export * as input from './input';
 export * from './InvocationContext';
-export * from './output';
+export * as output from './output';
 export * from './serviceBus';
 export * from './storage';
 export * from './timer';
-export * from './trigger';
+export * as trigger from './trigger';
 
 /**
  * Void if no `return` output is registered

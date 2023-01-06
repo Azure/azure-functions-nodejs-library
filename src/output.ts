@@ -23,66 +23,64 @@ import {
 } from '@azure/functions';
 import { addBindingName } from './addBindingName';
 
-export namespace output {
-    export function http(options: HttpOutputOptions): HttpOutput {
-        return addOutputBindingName({
-            ...options,
-            type: 'http',
-        });
-    }
+export function http(options: HttpOutputOptions): HttpOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'http',
+    });
+}
 
-    export function storageBlob(options: StorageBlobOutputOptions): StorageBlobOutput {
-        return addOutputBindingName({
-            ...options,
-            type: 'blob',
-        });
-    }
+export function storageBlob(options: StorageBlobOutputOptions): StorageBlobOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'blob',
+    });
+}
 
-    export function storageQueue(options: StorageQueueOutputOptions): StorageQueueOutput {
-        return addOutputBindingName({
-            ...options,
-            type: 'queue',
-        });
-    }
+export function storageQueue(options: StorageQueueOutputOptions): StorageQueueOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'queue',
+    });
+}
 
-    export function serviceBusQueue(options: ServiceBusQueueOutputOptions): ServiceBusQueueOutput {
-        return addOutputBindingName({
-            ...options,
-            type: 'serviceBus',
-        });
-    }
+export function serviceBusQueue(options: ServiceBusQueueOutputOptions): ServiceBusQueueOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'serviceBus',
+    });
+}
 
-    export function serviceBusTopic(options: ServiceBusTopicOutputOptions): ServiceBusTopicOutput {
-        return addOutputBindingName({
-            ...options,
-            type: 'serviceBus',
-        });
-    }
+export function serviceBusTopic(options: ServiceBusTopicOutputOptions): ServiceBusTopicOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'serviceBus',
+    });
+}
 
-    export function eventHub(options: EventHubOutputOptions): EventHubOutput {
-        return addOutputBindingName({
-            ...options,
-            type: 'eventHub',
-        });
-    }
+export function eventHub(options: EventHubOutputOptions): EventHubOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'eventHub',
+    });
+}
 
-    export function eventGrid(options: EventGridOutputOptions): EventGridOutput {
-        return addOutputBindingName({
-            ...options,
-            type: 'eventGrid',
-        });
-    }
+export function eventGrid(options: EventGridOutputOptions): EventGridOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'eventGrid',
+    });
+}
 
-    export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput {
-        return addOutputBindingName({
-            ...options,
-            type: 'cosmosDB',
-        });
-    }
+export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'cosmosDB',
+    });
+}
 
-    export function generic(options: GenericOutputOptions): FunctionOutput {
-        return addOutputBindingName(options);
-    }
+export function generic(options: GenericOutputOptions): FunctionOutput {
+    return addOutputBindingName(options);
 }
 
 function addOutputBindingName<T extends { type: string; name?: string }>(binding: T): T & { name: string } {

@@ -25,75 +25,73 @@ import {
 } from '@azure/functions';
 import { addBindingName } from './addBindingName';
 
-export namespace trigger {
-    export function http(options: HttpTriggerOptions): HttpTrigger {
-        return addTriggerBindingName({
-            ...options,
-            authLevel: options.authLevel || 'anonymous',
-            methods: options.methods || ['GET', 'POST'],
-            type: 'httpTrigger',
-        });
-    }
+export function http(options: HttpTriggerOptions): HttpTrigger {
+    return addTriggerBindingName({
+        ...options,
+        authLevel: options.authLevel || 'anonymous',
+        methods: options.methods || ['GET', 'POST'],
+        type: 'httpTrigger',
+    });
+}
 
-    export function timer(options: TimerTriggerOptions): TimerTrigger {
-        return addTriggerBindingName({
-            ...options,
-            type: 'timerTrigger',
-        });
-    }
+export function timer(options: TimerTriggerOptions): TimerTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'timerTrigger',
+    });
+}
 
-    export function storageBlob(options: StorageBlobTriggerOptions): StorageBlobTrigger {
-        return addTriggerBindingName({
-            ...options,
-            type: 'blobTrigger',
-        });
-    }
+export function storageBlob(options: StorageBlobTriggerOptions): StorageBlobTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'blobTrigger',
+    });
+}
 
-    export function storageQueue(options: StorageQueueTriggerOptions): StorageQueueTrigger {
-        return addTriggerBindingName({
-            ...options,
-            type: 'queueTrigger',
-        });
-    }
+export function storageQueue(options: StorageQueueTriggerOptions): StorageQueueTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'queueTrigger',
+    });
+}
 
-    export function serviceBusQueue(options: ServiceBusQueueTriggerOptions): ServiceBusQueueTrigger {
-        return addTriggerBindingName({
-            ...options,
-            type: 'serviceBusTrigger',
-        });
-    }
+export function serviceBusQueue(options: ServiceBusQueueTriggerOptions): ServiceBusQueueTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'serviceBusTrigger',
+    });
+}
 
-    export function serviceBusTopic(options: ServiceBusTopicTriggerOptions): ServiceBusTopicTrigger {
-        return addTriggerBindingName({
-            ...options,
-            type: 'serviceBusTrigger',
-        });
-    }
+export function serviceBusTopic(options: ServiceBusTopicTriggerOptions): ServiceBusTopicTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'serviceBusTrigger',
+    });
+}
 
-    export function eventHub(options: EventHubTriggerOptions): EventHubTrigger {
-        return addTriggerBindingName({
-            ...options,
-            type: 'eventHubTrigger',
-        });
-    }
+export function eventHub(options: EventHubTriggerOptions): EventHubTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'eventHubTrigger',
+    });
+}
 
-    export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger {
-        return addTriggerBindingName({
-            ...options,
-            type: 'eventGridTrigger',
-        });
-    }
+export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'eventGridTrigger',
+    });
+}
 
-    export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
-        return addTriggerBindingName({
-            ...options,
-            type: 'cosmosDBTrigger',
-        });
-    }
+export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'cosmosDBTrigger',
+    });
+}
 
-    export function generic(options: GenericTriggerOptions): FunctionTrigger {
-        return addTriggerBindingName(options);
-    }
+export function generic(options: GenericTriggerOptions): FunctionTrigger {
+    return addTriggerBindingName(options);
 }
 
 function addTriggerBindingName<T extends { type: string; name?: string }>(binding: T): T & { name: string } {
