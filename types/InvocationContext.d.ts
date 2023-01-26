@@ -5,7 +5,7 @@ import { CosmosDBInput, CosmosDBOutput } from './cosmosDB';
 import { EventGridOutput, EventGridPartialEvent } from './eventGrid';
 import { EventHubOutput } from './eventHub';
 import { HttpOutput, HttpResponse } from './http';
-import { FunctionInput, FunctionOutput } from './index';
+import { FunctionInput, FunctionOptions, FunctionOutput } from './index';
 import { ServiceBusQueueOutput, ServiceBusTopicOutput } from './serviceBus';
 import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './storage';
 
@@ -90,6 +90,12 @@ export declare class InvocationContext {
      * For example, this will be undefined for http and timer triggers because you can find that information on the request & timer object instead
      */
     triggerMetadata?: TriggerMetadata;
+
+    /**
+     * The options used when registering the function
+     * NOTE: This value may differ slightly from the original because it has been validated and defaults may have been explicitly added
+     */
+    options: EffectiveFunctionOptions;
 }
 
 /**
@@ -264,7 +270,11 @@ export interface InvocationContextInit {
     retryContext?: RetryContext;
 
     triggerMetadata?: TriggerMetadata;
+
+    options: EffectiveFunctionOptions;
 }
+
+export type EffectiveFunctionOptions = Omit<FunctionOptions, 'handler'>;
 
 export type LogHandler = (level: LogLevel, ...args: unknown[]) => void;
 

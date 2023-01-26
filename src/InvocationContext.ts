@@ -2,7 +2,14 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { InvocationContextInit, LogHandler, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
+import {
+    EffectiveFunctionOptions,
+    InvocationContextInit,
+    LogHandler,
+    RetryContext,
+    TraceContext,
+    TriggerMetadata,
+} from '@azure/functions';
 
 export class InvocationContext implements types.InvocationContext {
     invocationId: string;
@@ -12,6 +19,7 @@ export class InvocationContext implements types.InvocationContext {
     retryContext?: RetryContext;
     traceContext?: TraceContext;
     triggerMetadata?: TriggerMetadata;
+    options: EffectiveFunctionOptions;
     #userLogHandler: LogHandler;
 
     constructor(init: InvocationContextInit) {
@@ -22,6 +30,7 @@ export class InvocationContext implements types.InvocationContext {
         this.retryContext = init.retryContext;
         this.traceContext = init.traceContext;
         this.triggerMetadata = init.triggerMetadata;
+        this.options = init.options;
         this.#userLogHandler = init.logHandler;
     }
 
