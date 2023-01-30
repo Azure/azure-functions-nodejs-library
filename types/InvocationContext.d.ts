@@ -16,7 +16,7 @@ export declare class InvocationContext {
     /**
      * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
      */
-    constructor(init: InvocationContextInit);
+    constructor(init?: InvocationContextInit);
 
     /**
      * A unique guid specific to this invocation

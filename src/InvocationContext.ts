@@ -22,7 +22,8 @@ export class InvocationContext implements types.InvocationContext {
     options: EffectiveFunctionOptions;
     #userLogHandler: LogHandler;
 
-    constructor(init: InvocationContextInit) {
+    constructor(init?: InvocationContextInit) {
+        init = init || {};
         const fallbackString = 'unknown';
         this.invocationId = init.invocationId || fallbackString;
         this.functionName = init.functionName || fallbackString;
