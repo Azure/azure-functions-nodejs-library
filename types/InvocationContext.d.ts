@@ -5,7 +5,7 @@ import { CosmosDBInput, CosmosDBOutput } from './cosmosDB';
 import { EventGridOutput, EventGridPartialEvent } from './eventGrid';
 import { EventHubOutput } from './eventHub';
 import { HttpOutput, HttpResponse } from './http';
-import { FunctionInput, FunctionOptions, FunctionOutput } from './index';
+import { FunctionInput, FunctionOutput, FunctionTrigger } from './index';
 import { ServiceBusQueueOutput, ServiceBusTopicOutput } from './serviceBus';
 import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './storage';
 
@@ -253,17 +253,53 @@ export interface TraceContext {
 }
 
 /**
+ * The options used when registering the function, as passed to a specific invocation
+ * NOTE: This value may differ slightly from the original because it has been validated and defaults may have been explicitly added
+ */
+export interface EffectiveFunctionOptions {
+    /**
+     * Configuration for the primary input to the function, aka the reason it will be triggered
+     * This is the only input that is passed as an argument to the function handler during invocation
+     */
+    trigger: FunctionTrigger;
+
+    /**
+     * Configuration for the optional primary output of the function
+     * This is the main output that you should set as the return value of the function handler during invocation
+     */
+    return?: FunctionOutput;
+
+    /**
+     * Configuration for an optional set of secondary inputs
+     * During invocation, get these values with `context.extraInputs.get()`
+     */
+    extraInputs: FunctionInput[];
+
+    /**
+     * Configuration for an optional set of secondary outputs
+     * During invocation, set these values with `context.extraOutputs.set()`
+     */
+    extraOutputs: FunctionOutput[];
+}
+
+/**
  * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
  */
 export interface InvocationContextInit {
     /**
-     * A unique guid for this invocation
+     * Defaults to 'unknown' if not specified
      */
-    invocationId: string;
+    invocationId?: string;
 
-    functionName: string;
+    /**
+     * Defaults to 'unknown' if not specified
+     */
+    functionName?: string;
 
-    logHandler: LogHandler;
+    /**
+     * Defaults to Node.js console if not specified
+     */
+    logHandler?: LogHandler;
 
     traceContext?: TraceContext;
 
@@ -271,10 +307,11 @@ export interface InvocationContextInit {
 
     triggerMetadata?: TriggerMetadata;
 
-    options: EffectiveFunctionOptions;
+    /**
+     * Defaults to a trigger with 'unknown' type and name if not specified
+     */
+    options?: Partial<EffectiveFunctionOptions>;
 }
-
-export type EffectiveFunctionOptions = Omit<FunctionOptions, 'handler'>;
 
 export type LogHandler = (level: LogLevel, ...args: unknown[]) => void;
 
