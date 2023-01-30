@@ -14,6 +14,7 @@ import {
 } from '@azure/functions-core';
 import { format } from 'util';
 import { returnBindingKey } from './constants';
+import { fromRpcBindings } from './converters/fromRpcBindings';
 import { fromRpcRetryContext, fromRpcTraceContext } from './converters/fromRpcContext';
 import { fromRpcTriggerMetadata } from './converters/fromRpcTriggerMetadata';
 import { fromRpcTypedData } from './converters/fromRpcTypedData';
@@ -53,6 +54,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
             retryContext: fromRpcRetryContext(req.retryContext),
             traceContext: fromRpcTraceContext(req.traceContext),
             triggerMetadata: fromRpcTriggerMetadata(req.triggerMetadata, this.#triggerType),
+            options: fromRpcBindings(this.#bindings),
         });
 
         const inputs: unknown[] = [];

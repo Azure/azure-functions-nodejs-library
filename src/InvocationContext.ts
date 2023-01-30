@@ -2,7 +2,14 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { InvocationContextInit, LogHandler, RetryContext, TraceContext, TriggerMetadata } from '@azure/functions';
+import {
+    EffectiveFunctionOptions,
+    InvocationContextInit,
+    LogHandler,
+    RetryContext,
+    TraceContext,
+    TriggerMetadata,
+} from '@azure/functions';
 
 export class InvocationContext implements types.InvocationContext {
     invocationId: string;
@@ -12,17 +19,29 @@ export class InvocationContext implements types.InvocationContext {
     retryContext?: RetryContext;
     traceContext?: TraceContext;
     triggerMetadata?: TriggerMetadata;
+    options: EffectiveFunctionOptions;
     #userLogHandler: LogHandler;
 
-    constructor(init: InvocationContextInit) {
-        this.invocationId = init.invocationId;
-        this.functionName = init.functionName;
+    constructor(init?: InvocationContextInit) {
+        init = init || {};
+        const fallbackString = 'unknown';
+        this.invocationId = init.invocationId || fallbackString;
+        this.functionName = init.functionName || fallbackString;
         this.extraInputs = new InvocationContextExtraInputs();
         this.extraOutputs = new InvocationContextExtraOutputs();
         this.retryContext = init.retryContext;
         this.traceContext = init.traceContext;
         this.triggerMetadata = init.triggerMetadata;
-        this.#userLogHandler = init.logHandler;
+        this.options = {
+            trigger: init.options?.trigger || {
+                name: fallbackString,
+                type: fallbackString,
+            },
+            return: init.options?.return,
+            extraInputs: init.options?.extraInputs || [],
+            extraOutputs: init.options?.extraOutputs || [],
+        };
+        this.#userLogHandler = init.logHandler || fallbackLogHandler;
     }
 
     log(...args: unknown[]): void {
@@ -71,5 +90,28 @@ class InvocationContextExtraOutputs implements types.InvocationContextExtraOutpu
     set(outputOrName: types.FunctionOutput | string, value: unknown): void {
         const name = typeof outputOrName === 'string' ? outputOrName : outputOrName.name;
         this.#outputs[name] = value;
+    }
+}
+
+function fallbackLogHandler(level: types.LogLevel, ...args: unknown[]): void {
+    switch (level) {
+        case 'trace':
+            console.trace(...args);
+            break;
+        case 'debug':
+            console.debug(...args);
+            break;
+        case 'information':
+            console.info(...args);
+            break;
+        case 'warning':
+            console.warn(...args);
+            break;
+        case 'critical':
+        case 'error':
+            console.error(...args);
+            break;
+        default:
+            console.log(...args);
     }
 }
