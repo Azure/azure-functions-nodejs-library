@@ -2,8 +2,8 @@
 
 |Branch|Status|Support level|Node.js Versions|
 |---|---|---|---|
-|v4.x|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/Azure%2520Functions/145/v4.x)](https://azfunc.visualstudio.com/Azure%20Functions/_build/latest?definitionId=145&branchName=v4.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/Azure%2520Functions/146/v4.x?compact_message)](https://azfunc.visualstudio.com/Azure%20Functions/_build/latest?definitionId=146&branchName=v4.x)|Preview|18 (preview)|
-|v3.x (default)|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/Azure%2520Functions/145/v3.x)](https://azfunc.visualstudio.com/Azure%20Functions/_build/latest?definitionId=145&branchName=v3.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/Azure%2520Functions/146/v3.x?compact_message)](https://azfunc.visualstudio.com/Azure%20Functions/_build/latest?definitionId=146&branchName=v3.x)|GA (Recommended)|18 (preview), 16, 14|
+|v4.x|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/Azure%2520Functions/145/v4.x)](https://azfunc.visualstudio.com/Azure%20Functions/_build/latest?definitionId=145&branchName=v4.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/Azure%2520Functions/146/v4.x?compact_message)](https://azfunc.visualstudio.com/Azure%20Functions/_build/latest?definitionId=146&branchName=v4.x)|Preview|18|
+|v3.x (default)|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/Azure%2520Functions/145/v3.x)](https://azfunc.visualstudio.com/Azure%20Functions/_build/latest?definitionId=145&branchName=v3.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/Azure%2520Functions/146/v3.x?compact_message)](https://azfunc.visualstudio.com/Azure%20Functions/_build/latest?definitionId=146&branchName=v3.x)|GA (Recommended)|18, 16, 14|
 
 ## Install
 
