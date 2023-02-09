@@ -92,10 +92,12 @@ export class InvocationModel implements coreTypes.InvocationModel {
         const response: RpcInvocationResponse = { invocationId: this.#coreCtx.invocationId };
 
         response.outputData = [];
+        let usedReturnValue = false;
         for (const [name, binding] of Object.entries(this.#bindings)) {
             if (binding.direction === 'out') {
                 if (name === returnBindingKey) {
                     response.returnValue = await this.#convertOutput(binding, result);
+                    usedReturnValue = true;
                 } else {
                     response.outputData.push({
                         name,
@@ -109,7 +111,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         // to the host, even if no explicit output binding is set. In most cases, this is ignored,
         // but e.g., Durable uses this to pass orchestrator state back to the Durable extension, w/o
         // an explicit output binding. See here for more details: https://github.com/Azure/azure-functions-nodejs-library/pull/25
-        if (!response.returnValue && response.outputData.length == 0 && !isHttpTrigger(this.#triggerType)) {
+        if (!usedReturnValue && !isHttpTrigger(this.#triggerType)) {
             response.returnValue = toRpcTypedData(result);
         }
 
