@@ -1,4 +1,4 @@
-# Azure Functions Node.js Framework
+# Azure Functions Node.js Programming Model
 
 |Branch|Status|Support level|Node.js Versions|
 |---|---|---|---|
@@ -7,51 +7,64 @@
 
 ## Install
 
+```bash
+npm install @azure/functions@preview
 ```
-npm install @azure/functions
-```
+
+## Documentation
+
+- [Azure Functions JavaScript Developer Guide](https://learn.microsoft.com/azure/azure-functions/functions-reference-node?pivots=nodejs-model-v4)
+- [Upgrade guide from v3 to v4](https://learn.microsoft.com/azure/azure-functions/functions-node-upgrade-v4)
+- [Create your first TypeScript function](https://docs.microsoft.com/azure/azure-functions/create-first-function-vs-code-typescript?pivots=nodejs-model-v4)
+- [Create your first JavaScript function](https://docs.microsoft.com/azure/azure-functions/create-first-function-vs-code-node?pivots=nodejs-model-v4)
+
+## Considerations
+
+- During preview, the v4 model requires you to set the app setting `AzureWebJobsFeatureFlags` to `EnableWorkerIndexing`. For more information, see [Enable v4 programming model](https://learn.microsoft.com/azure/azure-functions/functions-reference-node?pivots=nodejs-model-v4#enable-v4-programming-model).
+- The Node.js "programming model" shouldn't be confused with the Azure Functions "runtime".
+  - _**Programming model**_: Defines how you author your code and is specific to JavaScript and TypeScript.
+  - _**Runtime**_: Defines underlying behavior of Azure Functions and is shared across all languages.
+- The programming model version is strictly tied to the version of the [`@azure/functions`](https://www.npmjs.com/package/@azure/functions) npm package, and is versioned independently of the [runtime](https://learn.microsoft.com/azure/azure-functions/functions-versions?pivots=programming-language-javascript). Both the runtime and the programming model use "4" as their latest major version, but that is purely a coincidence.
 
 ## Usage
 
-_**UPDATE**_: **See here for important information on v4 of the Azure Functions Node.js Framework: https://aka.ms/AzFuncNodeV4**
+### TypeScript
 
-Prior to version 3.5.0, this package only contained TypeScript type definitions. Starting with version 3.5.0 it _also_ contains the underlying Azure Functions Framework for Node.js. This framework package is included by default in [v4.x of the Azure Functions runtime](https://docs.microsoft.com/azure/azure-functions/functions-versions?pivots=programming-language-javascript), meaning you do _not_ need to include the package in your app. However, there may be cases where you want a specific version of the package, so you can override the default shipped in Azure with the below steps.
+```typescript
+import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 
-### TypeScript:
+export async function httpTrigger1(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+    context.log(`Http function processed request for url "${request.url}"`);
 
-For a full tutorial, see [how to create your first TypeScript function](https://docs.microsoft.com/azure/azure-functions/create-first-function-vs-code-typescript).
+    const name = request.query.get('name') || await request.text() || 'world';
 
-1. Specify a main entrypoint in your package.json
-    ```json
-    "main": "dist/src/index.js"
-    ```
-2. Add the following code to your entrypoint file (e.g. `src/index.ts`):
-    ```typescript
-    import * as func from '@azure/functions';
+    return { body: `Hello, ${name}!` };
+};
 
-    func.setup();
-    ```
-
-**IMPORTANT NOTE**: If you only want this package for the TypeScript type definitions, you may list this package in the "devDependencies" section of your package.json. If you are overriding the default shipped in Azure as described above, the package must be listed in the production "dependencies" section of your package.json.
-
-For more documentation, see the [TypeScript developer guide](https://docs.microsoft.com/azure/azure-functions/functions-reference-node#typescript).
+app.http('httpTrigger1', {
+    methods: ['GET', 'POST'],
+    authLevel: 'anonymous',
+    handler: httpTrigger1
+});
+```
 
 ### JavaScript
 
-For a full tutorial, see [how to create your first JavaScript function](https://docs.microsoft.com/azure/azure-functions/create-first-function-vs-code-node).
+```javascript
+const { app } = require('@azure/functions');
 
-1. Specify a main entrypoint in your package.json
-    ```json
-    "main": "src/index.js"
-    ```
-2. Add the following code to your entrypoint file:
-    ```javascript
-    const func = require('@azure/functions');
-    
-    func.setup();
-    ```
+app.http('httpTrigger1', {
+    methods: ['GET', 'POST'],
+    authLevel: 'anonymous',
+    handler: async (request, context) => {
+        context.log(`Http function processed request for url "${request.url}"`);
 
-For more documentation, see the [JavaScript developer guide](https://docs.microsoft.com/azure/azure-functions/functions-reference-node).
+        const name = request.query.get('name') || await request.text() || 'world';
+
+        return { body: `Hello, ${name}!` };
+    }
+});
+```
 
 ## Contributing
 
@@ -62,8 +75,7 @@ For more documentation, see the [JavaScript developer guide](https://docs.micros
 - Run `npm link`
 - Create or open a local function app to test with
 - In the local function app:
-  - Make sure you are calling `func.setup()` somewhere in your app, as described above in the "Usage" section
-  - Run `npm link @azure/functions`. This will point your app to the local repository for the framework package
+  - Run `npm link @azure/functions`. This will point your app to the local repository for the `@azure/functions` package
   - Add the following settings to your "local.settings.json" file or configure them directly as environment variables
     - `languageWorkers__node__arguments`: `--inspect`
       > 💡 Tip: Set `logging__logLevel__Worker` to `debug` if you want to view worker-specific logs in the output of `func start`
