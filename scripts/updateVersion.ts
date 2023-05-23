@@ -17,18 +17,24 @@ if (args.validate) {
     validateVersion();
 } else if (args.version) {
     updateVersion(args.version);
+} else if (args.buildNumber) {
+    const currentVersion = validateVersion();
+    const newVersion = currentVersion.includes('alpha')
+        ? `${currentVersion}.${args.buildNumber}`
+        : `${currentVersion}-alpha.${args.buildNumber}`;
+    updateVersion(newVersion);
 } else {
     console.log(`This script can be used to either update the version of the library or validate that the repo is in a valid state with regards to versioning.
 
 Example usage:
 
 npm run updateVersion -- --version 3.3.0
-
+npm run updateVersion -- --buildNumber 20230517.1
 npm run updateVersion -- --validate`);
     throw new Error('Invalid arguments');
 }
 
-function validateVersion() {
+function validateVersion(): string {
     const packageJson = readJSONSync(packageJsonPath);
     const packageJsonVersion: string = packageJson.version;
 
@@ -46,6 +52,7 @@ function validateVersion() {
         throw new Error(`Versions do not match.`);
     } else {
         console.log('Versions match! 🎉');
+        return packageJsonVersion;
     }
 }
 
