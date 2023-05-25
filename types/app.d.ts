@@ -163,4 +163,9 @@ export function onTerminate(callback: AppTerminateCallback): Disposable;
 export function onStart(callback: AppStartCallback): Disposable;
 export function onPreInvocation(functions: string[], callback: PreInvocationCallback): Disposable;
 export function onPostInvocation(functions: string[], callback: PostInvocationCallback): Disposable;
+
+export function on(hookName: 'appStart', callback: AppStartCallback): Disposable;
+export function on(hookName: 'appTerminate', callback: AppTerminateCallback): Disposable;
+export function on(hookName: 'preInvocation', callback: PreInvocationCallback): Disposable;
+export function on(hookName: 'postInvocation', callback: PostInvocationCallback): Disposable;
 export function on(hookName: string, callback: HookCallback): Disposable;

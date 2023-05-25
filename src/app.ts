@@ -288,15 +288,23 @@ export function generic(name: string, options: FunctionOptions): void {
 }
 
 export function onTerminate(callback: AppTerminateCallback): Disposable {
-    return coreTypes.registerHook('appTerminate', callback);
+    return on('appTerminate', callback as HookCallback);
 }
 
 export function onStart(callback: AppStartCallback): Disposable {
-    return coreTypes.registerHook('appStart', callback);
+    return on('appStart', callback as HookCallback);
 }
 
 export function on(hookName: string, callback: HookCallback): Disposable {
-    return coreTypes.registerHook(hookName, callback);
+    const coreApi = tryGetCoreApiLazy();
+    if (!coreApi) {
+        console.warn(
+            `WARNING: Skipping call to register ${hookName} hook because the "@azure/functions" package is in test mode.`
+        );
+        throw new Error(`Could not register ${hookName} hooks because the "@azure/functions" package is in test mode.`);
+    } else {
+        return coreApi.registerHook(hookName, callback);
+    }
 }
 
 export function onPreInvocation(functions: string[], callback: PreInvocationCallback): coreTypes.Disposable {
@@ -311,7 +319,7 @@ export function onPreInvocation(functions: string[], callback: PreInvocationCall
             return callback(newContext);
         }
     };
-    return coreTypes.registerHook('preInvocation', newCallback);
+    return on('preInvocation', newCallback as HookCallback);
 }
 
 export function onPostInvocation(
@@ -329,5 +337,5 @@ export function onPostInvocation(
             return callback(newContext);
         }
     };
-    return coreTypes.registerHook('postInvocation', newCallback);
+    return on('postInvocation', newCallback as HookCallback);
 }
