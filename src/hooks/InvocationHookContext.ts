@@ -2,14 +2,15 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { HookData, InvocationContext, LogHandler } from '@azure/functions';
+import { HookData, LogHandler } from '@azure/functions';
+import { InvocationContext } from '../InvocationContext';
 import { logHandlerFromContext } from '../log';
 import { HookContext } from './HookContext';
 
 export abstract class InvocationHookContext extends HookContext implements types.InvocationHookContext {
     readonly hookData: HookData;
     readonly appHookData: HookData;
-    readonly invocationContext: InvocationContext;
+    readonly invocationContext: types.InvocationContext;
     args: any[];
     #userLogHandler: LogHandler;
 

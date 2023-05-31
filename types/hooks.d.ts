@@ -160,9 +160,9 @@ export declare class PostInvocationContext extends InvocationHookContext {
     result: any;
 
     /**
-     * The error for the function, or null if there is no error. Changes to this value _will_ affect the overall result of the function
+     * The error thrown by the function, or null if there is no error. Changes to this value _will_ affect the overall result of the function
      */
-    error: any;
+    errorResult: any;
 }
 
 export interface PostInvocationContextInit extends InvocationHookContextInit {
@@ -174,7 +174,7 @@ export interface PostInvocationContextInit extends InvocationHookContextInit {
     /**
      * Defaults to `null` if not specified
      */
-    error?: any;
+    errorResult?: any;
 }
 
 /**

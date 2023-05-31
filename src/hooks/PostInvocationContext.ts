@@ -6,7 +6,7 @@ import { InvocationHookContext } from './InvocationHookContext';
 
 export class PostInvocationContext extends InvocationHookContext implements types.PostInvocationContext {
     result: any;
-    error: any;
+    errorResult: any;
 
     constructor(init?: types.PostInvocationContextInit) {
         init = init || {};
@@ -15,6 +15,6 @@ export class PostInvocationContext extends InvocationHookContext implements type
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         this.result = typeof init.result === 'undefined' ? null : init.result;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        this.error = typeof init.error === 'undefined' ? null : init.error;
+        this.errorResult = typeof init.errorResult === 'undefined' ? null : init.errorResult;
     }
 }
