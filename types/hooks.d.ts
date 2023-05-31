@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { FunctionHandler } from '.';
-import { InvocationContext } from './InvocationContext';
+import { InvocationContext, LogHandler } from './InvocationContext';
 
 export type HookCallback = (context: HookContext) => void | Promise<void>;
 export type PreInvocationCallback = (context: PreInvocationContext) => void | Promise<void>;
@@ -13,9 +13,14 @@ export type AppTerminateCallback = (context: AppTerminateContext) => void | Prom
 type HookData = { [key: string]: any };
 
 /**
- * Base interface for all hook context objects
+ * Base class for all hook context objects
  */
-export interface HookContext {
+export declare abstract class HookContext {
+    /**
+     * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+     */
+    constructor(init?: HookContextInit);
+
     /**
      * The recommended place to share data between hooks in the same scope (app-level vs invocation-level)
      * This object is readonly. You may modify it, but attempting to overwrite it will throw an error
@@ -28,11 +33,27 @@ export interface HookContext {
     readonly appHookData: HookData;
 }
 
+export interface HookContextInit {
+    /**
+     * Defaults to empty object if not specified
+     */
+    hookData?: HookData;
+
+    /**
+     * Defaults to empty object if not specified
+     */
+    appHookData?: HookData;
+}
+
 /**
- * Context on a function that is about to be executed
- * This object will be passed to all pre invocation hooks
+ * Base class for all invocation hook context objects
  */
-export interface PreInvocationContext extends HookContext {
+export declare abstract class InvocationHookContext extends HookContext {
+    /**
+     * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+     */
+    constructor(init?: InvocationHookContextInit);
+
     /**
      * The context object passed to the function
      * This object is readonly. You may modify it, but attempting to overwrite it will throw an error
@@ -40,9 +61,75 @@ export interface PreInvocationContext extends HookContext {
     readonly invocationContext: InvocationContext;
 
     /**
-     * The arguments passed to this specific invocation. Changes to this array _will_ affect the inputs passed to your function
+     * The arguments passed to this specific invocation.
+     * In pre-invocation hooks, changes to this array _will_ affect the inputs passed to your function
      */
     args: any[];
+
+    /**
+     * The recommended way to log data during invocation.
+     * Similar to Node.js's `console.log`, but has integration with Azure features like application insights
+     * Uses the 'information' log level
+     */
+    log(...args: any[]): void;
+
+    /**
+     * The recommended way to log trace data (level 0) during invocation.
+     * Similar to Node.js's `console.trace`, but has integration with Azure features like application insights
+     */
+    trace(...args: any[]): void;
+
+    /**
+     * The recommended way to log debug data (level 1) during invocation.
+     * Similar to Node.js's `console.debug`, but has integration with Azure features like application insights
+     */
+    debug(...args: any[]): void;
+
+    /**
+     * The recommended way to log information data (level 2) during invocation.
+     * Similar to Node.js's `console.info`, but has integration with Azure features like application insights
+     */
+    info(...args: any[]): void;
+
+    /**
+     * The recommended way to log warning data (level 3) during invocation.
+     * Similar to Node.js's `console.warn`, but has integration with Azure features like application insights
+     */
+    warn(...args: any[]): void;
+
+    /**
+     * The recommended way to log error data (level 4) during invocation.
+     * Similar to Node.js's `console.error`, but has integration with Azure features like application insights
+     */
+    error(...args: any[]): void;
+}
+
+interface InvocationHookContextInit extends HookContextInit {
+    /**
+     * Defaults to new InvocationContext with default values if not specified
+     */
+    invocationContext?: InvocationContext;
+
+    /**
+     * Defaults to empty array if not specified
+     */
+    args?: any[];
+
+    /**
+     * Defaults to logger on the invocation context if not specified
+     */
+    logHandler?: LogHandler;
+}
+
+/**
+ * Context on a function that is about to be executed
+ * This object will be passed to all pre invocation hooks
+ */
+export declare class PreInvocationContext extends InvocationHookContext {
+    /**
+     * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+     */
+    constructor(init?: PreInvocationContextInit);
 
     /**
      * The function callback for this specific invocation. Changes to this value _will_ affect the function itself
@@ -50,21 +137,22 @@ export interface PreInvocationContext extends HookContext {
     functionCallback: FunctionHandler;
 }
 
+export interface PreInvocationContextInit extends InvocationHookContextInit {
+    /**
+     * Defaults to an empty function if not specified
+     */
+    functionCallback?: FunctionHandler;
+}
+
 /**
  * Context on a function that has just executed
  * This object will be passed to all post invocation hooks
  */
-export interface PostInvocationContext extends HookContext {
+export declare class PostInvocationContext extends InvocationHookContext {
     /**
-     * The context object passed to the function
-     * This object is readonly. You may modify it, but attempting to overwrite it will throw an error
+     * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
      */
-    readonly invocationContext: InvocationContext;
-
-    /**
-     * The arguments passed to this specific invocation
-     */
-    args: any[];
+    constructor(init?: PostInvocationContextInit);
 
     /**
      * The result of the function, or null if there is no result. Changes to this value _will_ affect the overall result of the function
@@ -77,18 +165,49 @@ export interface PostInvocationContext extends HookContext {
     error: any;
 }
 
+export interface PostInvocationContextInit extends InvocationHookContextInit {
+    /**
+     * Defaults to `null` if not specified
+     */
+    result?: any;
+
+    /**
+     * Defaults to `null` if not specified
+     */
+    error?: any;
+}
+
 /**
  * Context on a function app that is about to be started
  * This object will be passed to all app start hooks
  */
-export interface AppStartContext extends HookContext {
+export declare class AppStartContext extends HookContext {
+    /**
+     * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+     */
+    constructor(init?: AppStartContextInit);
+
     /**
      * Absolute directory of the function app
      */
     functionAppDirectory: string;
 }
 
-export type AppTerminateContext = HookContext;
+export interface AppStartContextInit extends HookContextInit {
+    /**
+     * Defaults to 'unknown'
+     */
+    functionAppDirectory?: string;
+}
+
+export declare class AppTerminateContext extends HookContext {
+    /**
+     * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
+     */
+    constructor(init?: AppTerminateContextInit);
+}
+
+export interface AppTerminateContextInit extends HookContextInit {}
 
 /**
  * Represents a type which can release resources, such as event listening or a timer.

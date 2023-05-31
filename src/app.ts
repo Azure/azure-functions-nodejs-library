@@ -16,6 +16,7 @@ import {
     HttpMethod,
     HttpMethodFunctionOptions,
     InvocationContext,
+    PostInvocationCallback,
     PreInvocationCallback,
     ServiceBusQueueFunctionOptions,
     ServiceBusTopicFunctionOptions,
@@ -27,6 +28,8 @@ import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { InvocationModel } from './InvocationModel';
 import { returnBindingKey, version } from './constants';
+import { PostInvocationContext } from './hooks/PostInvocationContext';
+import { PreInvocationContext } from './hooks/PreInvocationContext';
 import * as output from './output';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';
@@ -287,15 +290,7 @@ export function generic(name: string, options: FunctionOptions): void {
     }
 }
 
-export function onTerminate(callback: AppTerminateCallback): Disposable {
-    return on('appTerminate', callback as HookCallback);
-}
-
-export function onStart(callback: AppStartCallback): Disposable {
-    return on('appStart', callback as HookCallback);
-}
-
-export function on(hookName: string, callback: HookCallback): Disposable {
+export function coreRegisterHook(hookName: string, callback: coreTypes.HookCallback): coreTypes.Disposable {
     const coreApi = tryGetCoreApiLazy();
     if (!coreApi) {
         console.warn(
@@ -307,35 +302,44 @@ export function on(hookName: string, callback: HookCallback): Disposable {
     }
 }
 
-export function onPreInvocation(functions: string[], callback: PreInvocationCallback): coreTypes.Disposable {
-    const newCallback: coreTypes.PreInvocationCallback = (context: coreTypes.PreInvocationContext) => {
-        const invocContext = context.invocationContext as InvocationContext;
-        if (functions.includes(invocContext.functionName) || functions.length === 0) {
-            const newContext = {
-                ...context,
-                args: context.inputs,
-                invocationContext: context.invocationContext as InvocationContext,
-            };
-            return callback(newContext);
-        }
-    };
-    return on('preInvocation', newCallback as HookCallback);
+export function onTerminate(callback: AppTerminateCallback): Disposable {
+    return on('appTerminate', callback as HookCallback);
 }
 
-export function onPostInvocation(
-    functions: string[],
-    callback: coreTypes.PostInvocationCallback
-): coreTypes.Disposable {
+export function onStart(callback: AppStartCallback): Disposable {
+    return on('appStart', callback as HookCallback);
+}
+
+export function on(hookName: string, callback: HookCallback): Disposable {
+    return coreRegisterHook(hookName, callback as coreTypes.HookCallback);
+}
+
+export function onPreInvocation(functions: string[], callback: PreInvocationCallback): Disposable {
+    const coreCallback: coreTypes.PreInvocationCallback = (coreContext: coreTypes.PreInvocationContext) => {
+        const invocContext = coreContext.invocationContext as InvocationContext;
+        if (functions.includes(invocContext.functionName) || functions.length === 0) {
+            const preInvocContext = new PreInvocationContext({
+                ...coreContext,
+                args: coreContext.inputs,
+                invocationContext: coreContext.invocationContext as InvocationContext,
+            });
+            return callback(preInvocContext);
+        }
+    };
+    return coreRegisterHook('preInvocation', coreCallback as coreTypes.HookCallback);
+}
+
+export function onPostInvocation(functions: string[], callback: PostInvocationCallback): coreTypes.Disposable {
     const newCallback: coreTypes.PostInvocationCallback = (context: coreTypes.PostInvocationContext) => {
         const invocContext: InvocationContext = context.invocationContext as InvocationContext;
         if (functions.includes(invocContext.functionName) || functions.length === 0) {
-            const newContext = {
+            const newContext = new PostInvocationContext({
                 ...context,
                 args: context.inputs,
-                invocationContext: context.invocationContext,
-            };
+                invocationContext: invocContext,
+            });
             return callback(newContext);
         }
     };
-    return on('postInvocation', newCallback as HookCallback);
+    return coreRegisterHook('postInvocation', newCallback as coreTypes.HookCallback);
 }

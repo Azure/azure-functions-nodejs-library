@@ -1,19 +1,19 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import {
-    AppStartCallback,
-    AppTerminateCallback,
-    Disposable,
-    HookCallback,
-    PostInvocationCallback,
-    PreInvocationCallback,
-} from '@azure/functions-core';
 import { CosmosDBFunctionOptions } from './cosmosDB';
 import { EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
-import { FunctionOptions } from './index';
+import {
+    AppStartCallback,
+    AppTerminateCallback,
+    Disposable,
+    FunctionOptions,
+    HookCallback,
+    PostInvocationCallback,
+    PreInvocationCallback,
+} from './index';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
 import { StorageBlobFunctionOptions, StorageQueueFunctionOptions } from './storage';
 import { TimerFunctionOptions } from './timer';
