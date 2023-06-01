@@ -18,6 +18,7 @@ export abstract class HookContext implements types.HookContext {
     get hookData(): HookData {
         return this.#hookData;
     }
+
     set hookData(_value: HookData) {
         throw new ReadOnlyError('hookData');
     }
@@ -25,6 +26,7 @@ export abstract class HookContext implements types.HookContext {
     get appHookData(): HookData {
         return this.#appHookData;
     }
+
     set appHookData(_value: HookData) {
         throw new ReadOnlyError('appHookData');
     }
