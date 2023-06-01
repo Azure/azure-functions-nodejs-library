@@ -4,11 +4,11 @@
 import { FunctionHandler } from '.';
 import { InvocationContext, LogHandler } from './InvocationContext';
 
-export type HookCallback = (context: HookContext) => void | Promise<void>;
-export type PreInvocationCallback = (context: PreInvocationContext) => void | Promise<void>;
-export type PostInvocationCallback = (context: PostInvocationContext) => void | Promise<void>;
-export type AppStartCallback = (context: AppStartContext) => void | Promise<void>;
-export type AppTerminateCallback = (context: AppTerminateContext) => void | Promise<void>;
+export type HookHandler = (context: HookContext) => void | Promise<void>;
+export type PreInvocationHandler = (context: PreInvocationContext) => void | Promise<void>;
+export type PostInvocationHandler = (context: PostInvocationContext) => void | Promise<void>;
+export type AppStartHandler = (context: AppStartContext) => void | Promise<void>;
+export type AppTerminateHandler = (context: AppTerminateContext) => void | Promise<void>;
 
 type HookData = { [key: string]: any };
 
@@ -61,12 +61,6 @@ export declare abstract class InvocationHookContext extends HookContext {
     readonly invocationContext: InvocationContext;
 
     /**
-     * The arguments passed to this specific invocation.
-     * In pre-invocation hooks, changes to this array _will_ affect the inputs passed to your function
-     */
-    args: any[];
-
-    /**
      * The recommended way to log data during invocation.
      * Similar to Node.js's `console.log`, but has integration with Azure features like application insights
      * Uses the 'information' log level
@@ -111,11 +105,6 @@ interface InvocationHookContextInit extends HookContextInit {
     invocationContext?: InvocationContext;
 
     /**
-     * Defaults to empty array if not specified
-     */
-    args?: any[];
-
-    /**
      * Defaults to logger on the invocation context if not specified
      */
     logHandler?: LogHandler;
@@ -132,16 +121,51 @@ export declare class PreInvocationContext extends InvocationHookContext {
     constructor(init?: PreInvocationContextInit);
 
     /**
-     * The function callback for this specific invocation. Changes to this value _will_ affect the function itself
+     * The arguments passed to this specific invocation.
+     * Changes to this array _will_ affect the inputs passed to your function
      */
-    functionCallback: FunctionHandler;
+    args: any[];
+
+    /**
+     * The function handler for this specific invocation. Changes to this value _will_ affect the function itself
+     */
+    functionHandler: FunctionHandler;
 }
 
 export interface PreInvocationContextInit extends InvocationHookContextInit {
     /**
+     * Defaults to empty array if not specified
+     */
+    args?: any[];
+
+    /**
      * Defaults to an empty function if not specified
      */
-    functionCallback?: FunctionHandler;
+    functionHandler?: FunctionHandler;
+
+    /**
+     * This is set automatically by the Azure Functions runtime. You should not set this yourself
+     */
+    coreContext?: PreInvocationCoreContext;
+}
+
+/**
+ * Context for Pre Invocation hooks coming from the Core API
+ * This object is relevant only for hooks that are registered using the Core API
+ * You should not construct this object yourself
+ */
+interface PreInvocationCoreContext {
+    /**
+     * The input values for this specific invocation.
+     * Changes to this array _will_ affect the inputs passed to your function
+     */
+    inputs: any[];
+
+    /**
+     * The function callback for this specific invocation.
+     * Changes to this value _will_ affect the function itself
+     */
+    functionCallback: FunctionHandler;
 }
 
 /**
@@ -153,6 +177,11 @@ export declare class PostInvocationContext extends InvocationHookContext {
      * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
      */
     constructor(init?: PostInvocationContextInit);
+
+    /**
+     * The arguments passed to this specific invocation.
+     */
+    args: any[];
 
     /**
      * The result of the function, or null if there is no result. Changes to this value _will_ affect the overall result of the function
@@ -167,6 +196,11 @@ export declare class PostInvocationContext extends InvocationHookContext {
 
 export interface PostInvocationContextInit extends InvocationHookContextInit {
     /**
+     * Defaults to empty array if not specified
+     */
+    args?: any[];
+
+    /**
      * Defaults to `null` if not specified
      */
     result?: any;
@@ -175,6 +209,35 @@ export interface PostInvocationContextInit extends InvocationHookContextInit {
      * Defaults to `null` if not specified
      */
     errorResult?: any;
+
+    /**
+     * This is set automatically by the Azure Functions runtime. You should not set this yourself
+     */
+    coreContext?: PostInvocationCoreContext;
+}
+
+/**
+ * Context for Post Invocation hooks coming from the Core API
+ * This object is relevant only for hooks that are registered using the Core API
+ * You should not construct this object yourself
+ */
+interface PostInvocationCoreContext {
+    /**
+     * The input values for this specific invocation
+     */
+    inputs: any[];
+
+    /**
+     * The result of the function, or null if there is no result.
+     * Changes to this value _will_ affect the overall result of the function
+     */
+    result: any;
+
+    /**
+     * The error for the function, or null if there is no error.
+     * Changes to this value _will_ affect the overall result of the function
+     */
+    error: any;
 }
 
 /**

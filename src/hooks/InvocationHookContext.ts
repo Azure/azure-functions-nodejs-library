@@ -9,14 +9,12 @@ import { logHandlerFromContext } from '../log';
 import { HookContext } from './HookContext';
 
 export abstract class InvocationHookContext extends HookContext implements types.InvocationHookContext {
-    args: any[];
     #userLogHandler: LogHandler;
     #invocationContext: types.InvocationContext;
 
-    constructor(init?: types.PreInvocationContextInit) {
+    constructor(init?: types.InvocationHookContextInit) {
         super(init);
         init = init || {};
-        this.args = init.args || [];
         this.#invocationContext = init.invocationContext || new InvocationContext({ logHandler: init.logHandler });
         this.#userLogHandler = init.logHandler || logHandlerFromContext(this.invocationContext);
     }

@@ -4,16 +4,16 @@
 import { CosmosDBFunctionOptions } from './cosmosDB';
 import { EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
-import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
 import {
-    AppStartCallback,
-    AppTerminateCallback,
+    AppStartHandler,
+    AppTerminateHandler,
     Disposable,
-    FunctionOptions,
-    HookCallback,
-    PostInvocationCallback,
-    PreInvocationCallback,
-} from './index';
+    HookHandler,
+    PostInvocationHandler,
+    PreInvocationHandler,
+} from './hooks';
+import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
+import { FunctionOptions } from './index';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
 import { StorageBlobFunctionOptions, StorageQueueFunctionOptions } from './storage';
 import { TimerFunctionOptions } from './timer';
@@ -159,13 +159,13 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
  */
 export function generic(name: string, options: FunctionOptions): void;
 
-export function onTerminate(callback: AppTerminateCallback): Disposable;
-export function onStart(callback: AppStartCallback): Disposable;
-export function onPreInvocation(functions: string[], callback: PreInvocationCallback): Disposable;
-export function onPostInvocation(functions: string[], callback: PostInvocationCallback): Disposable;
+export function onTerminate(handler: AppTerminateHandler): Disposable;
+export function onStart(handler: AppStartHandler): Disposable;
+export function onPreInvocation(functions: string[], handler: PreInvocationHandler): Disposable;
+export function onPostInvocation(functions: string[], handler: PostInvocationHandler): Disposable;
 
-export function on(hookName: 'appStart', callback: AppStartCallback): Disposable;
-export function on(hookName: 'appTerminate', callback: AppTerminateCallback): Disposable;
-export function on(hookName: 'preInvocation', callback: PreInvocationCallback): Disposable;
-export function on(hookName: 'postInvocation', callback: PostInvocationCallback): Disposable;
-export function on(hookName: string, callback: HookCallback): Disposable;
+export function on(hookName: 'appStart', handler: AppStartHandler): Disposable;
+export function on(hookName: 'appTerminate', handler: AppTerminateHandler): Disposable;
+export function on(hookName: 'preInvocation', handler: PreInvocationHandler): Disposable;
+export function on(hookName: 'postInvocation', handler: PostInvocationHandler): Disposable;
+export function on(hookName: string, handler: HookHandler): Disposable;

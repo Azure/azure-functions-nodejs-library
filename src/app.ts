@@ -2,22 +2,22 @@
 // Licensed under the MIT License.
 
 import {
-    AppStartCallback,
-    AppTerminateCallback,
+    AppStartHandler,
+    AppTerminateHandler,
     CosmosDBFunctionOptions,
     CosmosDBTrigger,
     Disposable,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
     FunctionOptions,
-    HookCallback,
+    HookHandler,
     HttpFunctionOptions,
     HttpHandler,
     HttpMethod,
     HttpMethodFunctionOptions,
     InvocationContext,
-    PostInvocationCallback,
-    PreInvocationCallback,
+    PostInvocationHandler,
+    PreInvocationHandler,
     ServiceBusQueueFunctionOptions,
     ServiceBusTopicFunctionOptions,
     StorageBlobFunctionOptions,
@@ -302,43 +302,48 @@ export function coreRegisterHook(hookName: string, callback: coreTypes.HookCallb
     }
 }
 
-export function onTerminate(callback: AppTerminateCallback): Disposable {
-    return on('appTerminate', callback as HookCallback);
+export function onTerminate(handler: AppTerminateHandler): Disposable {
+    return on('appTerminate', handler as HookHandler);
 }
 
-export function onStart(callback: AppStartCallback): Disposable {
-    return on('appStart', callback as HookCallback);
+export function onStart(handler: AppStartHandler): Disposable {
+    return on('appStart', handler as HookHandler);
 }
 
-export function on(hookName: string, callback: HookCallback): Disposable {
-    return coreRegisterHook(hookName, callback as coreTypes.HookCallback);
+export function on(hookName: string, handler: HookHandler): Disposable {
+    return coreRegisterHook(hookName, handler as coreTypes.HookCallback);
 }
 
-export function onPreInvocation(functions: string[], callback: PreInvocationCallback): Disposable {
+export function onPreInvocation(functions: string[], handler: PreInvocationHandler): Disposable {
     const coreCallback: coreTypes.PreInvocationCallback = (coreContext: coreTypes.PreInvocationContext) => {
         const invocContext = coreContext.invocationContext as InvocationContext;
         if (functions.includes(invocContext.functionName) || functions.length === 0) {
             const preInvocContext = new PreInvocationContext({
-                ...coreContext,
+                functionHandler: coreContext.functionCallback,
                 args: coreContext.inputs,
-                invocationContext: coreContext.invocationContext as InvocationContext,
+                invocationContext: invocContext,
+                coreContext,
             });
-            return callback(preInvocContext);
+            return handler(preInvocContext);
         }
     };
     return coreRegisterHook('preInvocation', coreCallback as coreTypes.HookCallback);
 }
 
-export function onPostInvocation(functions: string[], callback: PostInvocationCallback): coreTypes.Disposable {
+export function onPostInvocation(functions: string[], handler: PostInvocationHandler): coreTypes.Disposable {
     const newCallback: coreTypes.PostInvocationCallback = (context: coreTypes.PostInvocationContext) => {
         const invocContext: InvocationContext = context.invocationContext as InvocationContext;
         if (functions.includes(invocContext.functionName) || functions.length === 0) {
             const newContext = new PostInvocationContext({
-                ...context,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                result: context.result,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                errorResult: context.error,
                 args: context.inputs,
                 invocationContext: invocContext,
+                coreContext: context,
             });
-            return callback(newContext);
+            return handler(newContext);
         }
     };
     return coreRegisterHook('postInvocation', newCallback as coreTypes.HookCallback);
