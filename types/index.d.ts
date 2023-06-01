@@ -3,14 +3,16 @@
 
 import { InvocationContext } from './InvocationContext';
 
+export * from './InvocationContext';
 export * as app from './app';
 export * from './cosmosDB';
+export * from './cosmosDB.v3';
+export * from './cosmosDB.v4';
 export * from './eventGrid';
 export * from './eventHub';
 export * from './generic';
 export * from './http';
 export * as input from './input';
-export * from './InvocationContext';
 export * as output from './output';
 export * from './serviceBus';
 export * from './storage';
