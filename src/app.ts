@@ -3,6 +3,7 @@
 
 import {
     CosmosDBFunctionOptions,
+    CosmosDBTrigger,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
     FunctionOptions,
@@ -18,8 +19,8 @@ import {
 } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
-import { returnBindingKey, version } from './constants';
 import { InvocationModel } from './InvocationModel';
+import { returnBindingKey, version } from './constants';
 import * as output from './output';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';
@@ -174,21 +175,58 @@ export function eventGrid(name: string, options: EventGridFunctionOptions): void
 }
 
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
-    generic(name, {
-        trigger: trigger.cosmosDB({
+    let cosmosTrigger: CosmosDBTrigger;
+    if ('connectionStringSetting' in options) {
+        cosmosTrigger = trigger.cosmosDB({
+            checkpointDocumentCount: options.checkpointDocumentCount,
+            checkpointInterval: options.checkpointInterval,
             collectionName: options.collectionName,
             connectionStringSetting: options.connectionStringSetting,
             createLeaseCollectionIfNotExists: options.createLeaseCollectionIfNotExists,
             databaseName: options.databaseName,
+            feedPollDelay: options.feedPollDelay,
             id: options.id,
+            leaseAcquireInterval: options.leaseAcquireInterval,
             leaseCollectionName: options.leaseCollectionName,
             leaseCollectionPrefix: options.leaseCollectionPrefix,
             leaseCollectionThroughput: options.leaseCollectionThroughput,
             leaseConnectionStringSetting: options.leaseConnectionStringSetting,
             leaseDatabaseName: options.leaseDatabaseName,
+            leaseExpirationInterval: options.leaseExpirationInterval,
+            leaseRenewInterval: options.leaseRenewInterval,
+            maxItemsPerInvocation: options.maxItemsPerInvocation,
             partitionKey: options.partitionKey,
+            preferredLocations: options.preferredLocations,
             sqlQuery: options.sqlQuery,
-        }),
+            startFromBeginning: options.startFromBeginning,
+            useMultipleWriteLocations: options.useMultipleWriteLocations,
+        });
+    } else {
+        cosmosTrigger = trigger.cosmosDB({
+            connection: options.connection,
+            containerName: options.containerName,
+            createLeaseContainerIfNotExists: options.createLeaseContainerIfNotExists,
+            databaseName: options.databaseName,
+            feedPollDelay: options.feedPollDelay,
+            id: options.id,
+            leaseAcquireInterval: options.leaseAcquireInterval,
+            leaseConnection: options.leaseConnection,
+            leaseContainerName: options.leaseContainerName,
+            leaseContainerPrefix: options.leaseContainerPrefix,
+            leaseDatabaseName: options.leaseDatabaseName,
+            leaseExpirationInterval: options.leaseExpirationInterval,
+            leaseRenewInterval: options.leaseRenewInterval,
+            leasesContainerThroughput: options.leasesContainerThroughput,
+            maxItemsPerInvocation: options.maxItemsPerInvocation,
+            partitionKey: options.partitionKey,
+            preferredLocations: options.preferredLocations,
+            sqlQuery: options.sqlQuery,
+            startFromBeginning: options.startFromBeginning,
+            startFromTime: options.startFromTime,
+        });
+    }
+    generic(name, {
+        trigger: cosmosTrigger,
         ...options,
     });
 }
