@@ -16,8 +16,6 @@ export abstract class InvocationHookContext extends HookContext implements types
     constructor(init?: types.PreInvocationContextInit) {
         super(init);
         init = init || {};
-        this.hookData = init.hookData || {};
-        this.appHookData = init.appHookData || {};
         this.args = init.args || [];
         this.#invocationContext = init.invocationContext || new InvocationContext({ logHandler: init.logHandler });
         this.#userLogHandler = init.logHandler || logHandlerFromContext(this.invocationContext);
