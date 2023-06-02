@@ -319,6 +319,7 @@ export function onPreInvocation(functions: string[], handler: PreInvocationHandl
         const invocContext = coreContext.invocationContext as InvocationContext;
         if (functions.includes(invocContext.functionName) || functions.length === 0) {
             const preInvocContext = new PreInvocationContext({
+                ...coreContext,
                 functionHandler: coreContext.functionCallback,
                 args: coreContext.inputs,
                 invocationContext: invocContext,
@@ -331,20 +332,21 @@ export function onPreInvocation(functions: string[], handler: PreInvocationHandl
 }
 
 export function onPostInvocation(functions: string[], handler: PostInvocationHandler): coreTypes.Disposable {
-    const newCallback: coreTypes.PostInvocationCallback = (context: coreTypes.PostInvocationContext) => {
-        const invocContext: InvocationContext = context.invocationContext as InvocationContext;
+    const coreCallback: coreTypes.PostInvocationCallback = (coreContext: coreTypes.PostInvocationContext) => {
+        const invocContext: InvocationContext = coreContext.invocationContext as InvocationContext;
         if (functions.includes(invocContext.functionName) || functions.length === 0) {
-            const newContext = new PostInvocationContext({
+            const postInvocContext = new PostInvocationContext({
+                ...coreContext,
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                result: context.result,
+                result: coreContext.result,
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                errorResult: context.error,
-                args: context.inputs,
+                errorResult: coreContext.error,
+                args: coreContext.inputs,
                 invocationContext: invocContext,
-                coreContext: context,
+                coreContext,
             });
-            return handler(newContext);
+            return handler(postInvocContext);
         }
     };
-    return coreRegisterHook('postInvocation', newCallback as coreTypes.HookCallback);
+    return coreRegisterHook('postInvocation', coreCallback as coreTypes.HookCallback);
 }
