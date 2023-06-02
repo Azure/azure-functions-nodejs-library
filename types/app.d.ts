@@ -10,7 +10,9 @@ import {
     Disposable,
     HookHandler,
     PostInvocationHandler,
+    PostInvocationOptions,
     PreInvocationHandler,
+    PreInvocationOptions,
 } from './hooks';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
 import { FunctionOptions } from './index';
@@ -161,8 +163,12 @@ export function generic(name: string, options: FunctionOptions): void;
 
 export function onTerminate(handler: AppTerminateHandler): Disposable;
 export function onStart(handler: AppStartHandler): Disposable;
-export function onPreInvocation(functions: string[], handler: PreInvocationHandler): Disposable;
-export function onPostInvocation(functions: string[], handler: PostInvocationHandler): Disposable;
+
+export function onPreInvocation(handler: PreInvocationHandler): Disposable;
+export function onPreInvocation(options: PreInvocationOptions): Disposable;
+
+export function onPostInvocation(handler: PostInvocationHandler): Disposable;
+export function onPostInvocation(options: PostInvocationOptions): Disposable;
 
 export function on(hookName: 'appStart', handler: AppStartHandler): Disposable;
 export function on(hookName: 'appTerminate', handler: AppTerminateHandler): Disposable;

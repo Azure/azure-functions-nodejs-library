@@ -5,8 +5,23 @@ import { FunctionHandler } from '.';
 import { InvocationContext, LogHandler } from './InvocationContext';
 
 export type HookHandler = (context: HookContext) => void | Promise<void>;
+
 export type PreInvocationHandler = (context: PreInvocationContext) => void | Promise<void>;
+
+export interface PreInvocationOptions {
+    handler: PreInvocationHandler;
+    filter?: HookFilter | HookFilter[];
+}
+
 export type PostInvocationHandler = (context: PostInvocationContext) => void | Promise<void>;
+
+export interface PostInvocationOptions {
+    handler: PostInvocationHandler;
+    filter?: HookFilter | HookFilter[];
+}
+
+export type HookFilter = string | ((context: InvocationContext) => boolean);
+
 export type AppStartHandler = (context: AppStartContext) => void | Promise<void>;
 export type AppTerminateHandler = (context: AppTerminateContext) => void | Promise<void>;
 

@@ -10,6 +10,7 @@ import {
     EventGridFunctionOptions,
     EventHubFunctionOptions,
     FunctionOptions,
+    HookFilter,
     HookHandler,
     HttpFunctionOptions,
     HttpHandler,
@@ -17,7 +18,9 @@ import {
     HttpMethodFunctionOptions,
     InvocationContext,
     PostInvocationHandler,
+    PostInvocationOptions,
     PreInvocationHandler,
+    PreInvocationOptions,
     ServiceBusQueueFunctionOptions,
     ServiceBusTopicFunctionOptions,
     StorageBlobFunctionOptions,
@@ -319,10 +322,13 @@ export function on(hookName: string, handler: HookHandler): Disposable {
     return coreRegisterHook(hookName, coreCallback);
 }
 
-export function onPreInvocation(functions: string[], handler: PreInvocationHandler): Disposable {
+export function onPreInvocation(handlerOrOptions: PreInvocationHandler | PreInvocationOptions): Disposable {
+    const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : handlerOrOptions.handler;
+    const filter: HookFilter | HookFilter[] | undefined =
+        typeof handlerOrOptions === 'function' ? [] : handlerOrOptions.filter;
     const coreCallback: coreTypes.PreInvocationCallback = (coreContext: coreTypes.PreInvocationContext) => {
         const invocContext = coreContext.invocationContext as InvocationContext;
-        if (functions.includes(invocContext.functionName) || functions.length === 0) {
+        if (!filter || shouldRun(invocContext, filter)) {
             const preInvocContext = new PreInvocationContext({
                 ...coreContext,
                 functionHandler: coreContext.functionCallback,
@@ -336,10 +342,23 @@ export function onPreInvocation(functions: string[], handler: PreInvocationHandl
     return coreRegisterHook('preInvocation', coreCallback as coreTypes.HookCallback);
 }
 
-export function onPostInvocation(functions: string[], handler: PostInvocationHandler): coreTypes.Disposable {
+function shouldRun(invocationContext: InvocationContext, filter: HookFilter | HookFilter[]): boolean {
+    if (Array.isArray(filter)) {
+        return filter.every((f) => shouldRun(invocationContext, f));
+    } else if (typeof filter === 'string') {
+        return invocationContext.functionName === filter;
+    } else {
+        return filter(invocationContext);
+    }
+}
+
+export function onPostInvocation(handlerOrOptions: PostInvocationHandler | PostInvocationOptions): Disposable {
+    const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : handlerOrOptions.handler;
+    const filter: HookFilter | HookFilter[] | undefined =
+        typeof handlerOrOptions === 'function' ? [] : handlerOrOptions.filter;
     const coreCallback: coreTypes.PostInvocationCallback = (coreContext: coreTypes.PostInvocationContext) => {
         const invocContext: InvocationContext = coreContext.invocationContext as InvocationContext;
-        if (functions.includes(invocContext.functionName) || functions.length === 0) {
+        if (!filter || shouldRun(invocContext, filter)) {
             const postInvocContext = new PostInvocationContext({
                 ...coreContext,
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
