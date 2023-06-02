@@ -15,22 +15,38 @@ type HookData = { [key: string]: any };
 /**
  * Base class for all hook context objects
  */
-export declare abstract class HookContext {
+export declare class HookContext {
     /**
      * For testing purposes only. This will always be constructed for you when run in the context of the Azure Functions runtime
      */
     constructor(init?: HookContextInit);
 
     /**
-     * The recommended place to share data between hooks in the same scope (app-level vs invocation-level)
-     * This object is readonly. You may modify it, but attempting to overwrite it will throw an error
+     * Set a `propertyName` to some `value` to be shared with other hooks in the same scope (app-level vs invocation-level)
+     * @param propertyName The name of the property to set
+     * @param value The value to set
      */
-    readonly hookData: HookData;
+    set(propertyName: string, value: unknown): void;
+
     /**
-     * The recommended place to share data across scopes for all hooks
-     * This object is readonly. You may modify it, but attempting to overwrite it will throw an error
+     * Get the value of a `propertyName` shared with other hooks in the same scope (app-level vs invocation-level)
+     * @param propertyName the name of the property to get
      */
-    readonly appHookData: HookData;
+    get(propertyName: string): unknown;
+
+    /**
+     * Set a `propertyName` to some `value` to be shared across scopes for all hooks
+     *
+     * @param propertyName The name of the property to set
+     * @param value The value to set
+     */
+    setGlobal(propertyName: string, value: unknown): void;
+
+    /**
+     * Get the value of a `propertyName` shared across scopes for all hooks
+     * @param propertyName The name of the property to get
+     */
+    getGlobal(propertyName: string): unknown;
 }
 
 export interface HookContextInit {

@@ -3,9 +3,8 @@
 
 import * as types from '@azure/functions';
 import { HookContextInit, HookData } from '@azure/functions';
-import { ReadOnlyError } from '../errors';
 
-export abstract class HookContext implements types.HookContext {
+export class HookContext implements types.HookContext {
     #hookData: HookData;
     #appHookData: HookData;
 
@@ -15,19 +14,19 @@ export abstract class HookContext implements types.HookContext {
         this.#appHookData = init.appHookData || {};
     }
 
-    get hookData(): HookData {
-        return this.#hookData;
+    get(propertyName: string): unknown {
+        return this.#hookData[propertyName];
     }
 
-    set hookData(_value: HookData) {
-        throw new ReadOnlyError('hookData');
+    set(propertyName: string, value: unknown): void {
+        this.#hookData[propertyName] = value;
     }
 
-    get appHookData(): HookData {
-        return this.#appHookData;
+    getGlobal(propertyName: string): unknown {
+        return this.#appHookData[propertyName];
     }
 
-    set appHookData(_value: HookData) {
-        throw new ReadOnlyError('appHookData');
+    setGlobal(propertyName: string, value: unknown): void {
+        this.#appHookData[propertyName] = value;
     }
 }
