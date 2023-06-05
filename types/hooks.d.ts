@@ -20,7 +20,28 @@ export interface PostInvocationOptions {
     filter?: HookFilter | HookFilter[];
 }
 
-export type HookFilter = string | ((context: InvocationContext) => boolean);
+export type HookFilter = string | HookFilterObject | ((context: InvocationContext) => boolean);
+
+/**
+ * An object that can be passed as a filter on invocation hooks
+ * to limit the execution of hooks to particular function invocations
+ */
+export interface HookFilterObject {
+    /**
+     * Execute hooks only on invocations of the functions with one of these names
+     */
+    functionNames?: string[];
+
+    /**
+     * Execute hooks only on invocations of functions with one of these trigger types
+     */
+    triggerTypes?: string[];
+
+    /**
+     * Execute hooks only on invocations with one of these invocation IDs
+     */
+    invocationIds?: string[];
+}
 
 export type AppStartHandler = (context: AppStartContext) => void | Promise<void>;
 export type AppTerminateHandler = (context: AppTerminateContext) => void | Promise<void>;

@@ -345,6 +345,18 @@ export function onPreInvocation(handlerOrOptions: PreInvocationHandler | PreInvo
 function shouldRun(invocationContext: InvocationContext, filter: HookFilter | HookFilter[]): boolean {
     if (Array.isArray(filter)) {
         return filter.every((f) => shouldRun(invocationContext, f));
+    } else if (typeof filter === 'object') {
+        const filters: boolean[] = [];
+        if (filter.functionNames) {
+            filters.push(filter.functionNames.includes(invocationContext.functionName));
+        }
+        if (filter.triggerTypes) {
+            filters.push(filter.triggerTypes.includes(invocationContext.options.trigger.type));
+        }
+        if (filter.invocationIds) {
+            filters.push(filter.invocationIds.includes(invocationContext.invocationId));
+        }
+        return filters.every((f) => f);
     } else if (typeof filter === 'string') {
         return invocationContext.functionName === filter;
     } else {
