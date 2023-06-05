@@ -2,7 +2,12 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { FunctionHandler, PreInvocationContextInit, PreInvocationCoreContext } from '@azure/functions';
+import {
+    FunctionHandler,
+    InvocationContext,
+    PreInvocationContextInit,
+    PreInvocationCoreContext,
+} from '@azure/functions';
 import { InvocationHookContext } from './InvocationHookContext';
 
 export class PreInvocationContext extends InvocationHookContext implements types.PreInvocationContext {
@@ -36,5 +41,16 @@ export class PreInvocationContext extends InvocationHookContext implements types
 
     set args(value: any[]) {
         this.#coreCtx.inputs = value;
+    }
+
+    abort(): void {
+        this.invocationContext.warn(
+            `Aborting execution of ${this.invocationContext.functionName}` +
+                ` with invocation ID ${this.invocationContext.invocationId}`
+        );
+
+        this.#coreCtx.functionCallback = (_trigger, context: InvocationContext) => {
+            context.log(`Invocation ${context.invocationId} of ${context.functionName} has been aborted`);
+        };
     }
 }

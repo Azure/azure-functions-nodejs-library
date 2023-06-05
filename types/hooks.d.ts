@@ -161,6 +161,12 @@ export declare class PreInvocationContext extends InvocationHookContext {
      * The function handler for this specific invocation. Changes to this value _will_ affect the function itself
      */
     functionHandler: FunctionHandler;
+
+    /**
+     * Aborts the current invocation of the function.
+     * Calling this method will cause your function execution to not run.
+     */
+    abort(): void;
 }
 
 export interface PreInvocationContextInit extends InvocationHookContextInit {
