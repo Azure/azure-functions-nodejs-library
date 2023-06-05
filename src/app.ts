@@ -328,7 +328,7 @@ export function onPreInvocation(handlerOrOptions: PreInvocationHandler | PreInvo
         typeof handlerOrOptions === 'function' ? [] : handlerOrOptions.filter;
     const coreCallback: coreTypes.PreInvocationCallback = (coreContext: coreTypes.PreInvocationContext) => {
         const invocContext = coreContext.invocationContext as InvocationContext;
-        if (!filter || shouldRun(invocContext, filter)) {
+        if (!filter || shouldRunHook(invocContext, filter)) {
             const preInvocContext = new PreInvocationContext({
                 ...coreContext,
                 functionHandler: coreContext.functionCallback,
@@ -342,9 +342,9 @@ export function onPreInvocation(handlerOrOptions: PreInvocationHandler | PreInvo
     return coreRegisterHook('preInvocation', coreCallback as coreTypes.HookCallback);
 }
 
-function shouldRun(invocationContext: InvocationContext, filter: HookFilter | HookFilter[]): boolean {
+function shouldRunHook(invocationContext: InvocationContext, filter: HookFilter | HookFilter[]): boolean {
     if (Array.isArray(filter)) {
-        return filter.every((f) => shouldRun(invocationContext, f));
+        return filter.every((f) => shouldRunHook(invocationContext, f));
     } else if (typeof filter === 'object') {
         const filters: boolean[] = [];
         if (filter.functionNames) {
@@ -370,7 +370,7 @@ export function onPostInvocation(handlerOrOptions: PostInvocationHandler | PostI
         typeof handlerOrOptions === 'function' ? [] : handlerOrOptions.filter;
     const coreCallback: coreTypes.PostInvocationCallback = (coreContext: coreTypes.PostInvocationContext) => {
         const invocContext: InvocationContext = coreContext.invocationContext as InvocationContext;
-        if (!filter || shouldRun(invocContext, filter)) {
+        if (!filter || shouldRunHook(invocContext, filter)) {
             const postInvocContext = new PostInvocationContext({
                 ...coreContext,
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
