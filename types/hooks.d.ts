@@ -17,6 +17,10 @@ export type PostInvocationHandler = (context: PostInvocationContext) => void | P
 
 export interface PostInvocationOptions {
     handler: PostInvocationHandler;
+    /**
+     * If multiple filters ares provided,
+     * the hook is run only if satisfies _all_ of the provided filters
+     */
     filter?: HookFilter | HookFilter[];
 }
 
@@ -25,6 +29,8 @@ export type HookFilter = string | HookFilterObject | ((context: InvocationContex
 /**
  * An object that can be passed as a filter on invocation hooks
  * to limit the execution of hooks to particular function invocations
+ *
+ * The hook is run if it satisfies _any_ of the supplied criteria
  */
 export interface HookFilterObject {
     /**

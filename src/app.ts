@@ -21,6 +21,7 @@ import {
     PostInvocationOptions,
     PreInvocationHandler,
     PreInvocationOptions,
+    RegisterResult,
     ServiceBusQueueFunctionOptions,
     ServiceBusTopicFunctionOptions,
     StorageBlobFunctionOptions,
@@ -82,29 +83,29 @@ function convertToHttpOptions(
     return options;
 }
 
-export function get(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
-    http(name, convertToHttpOptions(optionsOrHandler, 'GET'));
+export function get(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): RegisterResult {
+    return http(name, convertToHttpOptions(optionsOrHandler, 'GET'));
 }
 
-export function put(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
-    http(name, convertToHttpOptions(optionsOrHandler, 'PUT'));
+export function put(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): RegisterResult {
+    return http(name, convertToHttpOptions(optionsOrHandler, 'PUT'));
 }
 
-export function post(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
-    http(name, convertToHttpOptions(optionsOrHandler, 'POST'));
+export function post(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): RegisterResult {
+    return http(name, convertToHttpOptions(optionsOrHandler, 'POST'));
 }
 
-export function patch(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
-    http(name, convertToHttpOptions(optionsOrHandler, 'PATCH'));
+export function patch(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): RegisterResult {
+    return http(name, convertToHttpOptions(optionsOrHandler, 'PATCH'));
 }
 
-export function deleteRequest(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
-    http(name, convertToHttpOptions(optionsOrHandler, 'DELETE'));
+export function deleteRequest(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): RegisterResult {
+    return http(name, convertToHttpOptions(optionsOrHandler, 'DELETE'));
 }
 
-export function http(name: string, options: HttpFunctionOptions): void {
+export function http(name: string, options: HttpFunctionOptions): RegisterResult {
     options.return ||= output.http({});
-    generic(name, {
+    return generic(name, {
         trigger: trigger.http({
             authLevel: options.authLevel,
             methods: options.methods,
@@ -114,8 +115,8 @@ export function http(name: string, options: HttpFunctionOptions): void {
     });
 }
 
-export function timer(name: string, options: TimerFunctionOptions): void {
-    generic(name, {
+export function timer(name: string, options: TimerFunctionOptions): RegisterResult {
+    return generic(name, {
         trigger: trigger.timer({
             schedule: options.schedule,
             runOnStartup: options.runOnStartup,
@@ -125,8 +126,8 @@ export function timer(name: string, options: TimerFunctionOptions): void {
     });
 }
 
-export function storageBlob(name: string, options: StorageBlobFunctionOptions): void {
-    generic(name, {
+export function storageBlob(name: string, options: StorageBlobFunctionOptions): RegisterResult {
+    return generic(name, {
         trigger: trigger.storageBlob({
             connection: options.connection,
             path: options.path,
@@ -135,8 +136,8 @@ export function storageBlob(name: string, options: StorageBlobFunctionOptions): 
     });
 }
 
-export function storageQueue(name: string, options: StorageQueueFunctionOptions): void {
-    generic(name, {
+export function storageQueue(name: string, options: StorageQueueFunctionOptions): RegisterResult {
+    return generic(name, {
         trigger: trigger.storageQueue({
             connection: options.connection,
             queueName: options.queueName,
@@ -145,8 +146,8 @@ export function storageQueue(name: string, options: StorageQueueFunctionOptions)
     });
 }
 
-export function serviceBusQueue(name: string, options: ServiceBusQueueFunctionOptions): void {
-    generic(name, {
+export function serviceBusQueue(name: string, options: ServiceBusQueueFunctionOptions): RegisterResult {
+    return generic(name, {
         trigger: trigger.serviceBusQueue({
             connection: options.connection,
             queueName: options.queueName,
@@ -156,8 +157,8 @@ export function serviceBusQueue(name: string, options: ServiceBusQueueFunctionOp
     });
 }
 
-export function serviceBusTopic(name: string, options: ServiceBusTopicFunctionOptions): void {
-    generic(name, {
+export function serviceBusTopic(name: string, options: ServiceBusTopicFunctionOptions): RegisterResult {
+    return generic(name, {
         trigger: trigger.serviceBusTopic({
             connection: options.connection,
             topicName: options.topicName,
@@ -168,8 +169,8 @@ export function serviceBusTopic(name: string, options: ServiceBusTopicFunctionOp
     });
 }
 
-export function eventHub(name: string, options: EventHubFunctionOptions): void {
-    generic(name, {
+export function eventHub(name: string, options: EventHubFunctionOptions): RegisterResult {
+    return generic(name, {
         trigger: trigger.eventHub({
             connection: options.connection,
             eventHubName: options.eventHubName,
@@ -180,14 +181,14 @@ export function eventHub(name: string, options: EventHubFunctionOptions): void {
     });
 }
 
-export function eventGrid(name: string, options: EventGridFunctionOptions): void {
-    generic(name, {
+export function eventGrid(name: string, options: EventGridFunctionOptions): RegisterResult {
+    return generic(name, {
         trigger: trigger.eventGrid({}),
         ...options,
     });
 }
 
-export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
+export function cosmosDB(name: string, options: CosmosDBFunctionOptions): RegisterResult {
     let cosmosTrigger: CosmosDBTrigger;
     if ('connectionStringSetting' in options) {
         cosmosTrigger = trigger.cosmosDB({
@@ -244,7 +245,7 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     });
 }
 
-export function generic(name: string, options: FunctionOptions): void {
+export function generic(name: string, options: FunctionOptions): RegisterResult {
     if (!hasSetup) {
         setup();
     }
@@ -292,6 +293,26 @@ export function generic(name: string, options: FunctionOptions): void {
     } else {
         coreApi.registerFunction({ name, bindings }, <FunctionCallback>options.handler);
     }
+
+    const result: RegisterResult = {
+        onPreInvocation(handler: PreInvocationHandler): RegisterResult {
+            onPreInvocation({
+                filter: name,
+                handler,
+            });
+            return this;
+        },
+
+        onPostInvocation(handler: PostInvocationHandler): RegisterResult {
+            onPostInvocation({
+                filter: name,
+                handler,
+            });
+            return this;
+        },
+    };
+
+    return result;
 }
 
 export function coreRegisterHook(hookName: string, callback: coreTypes.HookCallback): coreTypes.Disposable {
@@ -356,7 +377,7 @@ function shouldRunHook(invocationContext: InvocationContext, filter: HookFilter 
         if (filter.invocationIds) {
             filters.push(filter.invocationIds.includes(invocationContext.invocationId));
         }
-        return filters.every((f) => f);
+        return filters.some((f) => f);
     } else if (typeof filter === 'string') {
         return invocationContext.functionName === filter;
     } else {

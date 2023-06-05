@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { InvocationContext } from './InvocationContext';
+import { PostInvocationHandler, PreInvocationHandler } from './hooks';
 
 export * from './InvocationContext';
 export * as app from './app';
@@ -112,4 +113,21 @@ export interface FunctionOutput extends Record<string, unknown> {
      * If using the `output` namespace to create this object, the name will be auto-generated for you
      */
     name: string;
+}
+
+/**
+ * Result of registering a function
+ */
+export interface RegisterResult {
+    /**
+     * Register a hook to be run before executions of this function
+     * @param handler the hook handler
+     */
+    onPreInvocation: (handler: PreInvocationHandler) => RegisterResult;
+
+    /**
+     * Register a hook to be run after executions of this function
+     * @param handler the hook handler
+     */
+    onPostInvocation: (handler: PostInvocationHandler) => RegisterResult;
 }
