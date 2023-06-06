@@ -32,6 +32,7 @@ import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { InvocationModel } from './InvocationModel';
 import { returnBindingKey, version } from './constants';
+import { AppStartContext } from './hooks/AppStartContext';
 import { HookContext } from './hooks/HookContext';
 import { PostInvocationContext } from './hooks/PostInvocationContext';
 import { PreInvocationContext } from './hooks/PreInvocationContext';
@@ -332,7 +333,11 @@ export function onTerminate(handler: AppTerminateHandler): Disposable {
 }
 
 export function onStart(handler: AppStartHandler): Disposable {
-    return on('appStart', handler as HookHandler);
+    const coreHandler: coreTypes.AppStartCallback = (coreContext: coreTypes.AppStartContext) => {
+        const context = new AppStartContext(coreContext);
+        return handler(context);
+    };
+    return coreRegisterHook('appStart', coreHandler as coreTypes.HookCallback);
 }
 
 export function on(hookName: string, handler: HookHandler): Disposable {
