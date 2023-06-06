@@ -12,7 +12,6 @@ export class HookContext implements types.HookContext {
         init = init || {};
         this.#hookData = init.hookData || {};
         this.#appHookData = init.appHookData || {};
-        Object.assign(this, init);
     }
 
     get(propertyName: string): unknown {

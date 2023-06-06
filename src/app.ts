@@ -341,11 +341,21 @@ export function onStart(handler: AppStartHandler): Disposable {
 }
 
 export function on(hookName: string, handler: HookHandler): Disposable {
-    const coreCallback: coreTypes.HookCallback = (coreContext: coreTypes.HookContext) => {
-        const context = new HookContext(coreContext);
-        return handler(context);
-    };
-    return coreRegisterHook(hookName, coreCallback);
+    switch (hookName) {
+        case 'appStart':
+            return onStart(handler as AppStartHandler);
+        case 'preInvocation':
+            return onPreInvocation(handler as PreInvocationHandler);
+        case 'postInvocation':
+            return onPostInvocation(handler as PostInvocationHandler);
+        default: {
+            const coreCallback: coreTypes.HookCallback = (coreContext: coreTypes.HookContext) => {
+                const context = new HookContext(coreContext);
+                return handler(context);
+            };
+            return coreRegisterHook(hookName, coreCallback);
+        }
+    }
 }
 
 export function onPreInvocation(handlerOrOptions: PreInvocationHandler | PreInvocationOptions): Disposable {
