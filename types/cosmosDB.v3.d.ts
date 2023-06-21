@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
+import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger, RetryOptions } from './index';
 import { InvocationContext } from './InvocationContext';
 
 export type CosmosDBv3Handler = (documents: unknown[], context: InvocationContext) => FunctionResult;
@@ -10,6 +10,12 @@ export interface CosmosDBv3FunctionOptions extends CosmosDBv3TriggerOptions, Par
     handler: CosmosDBv3Handler;
 
     trigger?: CosmosDBv3Trigger;
+
+    /**
+     * An optional retry policy to rerun a failed execution until either successful completion occurs or the maximum number of retries is reached.
+     * Learn more [here](https://learn.microsoft.com/azure/azure-functions/functions-bindings-error-pages)
+     */
+    retry?: RetryOptions;
 }
 
 export interface CosmosDBv3InputOptions {

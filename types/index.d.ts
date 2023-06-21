@@ -112,3 +112,49 @@ export interface FunctionOutput extends Record<string, unknown> {
      */
     name: string;
 }
+
+export type RetryOptions = FixedDelayRetryOptions | ExponentialBackoffRetryOptions;
+
+export interface FixedDelayRetryOptions {
+    /**
+     * A specified amount of time is allowed to elapse between each retry.
+     */
+    strategy: 'fixedDelay';
+
+    /**
+     * The maximum number of retries allowed per function execution. -1 means to retry indefinitely.
+     */
+    maxRetryCount: number;
+
+    /**
+     * The delay that's used between retries.
+     * This can be a Node.js Date or Unix time in milliseconds.
+     */
+    delayInterval: Date | number;
+}
+
+export interface ExponentialBackoffRetryOptions {
+    /**
+     * The first retry waits for the minimum delay. On subsequent retries, time is added exponentially to
+     * the initial duration for each retry, until the maximum delay is reached. Exponential back-off adds
+     * some small randomization to delays to stagger retries in high-throughput scenarios.
+     */
+    strategy: 'exponentialBackoff';
+
+    /**
+     * The maximum number of retries allowed per function execution. -1 means to retry indefinitely.
+     */
+    maxRetryCount: number;
+
+    /**
+     * The minimum retry delay.
+     * This can be a Node.js Date or Unix time in milliseconds.
+     */
+    minimumInterval: Date | number;
+
+    /**
+     * The maximum retry delay.
+     * This can be a Node.js Date or Unix time in milliseconds.
+     */
+    maximumInterval: Date | number;
+}

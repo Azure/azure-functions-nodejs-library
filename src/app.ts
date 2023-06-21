@@ -6,7 +6,9 @@ import {
     CosmosDBTrigger,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
-    FunctionOptions,
+    ExponentialBackoffRetryOptions,
+    FixedDelayRetryOptions,
+    GenericFunctionOptions,
     HttpFunctionOptions,
     HttpHandler,
     HttpMethod,
@@ -21,6 +23,7 @@ import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { InvocationModel } from './InvocationModel';
 import { returnBindingKey, version } from './constants';
+import { toRpcTimestamp } from './converters/toRpcNullable';
 import * as output from './output';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';
@@ -231,7 +234,7 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     });
 }
 
-export function generic(name: string, options: FunctionOptions): void {
+export function generic(name: string, options: GenericFunctionOptions): void {
     if (!hasSetup) {
         setup();
     }
@@ -271,12 +274,29 @@ export function generic(name: string, options: FunctionOptions): void {
         }
     }
 
+    let retryOptions: coreTypes.RpcRetryOptions | undefined;
+    if (options.retry) {
+        retryOptions = {
+            ...options.retry,
+            retryStrategy: options.retry.strategy,
+            delayInterval: toRpcTimestamp((<FixedDelayRetryOptions>options.retry).delayInterval, 'retry.delayInterval'),
+            maximumInterval: toRpcTimestamp(
+                (<ExponentialBackoffRetryOptions>options.retry).maximumInterval,
+                'retry.maximumInterval'
+            ),
+            minimumInterval: toRpcTimestamp(
+                (<ExponentialBackoffRetryOptions>options.retry).minimumInterval,
+                'retry.minimumInterval'
+            ),
+        };
+    }
+
     const coreApi = tryGetCoreApiLazy();
     if (!coreApi) {
         console.warn(
             `WARNING: Skipping call to register function "${name}" because the "@azure/functions" package is in test mode.`
         );
     } else {
-        coreApi.registerFunction({ name, bindings }, <FunctionCallback>options.handler);
+        coreApi.registerFunction({ name, bindings, retryOptions }, <FunctionCallback>options.handler);
     }
 }
