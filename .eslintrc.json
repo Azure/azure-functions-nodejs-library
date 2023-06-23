@@ -37,7 +37,8 @@
             }
         ],
         "no-return-await": "off",
-        "@typescript-eslint/return-await": "error"
+        "@typescript-eslint/return-await": "error",
+        "eqeqeq": "error"
     },
     "ignorePatterns": [
         "**/*.js",

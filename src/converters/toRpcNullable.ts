@@ -3,6 +3,7 @@
 
 import { RpcNullableBool, RpcNullableDouble, RpcNullableString, RpcNullableTimestamp } from '@azure/functions-core';
 import { AzFuncSystemError } from '../errors';
+import { isDefined } from '../utils/nonNull';
 
 /**
  * Converts boolean input to an 'INullableBool' to be sent through the RPC layer.
@@ -17,7 +18,7 @@ export function toNullableBool(nullable: boolean | undefined, propertyName: stri
         };
     }
 
-    if (nullable != null) {
+    if (isDefined(nullable)) {
         throw new AzFuncSystemError(
             `A 'boolean' type was expected instead of a '${typeof nullable}' type. Cannot parse value of '${propertyName}'.`
         );
@@ -49,7 +50,7 @@ export function toNullableDouble(
         }
     }
 
-    if (nullable != null) {
+    if (isDefined(nullable)) {
         throw new AzFuncSystemError(
             `A 'number' type was expected instead of a '${typeof nullable}' type. Cannot parse value of '${propertyName}'.`
         );
@@ -69,7 +70,7 @@ export function toRpcString(nullable: string | undefined, propertyName: string):
         return nullable;
     }
 
-    if (nullable != null) {
+    if (isDefined(nullable)) {
         throw new AzFuncSystemError(
             `A 'string' type was expected instead of a '${typeof nullable}' type. Cannot parse value of '${propertyName}'.`
         );
@@ -91,7 +92,7 @@ export function toNullableString(nullable: string | undefined, propertyName: str
         };
     }
 
-    if (nullable != null) {
+    if (isDefined(nullable)) {
         throw new AzFuncSystemError(
             `A 'string' type was expected instead of a '${typeof nullable}' type. Cannot parse value of '${propertyName}'.`
         );
@@ -110,7 +111,7 @@ export function toNullableTimestamp(
     dateTime: Date | number | undefined,
     propertyName: string
 ): RpcNullableTimestamp | undefined {
-    if (dateTime != null) {
+    if (isDefined(dateTime)) {
         try {
             const timeInMilliseconds = typeof dateTime === 'number' ? dateTime : dateTime.getTime();
 
