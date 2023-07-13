@@ -3,6 +3,7 @@
 
 import {
     AppStartHandler,
+    AppTerminateContext,
     AppTerminateHandler,
     CosmosDBFunctionOptions,
     CosmosDBTrigger,
@@ -39,6 +40,7 @@ import { PreInvocationContext } from './hooks/PreInvocationContext';
 import * as output from './output';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';
+import { isDefined } from './utils/nonNull';
 
 let coreApi: typeof coreTypes | undefined | null;
 function tryGetCoreApiLazy(): typeof coreTypes | null {
@@ -316,34 +318,28 @@ export function generic(name: string, options: FunctionOptions): RegisterResult 
     return result;
 }
 
-export function coreRegisterHook(hookName: string, callback: coreTypes.HookCallback): coreTypes.Disposable {
+function coreRegisterHook(hookName: string, callback: coreTypes.HookCallback): coreTypes.Disposable {
     const coreApi = tryGetCoreApiLazy();
     if (!coreApi) {
-        console.warn(
+        console.error(
             `WARNING: Skipping call to register ${hookName} hook because the "@azure/functions" package is in test mode.`
         );
-        throw new Error(`Could not register ${hookName} hooks because the "@azure/functions" package is in test mode.`);
+        return new Disposable(() => {
+            console.log(
+                `WARNING: Skipping call to dispose ${hookName} hook because the "@azure/functions" package is in test mode.`
+            );
+        });
     } else {
         return coreApi.registerHook(hookName, callback);
     }
-}
-
-export function onTerminate(handler: AppTerminateHandler): Disposable {
-    return on('appTerminate', handler);
-}
-
-export function onStart(handler: AppStartHandler): Disposable {
-    const coreHandler: coreTypes.AppStartCallback = (coreContext: coreTypes.AppStartContext) => {
-        const context = new AppStartContext(coreContext);
-        return handler(context);
-    };
-    return coreRegisterHook('appStart', coreHandler as coreTypes.HookCallback);
 }
 
 export function on(hookName: string, handler: HookHandler): Disposable {
     switch (hookName) {
         case 'appStart':
             return onStart(handler as AppStartHandler);
+        case 'appTerminate':
+            return onTerminate(handler as AppTerminateHandler);
         case 'preInvocation':
             return onPreInvocation(handler as PreInvocationHandler);
         case 'postInvocation':
@@ -358,18 +354,35 @@ export function on(hookName: string, handler: HookHandler): Disposable {
     }
 }
 
+export function onStart(handler: AppStartHandler): Disposable {
+    const coreCallback: coreTypes.AppStartCallback = (coreContext: coreTypes.AppStartContext) => {
+        const context = new AppStartContext(coreContext);
+        return handler(context);
+    };
+    return coreRegisterHook('appStart', coreCallback as coreTypes.HookCallback);
+}
+
+export function onTerminate(handler: AppTerminateHandler): Disposable {
+    const coreCallback: coreTypes.AppTerminateCallback = (coreContext: coreTypes.AppTerminateContext) => {
+        const context = new AppTerminateContext(coreContext);
+        return handler(context);
+    };
+    return coreRegisterHook('appTerminate', coreCallback as coreTypes.HookCallback);
+}
+
 export function onPreInvocation(handlerOrOptions: PreInvocationHandler | PreInvocationOptions): Disposable {
     const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : handlerOrOptions.handler;
     const filter: HookFilter | HookFilter[] | undefined =
         typeof handlerOrOptions === 'function' ? [] : handlerOrOptions.filter;
+
     const coreCallback: coreTypes.PreInvocationCallback = (coreContext: coreTypes.PreInvocationContext) => {
-        const invocContext = coreContext.invocationContext as InvocationContext;
-        if (!filter || shouldRunHook(invocContext, filter)) {
+        const invocationContext = coreContext.invocationContext as InvocationContext;
+        if (!isDefined(filter) || shouldRunHook(invocationContext, filter)) {
             const preInvocContext = new PreInvocationContext({
                 ...coreContext,
                 functionHandler: coreContext.functionCallback,
                 args: coreContext.inputs,
-                invocationContext: invocContext,
+                invocationContext,
                 coreContext,
             });
             return handler(preInvocContext);
@@ -378,7 +391,31 @@ export function onPreInvocation(handlerOrOptions: PreInvocationHandler | PreInvo
     return coreRegisterHook('preInvocation', coreCallback as coreTypes.HookCallback);
 }
 
-function shouldRunHook(invocationContext: InvocationContext, filter: HookFilter | HookFilter[]): boolean {
+export function onPostInvocation(handlerOrOptions: PostInvocationHandler | PostInvocationOptions): Disposable {
+    const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : handlerOrOptions.handler;
+    const filter: HookFilter | HookFilter[] | undefined =
+        typeof handlerOrOptions === 'function' ? [] : handlerOrOptions.filter;
+
+    const coreCallback: coreTypes.PostInvocationCallback = (coreContext: coreTypes.PostInvocationContext) => {
+        const invocationContext = coreContext.invocationContext as InvocationContext;
+        if (!isDefined(filter) || shouldRunHook(invocationContext, filter)) {
+            const postInvocContext = new PostInvocationContext({
+                ...coreContext,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                result: coreContext.result,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                errorResult: coreContext.error,
+                args: coreContext.inputs,
+                invocationContext,
+                coreContext,
+            });
+            return handler(postInvocContext);
+        }
+    };
+    return coreRegisterHook('postInvocation', coreCallback as coreTypes.HookCallback);
+}
+
+export function shouldRunHook(invocationContext: InvocationContext, filter: HookFilter | HookFilter[]): boolean {
     if (Array.isArray(filter)) {
         return filter.every((f) => shouldRunHook(invocationContext, f));
     } else if (typeof filter === 'object') {
@@ -398,27 +435,4 @@ function shouldRunHook(invocationContext: InvocationContext, filter: HookFilter 
     } else {
         return filter(invocationContext);
     }
-}
-
-export function onPostInvocation(handlerOrOptions: PostInvocationHandler | PostInvocationOptions): Disposable {
-    const handler = typeof handlerOrOptions === 'function' ? handlerOrOptions : handlerOrOptions.handler;
-    const filter: HookFilter | HookFilter[] | undefined =
-        typeof handlerOrOptions === 'function' ? [] : handlerOrOptions.filter;
-    const coreCallback: coreTypes.PostInvocationCallback = (coreContext: coreTypes.PostInvocationContext) => {
-        const invocContext: InvocationContext = coreContext.invocationContext as InvocationContext;
-        if (!filter || shouldRunHook(invocContext, filter)) {
-            const postInvocContext = new PostInvocationContext({
-                ...coreContext,
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                result: coreContext.result,
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                errorResult: coreContext.error,
-                args: coreContext.inputs,
-                invocationContext: invocContext,
-                coreContext,
-            });
-            return handler(postInvocContext);
-        }
-    };
-    return coreRegisterHook('postInvocation', coreCallback as coreTypes.HookCallback);
 }
