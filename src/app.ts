@@ -240,7 +240,7 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): Regist
             startFromTime: options.startFromTime,
         });
     }
-    generic(name, {
+    return generic(name, {
         trigger: cosmosTrigger,
         ...options,
     });
