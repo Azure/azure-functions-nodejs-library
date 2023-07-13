@@ -9,14 +9,14 @@ import { logHandlerFromContext } from '../log';
 import { HookContext } from './HookContext';
 
 export abstract class InvocationHookContext extends HookContext implements types.InvocationHookContext {
-    #userLogHandler: LogHandler;
+    #logHandler: LogHandler;
     #invocationContext: types.InvocationContext;
 
     constructor(init?: types.InvocationHookContextInit) {
         super(init);
         init = init || {};
         this.#invocationContext = init.invocationContext || new InvocationContext({ logHandler: init.logHandler });
-        this.#userLogHandler = init.logHandler || logHandlerFromContext(this.invocationContext);
+        this.#logHandler = init.logHandler || logHandlerFromContext(this.invocationContext);
     }
 
     get invocationContext(): types.InvocationContext {
@@ -28,26 +28,26 @@ export abstract class InvocationHookContext extends HookContext implements types
     }
 
     log(...args: unknown[]): void {
-        this.#userLogHandler('information', ...args);
+        this.#logHandler('information', ...args);
     }
 
     trace(...args: unknown[]): void {
-        this.#userLogHandler('trace', ...args);
+        this.#logHandler('trace', ...args);
     }
 
     debug(...args: unknown[]): void {
-        this.#userLogHandler('debug', ...args);
+        this.#logHandler('debug', ...args);
     }
 
     info(...args: unknown[]): void {
-        this.#userLogHandler('information', ...args);
+        this.#logHandler('information', ...args);
     }
 
     warn(...args: unknown[]): void {
-        this.#userLogHandler('warning', ...args);
+        this.#logHandler('warning', ...args);
     }
 
     error(...args: unknown[]): void {
-        this.#userLogHandler('error', ...args);
+        this.#logHandler('error', ...args);
     }
 }
