@@ -121,13 +121,13 @@ export interface FunctionOutput extends Record<string, unknown> {
 export interface RegisterResult {
     /**
      * Register a hook to be run before executions of this function
-     * @param handler the hook handler
+     * @param handler the pre-invocation hook handler
      */
     onPreInvocation: (handler: PreInvocationHandler) => RegisterResult;
 
     /**
      * Register a hook to be run after executions of this function
-     * @param handler the hook handler
+     * @param handler the post-invocation hook handler
      */
     onPostInvocation: (handler: PostInvocationHandler) => RegisterResult;
 }

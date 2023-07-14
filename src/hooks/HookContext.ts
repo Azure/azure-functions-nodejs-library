@@ -10,6 +10,9 @@ export class HookContext implements types.HookContext {
 
     constructor(init?: HookContextInit) {
         init = init || {};
+
+        // It's important to use the original objects passed in init (no copies or clones)
+        // because modifications to these objects are persisted by the worker
         this.#hookData = init.hookData || {};
         this.#appHookData = init.appHookData || {};
     }

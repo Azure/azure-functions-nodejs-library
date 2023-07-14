@@ -161,17 +161,68 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): Regist
  */
 export function generic(name: string, options: FunctionOptions): RegisterResult;
 
-export function onTerminate(handler: AppTerminateHandler): Disposable;
-export function onStart(handler: AppStartHandler): Disposable;
-
-export function onPreInvocation(handler: PreInvocationHandler): Disposable;
-export function onPreInvocation(options: PreInvocationOptions): Disposable;
-
-export function onPostInvocation(handler: PostInvocationHandler): Disposable;
-export function onPostInvocation(options: PostInvocationOptions): Disposable;
-
+/**
+ * Registers a hook for the `hookName` event with the provided `handler`
+ *
+ * @param hookName the name of the event to register the hook for
+ * @param handler the hook handler for the event
+ *
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
 export function on(hookName: 'appStart', handler: AppStartHandler): Disposable;
 export function on(hookName: 'appTerminate', handler: AppTerminateHandler): Disposable;
 export function on(hookName: 'preInvocation', handler: PreInvocationHandler): Disposable;
 export function on(hookName: 'postInvocation', handler: PostInvocationHandler): Disposable;
 export function on(hookName: string, handler: HookHandler): Disposable;
+
+/**
+ * Register a hook on the `appStart` event, executed at the start of your application
+ *
+ * @param handler the handler for the event
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onStart(handler: AppStartHandler): Disposable;
+
+/**
+ * Register a hook on the `appTerminate` event, executed during graceful shutdown of your application
+ * This hook will not be executed if your application is terminated forcefully
+ * Please note that all `appTerminate` hooks must finish execution in 10 seconds or less, or they will be terminated.
+ 
+ * @param handler the handler for the event
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onTerminate(handler: AppTerminateHandler): Disposable;
+
+/**
+ * Register a hook to be run right _before_ a function is invoked.
+ * This hook will be executed for all functions in your app.
+ *
+ * @param handler the handler for the event
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onPreInvocation(handler: PreInvocationHandler): Disposable;
+/**
+ * Register a hook to be run right _before_ a function is invoked.
+ * The options object can be used to customize when this hook is run.
+ *
+ * @param options Object specifying the hook handler and any filters to apply to the hook
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onPreInvocation(options: PreInvocationOptions): Disposable;
+
+/**
+ * Register a hook to be run right _after_ a function is invoked.
+ * This hook will be executed for all functions in your app.
+ *
+ * @param handler the handler for the event
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onPostInvocation(handler: PostInvocationHandler): Disposable;
+/**
+ * Register a hook to be run right _after_ a function is invoked.
+ * The options object can be used to customize when this hook is run.
+ *
+ * @param options Object specifying the hook handler and any filters to apply to the hook
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onPostInvocation(options: PostInvocationOptions): Disposable;

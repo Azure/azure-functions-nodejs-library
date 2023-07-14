@@ -379,6 +379,7 @@ export function onPreInvocation(handlerOrOptions: PreInvocationHandler | PreInvo
         const invocationContext = coreContext.invocationContext as InvocationContext;
         if (!isDefined(filter) || shouldRunHook(invocationContext, filter)) {
             const preInvocContext = new PreInvocationContext({
+                // spreading here is necessary to pass hookData and appHookData objects
                 ...coreContext,
                 functionHandler: coreContext.functionCallback,
                 args: coreContext.inputs,
@@ -400,6 +401,7 @@ export function onPostInvocation(handlerOrOptions: PostInvocationHandler | PostI
         const invocationContext = coreContext.invocationContext as InvocationContext;
         if (!isDefined(filter) || shouldRunHook(invocationContext, filter)) {
             const postInvocContext = new PostInvocationContext({
+                // spreading here is necessary to pass hookData and appHookData objects
                 ...coreContext,
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 result: coreContext.result,

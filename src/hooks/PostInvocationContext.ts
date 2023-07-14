@@ -30,6 +30,8 @@ export class PostInvocationContext extends InvocationHookContext implements type
     }
 
     set args(value: any[]) {
+        // it's important to use the core context inputs
+        // since changes to this array are persisted by the worker
         this.#coreCtx.inputs = value;
     }
 
@@ -39,6 +41,8 @@ export class PostInvocationContext extends InvocationHookContext implements type
     }
 
     set result(value: any) {
+        // it's important to use the core context result
+        // since changes to this value are persisted by the worker
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         this.#coreCtx.result = value;
     }
@@ -49,6 +53,8 @@ export class PostInvocationContext extends InvocationHookContext implements type
     }
 
     set errorResult(value: any) {
+        // it's important to use the core context result
+        // since changes to this value are persisted by the worker
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         this.#coreCtx.error = value;
     }

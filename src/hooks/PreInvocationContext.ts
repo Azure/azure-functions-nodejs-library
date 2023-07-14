@@ -31,6 +31,8 @@ export class PreInvocationContext extends InvocationHookContext implements types
     }
 
     set functionHandler(value: FunctionHandler) {
+        // it's important to use the core context functionCallback
+        // since changes to this value are persisted by the worker
         this.#coreCtx.functionCallback = value;
     }
 
@@ -40,6 +42,8 @@ export class PreInvocationContext extends InvocationHookContext implements types
     }
 
     set args(value: any[]) {
+        // it's important to use the core context inputs
+        // since changes to this array are persisted by the worker
         this.#coreCtx.inputs = value;
     }
 
