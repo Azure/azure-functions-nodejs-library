@@ -7,7 +7,6 @@ import {
     AppTerminateHandler,
     CosmosDBFunctionOptions,
     CosmosDBTrigger,
-    Disposable,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
     FunctionOptions,
@@ -34,6 +33,7 @@ import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { InvocationModel } from './InvocationModel';
 import { returnBindingKey, version } from './constants';
 import { AppStartContext } from './hooks/AppStartContext';
+import { Disposable } from './hooks/Disposable';
 import { HookContext } from './hooks/HookContext';
 import { PostInvocationContext } from './hooks/PostInvocationContext';
 import { PreInvocationContext } from './hooks/PreInvocationContext';
@@ -321,7 +321,7 @@ export function generic(name: string, options: FunctionOptions): RegisterResult 
 function coreRegisterHook(hookName: string, callback: coreTypes.HookCallback): coreTypes.Disposable {
     const coreApi = tryGetCoreApiLazy();
     if (!coreApi) {
-        console.error(
+        console.warn(
             `WARNING: Skipping call to register ${hookName} hook because the "@azure/functions" package is in test mode.`
         );
         return new Disposable(() => {

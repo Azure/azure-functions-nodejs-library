@@ -7,7 +7,7 @@ import { InvocationContext, LogHandler } from './InvocationContext';
 /**
  * Represents a type which can release resources, such as event listening or a timer.
  */
-export class Disposable {
+export declare class Disposable {
     /**
      * Combine many disposable-likes into one. You can use this method when having objects with a dispose function which aren't instances of `Disposable`.
      *
