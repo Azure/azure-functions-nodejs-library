@@ -3,7 +3,6 @@
 
 import {
     AppStartHandler,
-    AppTerminateContext,
     AppTerminateHandler,
     CosmosDBFunctionOptions,
     CosmosDBTrigger,
@@ -33,6 +32,7 @@ import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { InvocationModel } from './InvocationModel';
 import { returnBindingKey, version } from './constants';
 import { AppStartContext } from './hooks/AppStartContext';
+import { AppTerminateContext } from './hooks/AppTerminateContext';
 import { Disposable } from './hooks/Disposable';
 import { HookContext } from './hooks/HookContext';
 import { PostInvocationContext } from './hooks/PostInvocationContext';
