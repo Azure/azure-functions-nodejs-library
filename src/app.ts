@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 import {
+    AppStartHandler,
+    AppTerminateHandler,
     CosmosDBFunctionOptions,
     CosmosDBTrigger,
     EventGridFunctionOptions,
@@ -11,6 +13,9 @@ import {
     HttpHandler,
     HttpMethod,
     HttpMethodFunctionOptions,
+    InvocationContext,
+    PostInvocationHandler,
+    PreInvocationHandler,
     ServiceBusQueueFunctionOptions,
     ServiceBusTopicFunctionOptions,
     StorageBlobFunctionOptions,
@@ -21,6 +26,11 @@ import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { InvocationModel } from './InvocationModel';
 import { returnBindingKey, version } from './constants';
+import { AppStartContext } from './hooks/AppStartContext';
+import { AppTerminateContext } from './hooks/AppTerminateContext';
+import { Disposable } from './hooks/Disposable';
+import { PostInvocationContext } from './hooks/PostInvocationContext';
+import { PreInvocationContext } from './hooks/PreInvocationContext';
 import * as output from './output';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';
@@ -279,4 +289,73 @@ export function generic(name: string, options: FunctionOptions): void {
     } else {
         coreApi.registerFunction({ name, bindings }, <FunctionCallback>options.handler);
     }
+}
+
+function coreRegisterHook(hookName: string, callback: coreTypes.HookCallback): coreTypes.Disposable {
+    const coreApi = tryGetCoreApiLazy();
+    if (!coreApi) {
+        console.warn(
+            `WARNING: Skipping call to register ${hookName} hook because the "@azure/functions" package is in test mode.`
+        );
+        return new Disposable(() => {
+            console.log(
+                `WARNING: Skipping call to dispose ${hookName} hook because the "@azure/functions" package is in test mode.`
+            );
+        });
+    } else {
+        return coreApi.registerHook(hookName, callback);
+    }
+}
+
+export function onStart(handler: AppStartHandler): Disposable {
+    const coreCallback: coreTypes.AppStartCallback = (coreContext: coreTypes.AppStartContext) => {
+        const context = new AppStartContext(coreContext);
+        return handler(context);
+    };
+    return coreRegisterHook('appStart', coreCallback as coreTypes.HookCallback);
+}
+
+export function onTerminate(handler: AppTerminateHandler): Disposable {
+    const coreCallback: coreTypes.AppTerminateCallback = (coreContext: coreTypes.AppTerminateContext) => {
+        const context = new AppTerminateContext(coreContext);
+        return handler(context);
+    };
+    return coreRegisterHook('appTerminate', coreCallback as coreTypes.HookCallback);
+}
+
+export function onPreInvocation(handler: PreInvocationHandler): Disposable {
+    const coreCallback: coreTypes.PreInvocationCallback = (coreContext: coreTypes.PreInvocationContext) => {
+        const invocationContext = coreContext.invocationContext as InvocationContext;
+        const preInvocContext = new PreInvocationContext({
+            // spreading here is necessary to pass hookData and appHookData objects
+            ...coreContext,
+            functionHandler: coreContext.functionCallback,
+            args: coreContext.inputs,
+            invocationContext,
+            coreContext,
+        });
+        return handler(preInvocContext);
+    };
+
+    return coreRegisterHook('preInvocation', coreCallback as coreTypes.HookCallback);
+}
+
+export function onPostInvocation(handler: PostInvocationHandler): Disposable {
+    const coreCallback: coreTypes.PostInvocationCallback = (coreContext: coreTypes.PostInvocationContext) => {
+        const invocationContext = coreContext.invocationContext as InvocationContext;
+        const postInvocContext = new PostInvocationContext({
+            // spreading here is necessary to pass hookData and appHookData objects
+            ...coreContext,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            result: coreContext.result,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            errorResult: coreContext.error,
+            args: coreContext.inputs,
+            invocationContext,
+            coreContext,
+        });
+        return handler(postInvocContext);
+    };
+
+    return coreRegisterHook('postInvocation', coreCallback as coreTypes.HookCallback);
 }

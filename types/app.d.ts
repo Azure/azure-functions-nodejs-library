@@ -4,6 +4,7 @@
 import { CosmosDBFunctionOptions } from './cosmosDB';
 import { EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
+import { AppStartHandler, AppTerminateHandler, Disposable, PostInvocationHandler, PreInvocationHandler } from './hooks';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
 import { FunctionOptions } from './index';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
@@ -150,3 +151,39 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function generic(name: string, options: FunctionOptions): void;
+
+/**
+ * Register a hook on the `appStart` event, executed at the start of your application
+ *
+ * @param handler the handler for the event
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onStart(handler: AppStartHandler): Disposable;
+
+/**
+ * Register a hook on the `appTerminate` event, executed during graceful shutdown of your application
+ * This hook will not be executed if your application is terminated forcefully
+ * Please note that all `appTerminate` hooks must finish execution in 10 seconds or less, or they will be terminated.
+ 
+ * @param handler the handler for the event
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onTerminate(handler: AppTerminateHandler): Disposable;
+
+/**
+ * Register a hook to be run right _before_ a function is invoked.
+ * This hook will be executed for all functions in your app.
+ *
+ * @param handler the handler for the event
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onPreInvocation(handler: PreInvocationHandler): Disposable;
+
+/**
+ * Register a hook to be run right _after_ a function is invoked.
+ * This hook will be executed for all functions in your app.
+ *
+ * @param handler the handler for the event
+ * @returns a `Disposable` object that can be used to unregister the hook
+ */
+export function onPostInvocation(handler: PostInvocationHandler): Disposable;

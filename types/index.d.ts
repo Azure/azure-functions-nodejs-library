@@ -11,6 +11,7 @@ export * from './cosmosDB.v4';
 export * from './eventGrid';
 export * from './eventHub';
 export * from './generic';
+export * from './hooks';
 export * from './http';
 export * as input from './input';
 export * as output from './output';
