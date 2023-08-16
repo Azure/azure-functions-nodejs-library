@@ -128,9 +128,9 @@ export interface FixedDelayRetryOptions {
 
     /**
      * The delay that's used between retries.
-     * This can be a Node.js Date or Unix time in milliseconds.
+     * This can be a number in milliseconds or a Duration object
      */
-    delayInterval: Date | number;
+    delayInterval: Duration | number;
 }
 
 export interface ExponentialBackoffRetryOptions {
@@ -148,13 +148,20 @@ export interface ExponentialBackoffRetryOptions {
 
     /**
      * The minimum retry delay.
-     * This can be a Node.js Date or Unix time in milliseconds.
+     * This can be a number in milliseconds, or a Duration object
      */
-    minimumInterval: Date | number;
+    minimumInterval: Duration | number;
 
     /**
      * The maximum retry delay.
-     * This can be a Node.js Date or Unix time in milliseconds.
+     * This can be a number in milliseconds, or a Duration object
      */
-    maximumInterval: Date | number;
+    maximumInterval: Duration | number;
+}
+
+export interface Duration {
+    hours?: number;
+    minutes?: number;
+    seconds?: number;
+    milliseconds?: number;
 }

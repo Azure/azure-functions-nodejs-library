@@ -23,7 +23,7 @@ import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { InvocationModel } from './InvocationModel';
 import { returnBindingKey, version } from './constants';
-import { toRpcTimestamp } from './converters/toRpcNullable';
+import { toRpcDuration } from './converters/toRpcDuration';
 import * as output from './output';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';
@@ -279,12 +279,12 @@ export function generic(name: string, options: GenericFunctionOptions): void {
         retryOptions = {
             ...options.retry,
             retryStrategy: options.retry.strategy,
-            delayInterval: toRpcTimestamp((<FixedDelayRetryOptions>options.retry).delayInterval, 'retry.delayInterval'),
-            maximumInterval: toRpcTimestamp(
+            delayInterval: toRpcDuration((<FixedDelayRetryOptions>options.retry).delayInterval, 'retry.delayInterval'),
+            maximumInterval: toRpcDuration(
                 (<ExponentialBackoffRetryOptions>options.retry).maximumInterval,
                 'retry.maximumInterval'
             ),
-            minimumInterval: toRpcTimestamp(
+            minimumInterval: toRpcDuration(
                 (<ExponentialBackoffRetryOptions>options.retry).minimumInterval,
                 'retry.minimumInterval'
             ),

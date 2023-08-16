@@ -1,13 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import {
-    RpcNullableBool,
-    RpcNullableDouble,
-    RpcNullableString,
-    RpcNullableTimestamp,
-    RpcTimestamp,
-} from '@azure/functions-core';
+import { RpcNullableBool, RpcNullableDouble, RpcNullableString, RpcNullableTimestamp } from '@azure/functions-core';
 import { AzFuncSystemError } from '../errors';
 import { isDefined } from '../utils/nonNull';
 
@@ -107,32 +101,25 @@ export function toNullableString(nullable: string | undefined, propertyName: str
     return undefined;
 }
 
+/**
+ * Converts Date or number input to an 'INullableTimestamp' to be sent through the RPC layer.
+ * Input that is not a Date or number but is also not null or undefined logs a function app level warning.
+ * @param nullable Input to be converted to an INullableTimestamp if it is valid input
+ * @param propertyName The name of the property that the caller will assign the output to. Used for debugging.
+ */
 export function toNullableTimestamp(
     dateTime: Date | number | undefined,
     propertyName: string
 ): RpcNullableTimestamp | undefined {
-    if (isDefined(dateTime)) {
-        return {
-            value: toRpcTimestamp(dateTime, propertyName),
-        };
-    }
-    return undefined;
-}
-
-/**
- * Converts Date or number input to an 'RpcTimestamp' to be sent through the RPC layer.
- * Input that is not a Date or number but is also not null or undefined logs a function app level warning.
- * @param dateTime Input to be converted to an RpcTimestamp if it is valid input
- * @param propertyName The name of the property that the caller will assign the output to. Used for debugging.
- */
-export function toRpcTimestamp(dateTime: Date | number | undefined, propertyName: string): RpcTimestamp | undefined {
     if (isDefined(dateTime)) {
         try {
             const timeInMilliseconds = typeof dateTime === 'number' ? dateTime : dateTime.getTime();
 
             if (timeInMilliseconds && timeInMilliseconds >= 0) {
                 return {
-                    seconds: Math.round(timeInMilliseconds / 1000),
+                    value: {
+                        seconds: Math.round(timeInMilliseconds / 1000),
+                    },
                 };
             }
         } catch {
