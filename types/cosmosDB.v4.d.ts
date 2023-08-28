@@ -54,7 +54,22 @@ export interface CosmosDBv4InputOptions {
 }
 export type CosmosDBv4Input = FunctionInput & CosmosDBv4InputOptions;
 
-export interface CosmosDBv4TriggerOptions extends CosmosDBv4InputOptions {
+export interface CosmosDBv4TriggerOptions {
+    /**
+     * An app setting (or environment variable) with the Cosmos DB connection string
+     */
+    connection: string;
+
+    /**
+     * The name of the Azure Cosmos DB database with the container being monitored
+     */
+    databaseName: string;
+
+    /**
+     * The name of the container being monitored
+     */
+    containerName: string;
+
     /**
      * The name of an app setting that contains the connection string to the service which holds the lease container.
      * If not set it will connect to the service defined by `connection`
@@ -132,6 +147,12 @@ export interface CosmosDBv4TriggerOptions extends CosmosDBv4InputOptions {
      * This is only used to set the initial trigger state. After the trigger has a lease state, changing this value has no effect.
      */
     startFromTime?: string;
+
+    /**
+     * Defines preferred locations (regions) for geo-replicated database accounts in the Azure Cosmos DB service.
+     * Values should be comma-separated. For example, East US,South Central US,North Europe
+     */
+    preferredLocations?: string;
 }
 export type CosmosDBv4Trigger = FunctionTrigger & CosmosDBv4TriggerOptions;
 
