@@ -5,8 +5,11 @@ import {
     CosmosDBFunctionOptions,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
+    ExponentialBackoffRetryOptions,
+    FixedDelayRetryOptions,
     FunctionOptions,
     FunctionTrigger,
+    GenericFunctionOptions,
     HttpFunctionOptions,
     HttpHandler,
     HttpMethod,
@@ -21,6 +24,7 @@ import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
 import { InvocationModel } from './InvocationModel';
 import { returnBindingKey, version } from './constants';
+import { toRpcDuration } from './converters/toRpcDuration';
 import * as output from './output';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';
@@ -141,7 +145,7 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     generic(name, convertToGenericOptions(options, <any>trigger.cosmosDB));
 }
 
-export function generic(name: string, options: FunctionOptions): void {
+export function generic(name: string, options: GenericFunctionOptions): void {
     if (!hasSetup) {
         setup();
     }
@@ -181,12 +185,29 @@ export function generic(name: string, options: FunctionOptions): void {
         }
     }
 
+    let retryOptions: coreTypes.RpcRetryOptions | undefined;
+    if (options.retry) {
+        retryOptions = {
+            ...options.retry,
+            retryStrategy: options.retry.strategy,
+            delayInterval: toRpcDuration((<FixedDelayRetryOptions>options.retry).delayInterval, 'retry.delayInterval'),
+            maximumInterval: toRpcDuration(
+                (<ExponentialBackoffRetryOptions>options.retry).maximumInterval,
+                'retry.maximumInterval'
+            ),
+            minimumInterval: toRpcDuration(
+                (<ExponentialBackoffRetryOptions>options.retry).minimumInterval,
+                'retry.minimumInterval'
+            ),
+        };
+    }
+
     const coreApi = tryGetCoreApiLazy();
     if (!coreApi) {
         console.warn(
             `WARNING: Skipping call to register function "${name}" because the "@azure/functions" package is in test mode.`
         );
     } else {
-        coreApi.registerFunction({ name, bindings }, <FunctionCallback>options.handler);
+        coreApi.registerFunction({ name, bindings, retryOptions }, <FunctionCallback>options.handler);
     }
 }
