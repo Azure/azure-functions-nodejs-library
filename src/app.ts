@@ -3,11 +3,12 @@
 
 import {
     CosmosDBFunctionOptions,
-    CosmosDBTrigger,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
     ExponentialBackoffRetryOptions,
     FixedDelayRetryOptions,
+    FunctionOptions,
+    FunctionTrigger,
     GenericFunctionOptions,
     HttpFunctionOptions,
     HttpHandler,
@@ -72,6 +73,20 @@ function convertToHttpOptions(
     return options;
 }
 
+function convertToGenericOptions<T extends Omit<FunctionOptions, 'trigger'> & Partial<FunctionOptions>>(
+    options: T,
+    triggerMethod: (o: Omit<T, 'handler' | 'return' | 'trigger' | 'extraInputs' | 'extraOutputs'>) => FunctionTrigger
+): FunctionOptions {
+    const { handler, return: ret, trigger, extraInputs, extraOutputs, ...triggerOptions } = options;
+    return {
+        trigger: trigger ?? triggerMethod(triggerOptions),
+        return: ret,
+        extraInputs,
+        extraOutputs,
+        handler,
+    };
+}
+
 export function get(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
     http(name, convertToHttpOptions(optionsOrHandler, 'GET'));
 }
@@ -94,138 +109,40 @@ export function deleteRequest(name: string, optionsOrHandler: HttpMethodFunction
 
 export function http(name: string, options: HttpFunctionOptions): void {
     options.return ||= output.http({});
-    generic(name, {
-        trigger: trigger.http({
-            authLevel: options.authLevel,
-            methods: options.methods,
-            route: options.route,
-        }),
-        ...options,
-    });
+    generic(name, convertToGenericOptions(options, trigger.http));
 }
 
 export function timer(name: string, options: TimerFunctionOptions): void {
-    generic(name, {
-        trigger: trigger.timer({
-            schedule: options.schedule,
-            runOnStartup: options.runOnStartup,
-            useMonitor: options.useMonitor,
-        }),
-        ...options,
-    });
+    generic(name, convertToGenericOptions(options, trigger.timer));
 }
 
 export function storageBlob(name: string, options: StorageBlobFunctionOptions): void {
-    generic(name, {
-        trigger: trigger.storageBlob({
-            connection: options.connection,
-            path: options.path,
-        }),
-        ...options,
-    });
+    generic(name, convertToGenericOptions(options, trigger.storageBlob));
 }
 
 export function storageQueue(name: string, options: StorageQueueFunctionOptions): void {
-    generic(name, {
-        trigger: trigger.storageQueue({
-            connection: options.connection,
-            queueName: options.queueName,
-        }),
-        ...options,
-    });
+    generic(name, convertToGenericOptions(options, trigger.storageQueue));
 }
 
 export function serviceBusQueue(name: string, options: ServiceBusQueueFunctionOptions): void {
-    generic(name, {
-        trigger: trigger.serviceBusQueue({
-            connection: options.connection,
-            queueName: options.queueName,
-            isSessionsEnabled: options.isSessionsEnabled,
-        }),
-        ...options,
-    });
+    generic(name, convertToGenericOptions(options, trigger.serviceBusQueue));
 }
 
 export function serviceBusTopic(name: string, options: ServiceBusTopicFunctionOptions): void {
-    generic(name, {
-        trigger: trigger.serviceBusTopic({
-            connection: options.connection,
-            topicName: options.topicName,
-            subscriptionName: options.subscriptionName,
-            isSessionsEnabled: options.isSessionsEnabled,
-        }),
-        ...options,
-    });
+    generic(name, convertToGenericOptions(options, trigger.serviceBusTopic));
 }
 
 export function eventHub(name: string, options: EventHubFunctionOptions): void {
-    generic(name, {
-        trigger: trigger.eventHub({
-            connection: options.connection,
-            eventHubName: options.eventHubName,
-            cardinality: options.cardinality,
-            consumerGroup: options.consumerGroup,
-        }),
-        ...options,
-    });
+    generic(name, convertToGenericOptions(options, trigger.eventHub));
 }
 
 export function eventGrid(name: string, options: EventGridFunctionOptions): void {
-    generic(name, {
-        trigger: trigger.eventGrid({}),
-        ...options,
-    });
+    generic(name, convertToGenericOptions(options, trigger.eventGrid));
 }
 
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
-    let cosmosTrigger: CosmosDBTrigger;
-    if ('connectionStringSetting' in options) {
-        cosmosTrigger = trigger.cosmosDB({
-            checkpointDocumentCount: options.checkpointDocumentCount,
-            checkpointInterval: options.checkpointInterval,
-            collectionName: options.collectionName,
-            connectionStringSetting: options.connectionStringSetting,
-            createLeaseCollectionIfNotExists: options.createLeaseCollectionIfNotExists,
-            databaseName: options.databaseName,
-            feedPollDelay: options.feedPollDelay,
-            leaseAcquireInterval: options.leaseAcquireInterval,
-            leaseCollectionName: options.leaseCollectionName,
-            leaseCollectionPrefix: options.leaseCollectionPrefix,
-            leaseCollectionThroughput: options.leaseCollectionThroughput,
-            leaseConnectionStringSetting: options.leaseConnectionStringSetting,
-            leaseDatabaseName: options.leaseDatabaseName,
-            leaseExpirationInterval: options.leaseExpirationInterval,
-            leaseRenewInterval: options.leaseRenewInterval,
-            maxItemsPerInvocation: options.maxItemsPerInvocation,
-            preferredLocations: options.preferredLocations,
-            startFromBeginning: options.startFromBeginning,
-            useMultipleWriteLocations: options.useMultipleWriteLocations,
-        });
-    } else {
-        cosmosTrigger = trigger.cosmosDB({
-            connection: options.connection,
-            containerName: options.containerName,
-            createLeaseContainerIfNotExists: options.createLeaseContainerIfNotExists,
-            databaseName: options.databaseName,
-            feedPollDelay: options.feedPollDelay,
-            leaseAcquireInterval: options.leaseAcquireInterval,
-            leaseConnection: options.leaseConnection,
-            leaseContainerName: options.leaseContainerName,
-            leaseContainerPrefix: options.leaseContainerPrefix,
-            leaseDatabaseName: options.leaseDatabaseName,
-            leaseExpirationInterval: options.leaseExpirationInterval,
-            leaseRenewInterval: options.leaseRenewInterval,
-            leasesContainerThroughput: options.leasesContainerThroughput,
-            maxItemsPerInvocation: options.maxItemsPerInvocation,
-            preferredLocations: options.preferredLocations,
-            startFromBeginning: options.startFromBeginning,
-            startFromTime: options.startFromTime,
-        });
-    }
-    generic(name, {
-        trigger: cosmosTrigger,
-        ...options,
-    });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    generic(name, convertToGenericOptions(options, <any>trigger.cosmosDB));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {
