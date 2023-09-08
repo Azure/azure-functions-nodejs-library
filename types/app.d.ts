@@ -4,8 +4,8 @@
 import { CosmosDBFunctionOptions } from './cosmosDB';
 import { EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
+import { GenericFunctionOptions } from './generic';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
-import { FunctionOptions } from './index';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
 import { StorageBlobFunctionOptions, StorageQueueFunctionOptions } from './storage';
 import { TimerFunctionOptions } from './timer';
@@ -149,4 +149,4 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function generic(name: string, options: FunctionOptions): void;
+export function generic(name: string, options: GenericFunctionOptions): void;
