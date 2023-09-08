@@ -69,6 +69,20 @@ function convertToHttpOptions(
     return options;
 }
 
+function convertToGenericOptions<T extends Omit<FunctionOptions, 'trigger'> & Partial<FunctionOptions>>(
+    options: T,
+    triggerMethod: (o: Omit<T, 'handler' | 'return' | 'trigger' | 'extraInputs' | 'extraOutputs'>) => FunctionTrigger
+): FunctionOptions {
+    const { handler, return: ret, trigger, extraInputs, extraOutputs, ...triggerOptions } = options;
+    return {
+        trigger: trigger ?? triggerMethod(triggerOptions),
+        return: ret,
+        extraInputs,
+        extraOutputs,
+        handler,
+    };
+}
+
 export function get(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
     http(name, convertToHttpOptions(optionsOrHandler, 'GET'));
 }
@@ -91,55 +105,40 @@ export function deleteRequest(name: string, optionsOrHandler: HttpMethodFunction
 
 export function http(name: string, options: HttpFunctionOptions): void {
     options.return ||= output.http({});
-    parseOptionsAndRegister(name, options, trigger.http);
+    generic(name, convertToGenericOptions(options, trigger.http));
 }
 
 export function timer(name: string, options: TimerFunctionOptions): void {
-    parseOptionsAndRegister(name, options, trigger.timer);
+    generic(name, convertToGenericOptions(options, trigger.timer));
 }
 
 export function storageBlob(name: string, options: StorageBlobFunctionOptions): void {
-    parseOptionsAndRegister(name, options, trigger.storageBlob);
+    generic(name, convertToGenericOptions(options, trigger.storageBlob));
 }
 
 export function storageQueue(name: string, options: StorageQueueFunctionOptions): void {
-    parseOptionsAndRegister(name, options, trigger.storageQueue);
+    generic(name, convertToGenericOptions(options, trigger.storageQueue));
 }
 
 export function serviceBusQueue(name: string, options: ServiceBusQueueFunctionOptions): void {
-    parseOptionsAndRegister(name, options, trigger.serviceBusQueue);
+    generic(name, convertToGenericOptions(options, trigger.serviceBusQueue));
 }
 
 export function serviceBusTopic(name: string, options: ServiceBusTopicFunctionOptions): void {
-    parseOptionsAndRegister(name, options, trigger.serviceBusTopic);
+    generic(name, convertToGenericOptions(options, trigger.serviceBusTopic));
 }
 
 export function eventHub(name: string, options: EventHubFunctionOptions): void {
-    parseOptionsAndRegister(name, options, trigger.eventHub);
+    generic(name, convertToGenericOptions(options, trigger.eventHub));
 }
 
 export function eventGrid(name: string, options: EventGridFunctionOptions): void {
-    parseOptionsAndRegister(name, options, trigger.eventGrid);
+    generic(name, convertToGenericOptions(options, trigger.eventGrid));
 }
 
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    parseOptionsAndRegister(name, options, <any>trigger.cosmosDB);
-}
-
-function parseOptionsAndRegister<T extends Omit<FunctionOptions, 'trigger'> & Partial<FunctionOptions>>(
-    name: string,
-    options: T,
-    triggerFunc: (o: Omit<T, 'handler' | 'return' | 'trigger' | 'extraInputs' | 'extraOutputs'>) => FunctionTrigger
-): void {
-    const { handler, return: ret, trigger: trig, extraInputs, extraOutputs, ...trigOptions } = options;
-    generic(name, {
-        trigger: trig ?? triggerFunc(trigOptions),
-        return: ret,
-        extraInputs,
-        extraOutputs,
-        handler,
-    });
+    generic(name, convertToGenericOptions(options, <any>trigger.cosmosDB));
 }
 
 export function generic(name: string, options: FunctionOptions): void {
