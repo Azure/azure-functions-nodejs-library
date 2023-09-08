@@ -112,7 +112,7 @@ export interface InvocationContextExtraInputs {
      * Get a secondary Cosmos DB documents input for this invocation
      * @input the configuration object for this Cosmos DB input
      */
-    get(input: CosmosDBInput): unknown[];
+    get(input: CosmosDBInput): unknown;
 
     /**
      * Get a secondary generic input for this invocation
@@ -156,9 +156,9 @@ export interface InvocationContextExtraOutputs {
     /**
      * Set a secondary Cosmos DB documents output for this invocation
      * @output the configuration object for this Cosmos DB output
-     * @documents the output documents value
+     * @documents the output document(s) value
      */
-    set(output: CosmosDBOutput, documents: unknown[]): void;
+    set(output: CosmosDBOutput, documents: unknown): void;
 
     /**
      * Set a secondary Service Bus queue output for this invocation
@@ -177,7 +177,7 @@ export interface InvocationContextExtraOutputs {
     /**
      * Set a secondary Event Hub output for this invocation
      * @output the configuration object for this EventHub output
-     * @message the output messages value
+     * @message the output message(s) value
      */
     set(output: EventHubOutput, messages: unknown): void;
 
