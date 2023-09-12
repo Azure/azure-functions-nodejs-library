@@ -43,7 +43,14 @@ export interface StorageQueueOptions {
     connection: string;
 }
 
-export type StorageBlobTriggerOptions = StorageBlobOptions;
+export interface StorageBlobTriggerOptions extends StorageBlobOptions {
+    /**
+     * The source of the triggering event.
+     * Use `EventGrid` for an Event Grid-based blob trigger, which provides much lower latency.
+     * The default is `LogsAndContainerScan`, which uses the standard polling mechanism to detect changes in the container.
+     */
+    source?: 'EventGrid' | 'LogsAndContainerScan';
+}
 export type StorageBlobTrigger = FunctionTrigger & StorageBlobTriggerOptions;
 
 export type StorageBlobInputOptions = StorageBlobOptions;
