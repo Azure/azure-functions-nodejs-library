@@ -163,16 +163,16 @@ export interface InvocationContextExtraOutputs {
     /**
      * Set a secondary Service Bus queue output for this invocation
      * @output the configuration object for this Service Bus output
-     * @message the output message value
+     * @message the output message(s) value
      */
-    set(output: ServiceBusQueueOutput, message: unknown): void;
+    set(output: ServiceBusQueueOutput, messages: unknown): void;
 
     /**
      * Set a secondary Service Bus topic output for this invocation
      * @output the configuration object for this Service Bus output
-     * @message the output message value
+     * @message the output message(s) value
      */
-    set(output: ServiceBusTopicOutput, message: unknown): void;
+    set(output: ServiceBusTopicOutput, messages: unknown): void;
 
     /**
      * Set a secondary Event Hub output for this invocation

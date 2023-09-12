@@ -4,7 +4,7 @@
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type ServiceBusQueueHandler = (message: unknown, context: InvocationContext) => FunctionResult;
+export type ServiceBusQueueHandler = (messages: unknown, context: InvocationContext) => FunctionResult;
 
 export interface ServiceBusQueueFunctionOptions extends ServiceBusQueueTriggerOptions, Partial<FunctionOptions> {
     handler: ServiceBusQueueHandler;
@@ -27,6 +27,11 @@ export interface ServiceBusQueueTriggerOptions {
      * `true` if connecting to a [session-aware](https://docs.microsoft.com/azure/service-bus-messaging/message-sessions) queue. Default is `false`
      */
     isSessionsEnabled?: boolean;
+
+    /**
+     * Set to `many` in order to enable batching. If omitted or set to `one`, a single message is passed to the function.
+     */
+    cardinality?: 'many' | 'one';
 }
 export type ServiceBusQueueTrigger = FunctionTrigger & ServiceBusQueueTriggerOptions;
 
@@ -71,6 +76,11 @@ export interface ServiceBusTopicTriggerOptions {
      * `true` if connecting to a [session-aware](https://docs.microsoft.com/azure/service-bus-messaging/message-sessions) subscription. Default is `false`
      */
     isSessionsEnabled?: boolean;
+
+    /**
+     * Set to `many` in order to enable batching. If omitted or set to `one`, a single message is passed to the function.
+     */
+    cardinality?: 'many' | 'one';
 }
 export type ServiceBusTopicTrigger = FunctionTrigger & ServiceBusTopicTriggerOptions;
 
