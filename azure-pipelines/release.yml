@@ -19,17 +19,21 @@ resources:
     branch: v3.x
 
 jobs:
-- job: ReleaseTypes
+- job: Release
   pool:
     name: '1ES-Hosted-AzFunc'
     demands:
     - ImageOverride -equals MMSUbuntu20.04TLS
   steps:
+  - download: nodeLibraryCI
   - task: NodeTool@0
     displayName: 'Install Node.js'
     inputs:
       versionSpec: 14.x
-  - download: nodeLibraryCI
+  - script: npm ci
+    displayName: 'npm ci'
+  - script: 'npm run validateRelease -- --publishTag ${{ parameters.NpmPublishTag }} --dropPath "$(Pipeline.Workspace)/nodeLibraryCI/drop"'
+    displayName: 'validate release'
   - script: mv *.tgz package.tgz
     displayName: 'Rename tgz file' # because the publish command below requires an exact path
     workingDirectory: '$(Pipeline.Workspace)/nodeLibraryCI/drop'
