@@ -15,6 +15,7 @@ export * from './http';
 export * as input from './input';
 export * as output from './output';
 export * from './serviceBus';
+export * from './sql';
 export * from './storage';
 export * from './timer';
 export * as trigger from './trigger';

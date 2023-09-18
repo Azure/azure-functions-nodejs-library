@@ -16,6 +16,8 @@ import {
     ServiceBusQueueOutputOptions,
     ServiceBusTopicOutput,
     ServiceBusTopicOutputOptions,
+    SqlOutput,
+    SqlOutputOptions,
     StorageBlobOutput,
     StorageBlobOutputOptions,
     StorageQueueOutput,
@@ -76,6 +78,13 @@ export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput {
     return addOutputBindingName({
         ...options,
         type: 'cosmosDB',
+    });
+}
+
+export function sql(options: SqlOutputOptions): SqlOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'sql',
     });
 }
 
