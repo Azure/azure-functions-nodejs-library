@@ -16,6 +16,7 @@ export * as input from './input';
 export * as output from './output';
 export * from './serviceBus';
 export * from './storage';
+export * from './table';
 export * from './timer';
 export * as trigger from './trigger';
 

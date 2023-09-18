@@ -5,11 +5,17 @@ import { CosmosDBInput, CosmosDBInputOptions } from './cosmosDB';
 import { GenericInputOptions } from './generic';
 import { FunctionInput } from './index';
 import { StorageBlobInput, StorageBlobInputOptions } from './storage';
+import { TableInput, TableInputOptions } from './table';
 
 /**
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-blob-input?pivots=programming-language-javascript)
  */
 export function storageBlob(options: StorageBlobInputOptions): StorageBlobInput;
+
+/**
+ * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-table-input?pivots=programming-language-javascript)
+ */
+export function table(options: TableInputOptions): TableInput;
 
 /**
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-input?pivots=programming-language-javascript)

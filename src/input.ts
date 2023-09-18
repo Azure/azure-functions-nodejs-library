@@ -8,6 +8,8 @@ import {
     GenericInputOptions,
     StorageBlobInput,
     StorageBlobInputOptions,
+    TableInput,
+    TableInputOptions,
 } from '@azure/functions';
 import { addBindingName } from './addBindingName';
 
@@ -15,6 +17,13 @@ export function storageBlob(options: StorageBlobInputOptions): StorageBlobInput 
     return addInputBindingName({
         ...options,
         type: 'blob',
+    });
+}
+
+export function table(options: TableInputOptions): TableInput {
+    return addInputBindingName({
+        ...options,
+        type: 'table',
     });
 }
 

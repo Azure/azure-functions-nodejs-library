@@ -20,6 +20,8 @@ import {
     StorageBlobOutputOptions,
     StorageQueueOutput,
     StorageQueueOutputOptions,
+    TableOutput,
+    TableOutputOptions,
 } from '@azure/functions';
 import { addBindingName } from './addBindingName';
 
@@ -34,6 +36,13 @@ export function storageBlob(options: StorageBlobOutputOptions): StorageBlobOutpu
     return addOutputBindingName({
         ...options,
         type: 'blob',
+    });
+}
+
+export function table(options: TableOutputOptions): TableOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'table',
     });
 }
 
