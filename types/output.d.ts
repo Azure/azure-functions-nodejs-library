@@ -15,6 +15,7 @@ import {
 } from './serviceBus';
 import { SqlOutput, SqlOutputOptions } from './sql';
 import { StorageBlobOutput, StorageBlobOutputOptions, StorageQueueOutput, StorageQueueOutputOptions } from './storage';
+import { TableOutput, TableOutputOptions } from './table';
 
 /**
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-output?&pivots=programming-language-javascript)
@@ -25,6 +26,11 @@ export function http(options: HttpOutputOptions): HttpOutput;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-blob-output?pivots=programming-language-javascript)
  */
 export function storageBlob(options: StorageBlobOutputOptions): StorageBlobOutput;
+
+/**
+ * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-table-output?pivots=programming-language-javascript)
+ */
+export function table(options: TableOutputOptions): TableOutput;
 
 /**
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-storage-queue-output?pivots=programming-language-javascript)

@@ -9,6 +9,7 @@ import { FunctionInput, FunctionOutput, FunctionTrigger } from './index';
 import { ServiceBusQueueOutput, ServiceBusTopicOutput } from './serviceBus';
 import { SqlInput, SqlOutput } from './sql';
 import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './storage';
+import { TableInput, TableOutput } from './table';
 
 /**
  * Contains metadata and helper methods specific to this invocation
@@ -110,6 +111,12 @@ export interface InvocationContextExtraInputs {
     get(input: StorageBlobInput): unknown;
 
     /**
+     * Get a secondary table input for this invocation
+     * @input the configuration object for this table input
+     */
+    get(input: TableInput): unknown;
+
+    /**
      * Get a secondary Cosmos DB documents input for this invocation
      * @input the configuration object for this Cosmos DB input
      */
@@ -152,6 +159,13 @@ export interface InvocationContextExtraOutputs {
      * @blob the blob output value
      */
     set(output: StorageBlobOutput, blob: unknown): void;
+
+    /**
+     * Set a secondary table output for this invocation
+     * @output the configuration object for this table output
+     * @tableEntity the table output value
+     */
+    set(output: TableOutput, tableEntity: unknown): void;
 
     /**
      * Set a secondary storage queue entry output for this invocation
