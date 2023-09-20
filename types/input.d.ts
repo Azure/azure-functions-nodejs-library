@@ -4,6 +4,7 @@
 import { CosmosDBInput, CosmosDBInputOptions } from './cosmosDB';
 import { GenericInputOptions } from './generic';
 import { FunctionInput } from './index';
+import { SqlInput, SqlInputOptions } from './sql';
 import { StorageBlobInput, StorageBlobInputOptions } from './storage';
 
 /**
@@ -15,6 +16,11 @@ export function storageBlob(options: StorageBlobInputOptions): StorageBlobInput;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-input?pivots=programming-language-javascript)
  */
 export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput;
+
+/**
+ * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-azure-sql-input?pivots=programming-language-javascript)
+ */
+export function sql(options: SqlInputOptions): SqlInput;
 
 /**
  * A generic option that can be used for any input type

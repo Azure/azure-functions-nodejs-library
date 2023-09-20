@@ -7,6 +7,7 @@ import { EventHubOutput } from './eventHub';
 import { HttpOutput, HttpResponse } from './http';
 import { FunctionInput, FunctionOutput, FunctionTrigger } from './index';
 import { ServiceBusQueueOutput, ServiceBusTopicOutput } from './serviceBus';
+import { SqlInput, SqlOutput } from './sql';
 import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './storage';
 
 /**
@@ -115,6 +116,12 @@ export interface InvocationContextExtraInputs {
     get(input: CosmosDBInput): unknown;
 
     /**
+     * Get a secondary SQL items input for this invocation
+     * @input the configuration object for this SQL input
+     */
+    get(input: SqlInput): unknown;
+
+    /**
      * Get a secondary generic input for this invocation
      * @inputOrName the configuration object or name for this input
      */
@@ -159,6 +166,13 @@ export interface InvocationContextExtraOutputs {
      * @documents the output document(s) value
      */
     set(output: CosmosDBOutput, documents: unknown): void;
+
+    /**
+     * Set a secondary SQL items output for this invocation
+     * @output the configuration object for this SQL output
+     * @documents the output item(s) value
+     */
+    set(output: SqlOutput, items: unknown): void;
 
     /**
      * Set a secondary Service Bus queue output for this invocation

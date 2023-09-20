@@ -6,6 +6,8 @@ import {
     CosmosDBInputOptions,
     FunctionInput,
     GenericInputOptions,
+    SqlInput,
+    SqlInputOptions,
     StorageBlobInput,
     StorageBlobInputOptions,
 } from '@azure/functions';
@@ -22,6 +24,13 @@ export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput {
     return addInputBindingName({
         ...options,
         type: 'cosmosDB',
+    });
+}
+
+export function sql(options: SqlInputOptions): SqlInput {
+    return addInputBindingName({
+        ...options,
+        type: 'sql',
     });
 }
 
