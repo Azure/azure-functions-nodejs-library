@@ -13,6 +13,7 @@ import {
     ServiceBusTopicTrigger,
     ServiceBusTopicTriggerOptions,
 } from './serviceBus';
+import { SqlTrigger, SqlTriggerOptions } from './sql';
 import {
     StorageBlobTrigger,
     StorageBlobTriggerOptions,
@@ -65,6 +66,11 @@ export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger?pivots=programming-language-javascript)
  */
 export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
+
+/**
+ * (Preview) [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-azure-sql-trigger?pivots=programming-language-javascript)
+ */
+export function sql(options: SqlTriggerOptions): SqlTrigger;
 
 /**
  * A generic option that can be used for any trigger type

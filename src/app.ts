@@ -16,6 +16,7 @@ import {
     HttpMethodFunctionOptions,
     ServiceBusQueueFunctionOptions,
     ServiceBusTopicFunctionOptions,
+    SqlFunctionOptions,
     StorageBlobFunctionOptions,
     StorageQueueFunctionOptions,
     TimerFunctionOptions,
@@ -143,6 +144,10 @@ export function eventGrid(name: string, options: EventGridFunctionOptions): void
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     generic(name, convertToGenericOptions(options, <any>trigger.cosmosDB));
+}
+
+export function sql(name: string, options: SqlFunctionOptions): void {
+    generic(name, convertToGenericOptions(options, trigger.sql));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {

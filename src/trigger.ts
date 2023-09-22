@@ -16,6 +16,8 @@ import {
     ServiceBusQueueTriggerOptions,
     ServiceBusTopicTrigger,
     ServiceBusTopicTriggerOptions,
+    SqlTrigger,
+    SqlTriggerOptions,
     StorageBlobTrigger,
     StorageBlobTriggerOptions,
     StorageQueueTrigger,
@@ -87,6 +89,13 @@ export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
     return addTriggerBindingName({
         ...options,
         type: 'cosmosDBTrigger',
+    });
+}
+
+export function sql(options: SqlTriggerOptions): SqlTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'sqlTrigger',
     });
 }
 

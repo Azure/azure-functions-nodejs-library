@@ -1,7 +1,34 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { FunctionInput, FunctionOutput } from './index';
+import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
+import { InvocationContext } from './InvocationContext';
+
+export type SqlHandler = (changes: SqlTriggerChange[], context: InvocationContext) => FunctionResult;
+
+export interface SqlFunctionOptions extends SqlTriggerOptions, Partial<FunctionOptions> {
+    handler: SqlHandler;
+
+    trigger?: SqlTrigger;
+}
+
+export interface SqlTriggerOptions {
+    /**
+     * The name of the table monitored by the trigger.
+     */
+    tableName: string;
+
+    /**
+     * An app setting (or environment variable) with the connection string for the database containing the table monitored for changes
+     */
+    connectionStringSetting: string;
+}
+export type SqlTrigger = FunctionTrigger & SqlTriggerOptions;
+
+export interface SqlTriggerChange {
+    item: unknown;
+    operation: 'Insert' | 'Update' | 'Delete';
+}
 
 export interface SqlInputOptions {
     /**
