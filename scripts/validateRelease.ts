@@ -36,6 +36,7 @@ function validateRelease(publishTag: string, dropPath: string): void {
             expectedFormat = 'x.x.x-alpha.x';
             break;
         case 'latest':
+        case 'legacy':
             regex = /^[0-9]+\.[0-9]+\.[0-9]+$/;
             expectedFormat = 'x.x.x';
             break;

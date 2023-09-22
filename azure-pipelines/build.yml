@@ -40,7 +40,6 @@ jobs:
         src/**
         types/**
         LICENSE
-        NOTICE.html
         package.json
         README.md
       targetFolder: '$(Build.ArtifactStagingDirectory)'
