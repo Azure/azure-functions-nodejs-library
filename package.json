@@ -26,7 +26,6 @@
         "types/",
         "LICENSE",
         "README.md",
-        "NOTICE.html",
         "_manifest"
     ],
     "scripts": {
