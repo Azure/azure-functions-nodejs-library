@@ -1,6 +1,6 @@
 {
     "name": "@azure/functions",
-    "version": "4.0.0-alpha.13",
+    "version": "4.0.0",
     "description": "Microsoft Azure Functions NodeJS Framework",
     "keywords": [
         "azure",
@@ -26,7 +26,6 @@
         "types/",
         "LICENSE",
         "README.md",
-        "NOTICE.html",
         "_manifest"
     ],
     "engines": {
