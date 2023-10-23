@@ -22,6 +22,8 @@ import {
     StorageQueueTriggerOptions,
     TimerTrigger,
     TimerTriggerOptions,
+    WarmupTrigger,
+    WarmupTriggerOptions,
 } from '@azure/functions';
 import { addBindingName } from './addBindingName';
 
@@ -87,6 +89,13 @@ export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
     return addTriggerBindingName({
         ...options,
         type: 'cosmosDBTrigger',
+    });
+}
+
+export function warmup(options: WarmupTriggerOptions): WarmupTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'warmupTrigger',
     });
 }
 
