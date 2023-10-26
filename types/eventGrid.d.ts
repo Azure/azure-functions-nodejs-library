@@ -18,7 +18,7 @@ export interface EventGridFunctionOptions extends EventGridTriggerOptions, Parti
 export interface EventGridTriggerOptions {}
 export type EventGridTrigger = FunctionTrigger & EventGridTriggerOptions;
 
-export interface EventGridOutputOptions {
+export interface EventGridOutputKeyOptions {
     /**
      * An app setting (or environment variable) that contains the URI for the custom topic
      */
@@ -29,6 +29,14 @@ export interface EventGridOutputOptions {
      */
     topicKeySetting: string;
 }
+export interface EventGridOutputConnectionOptions {
+    /**
+     * The value of the common prefix for the app setting that contains the `topicEndpointUri`.
+     * When setting the `connection` property, the `topicEndpointUri` and `topicKeySetting` properties should NOT be set.
+     */
+    connection: string;
+}
+export type EventGridOutputOptions = EventGridOutputKeyOptions | EventGridOutputConnectionOptions;
 export type EventGridOutput = FunctionOutput & EventGridOutputOptions;
 
 /**
