@@ -8,6 +8,8 @@ export type WarmupHandler = (warmupContext: object, context: InvocationContext) 
 
 export interface WarmupFunctionOptions extends WarmupTriggerOptions, Partial<FunctionOptions> {
     handler: WarmupHandler;
+
+    trigger?: WarmupTrigger;
 }
 
 export interface WarmupTriggerOptions {}
