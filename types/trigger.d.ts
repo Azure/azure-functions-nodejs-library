@@ -68,7 +68,7 @@ export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger;
 export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
 
 /**
- * [Link to docs and examples](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-warmup?tabs=isolated-process&pivots=programming-language-javascript)
+ * [Link to docs and examples](https://learn.microsoft.com/azure/azure-functions/functions-bindings-warmup?tabs=isolated-process&pivots=programming-language-javascript)
  */
 export function warmup(options: WarmupTriggerOptions): WarmupTrigger;
 
