@@ -147,8 +147,7 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
 }
 
 export function warmup(name: string, options: WarmupFunctionOptions): void {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    generic(name, convertToGenericOptions(options, <any>trigger.warmup));
+    generic(name, convertToGenericOptions(options, trigger.warmup));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {

@@ -1,17 +1,17 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+export { InvocationContext } from './InvocationContext';
 export { HttpRequest } from './http/HttpRequest';
 export { HttpResponse } from './http/HttpResponse';
-export { InvocationContext } from './InvocationContext';
 
 const bindingCounts: Record<string, number> = {};
 /**
- * If the host spawns multiple workers, it expects the metadata (including binding name) to be the same accross workers
- * That means we need to generate binding names in a deterministic fashion, so we'll do that using a count
+ * If the host spawns multiple workers, it expects the metadata (including binding name) to be the same across workers.
+ * Therefore, we need to generate binding names in a deterministic fashion. We'll do so using a count.
  * There's a tiny risk users register bindings in a non-deterministic order (i.e. async race conditions), but it's okay considering the following:
  * 1. We will track the count individually for each binding type. This makes the names more readable and reduces the chances a race condition will matter
- * 2. Users can manually specify the name themselves (aka if they're doing weird async stuff) and we will respect that
+ * 2. Users can manually specify the name themselves (e.g. if they're doing weird async stuff) and we will respect that
  * More info here: https://github.com/Azure/azure-functions-nodejs-worker/issues/638
  */
 export function addBindingName<T extends { type: string; name?: string }>(
