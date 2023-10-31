@@ -19,6 +19,7 @@ import {
     StorageBlobFunctionOptions,
     StorageQueueFunctionOptions,
     TimerFunctionOptions,
+    WarmupFunctionOptions,
 } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
@@ -143,6 +144,10 @@ export function eventGrid(name: string, options: EventGridFunctionOptions): void
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     generic(name, convertToGenericOptions(options, <any>trigger.cosmosDB));
+}
+
+export function warmup(name: string, options: WarmupFunctionOptions): void {
+    generic(name, convertToGenericOptions(options, trigger.warmup));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {

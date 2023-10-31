@@ -20,6 +20,7 @@ import {
     StorageQueueTriggerOptions,
 } from './storage';
 import { TimerTrigger, TimerTriggerOptions } from './timer';
+import { WarmupTrigger, WarmupTriggerOptions } from './warmup';
 
 /**
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-http-webhook-trigger?&pivots=programming-language-javascript)
@@ -65,6 +66,11 @@ export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger?pivots=programming-language-javascript)
  */
 export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
+
+/**
+ * [Link to docs and examples](https://learn.microsoft.com/azure/azure-functions/functions-bindings-warmup?tabs=isolated-process&pivots=programming-language-javascript)
+ */
+export function warmup(options: WarmupTriggerOptions): WarmupTrigger;
 
 /**
  * A generic option that can be used for any trigger type

@@ -9,6 +9,7 @@ import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './h
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
 import { StorageBlobFunctionOptions, StorageQueueFunctionOptions } from './storage';
 import { TimerFunctionOptions } from './timer';
+import { WarmupFunctionOptions } from './warmup';
 
 /**
  * Registers an http function in your app that will be triggered by making a request to the function url
@@ -142,6 +143,18 @@ export function eventGrid(name: string, options: EventGridFunctionOptions): void
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
+
+/**
+ * Registers a function in your app that will be triggered when an instance is added to scale a running function app.
+ * The warmup trigger is only called during scale-out operations, not during restarts or other non-scale startups.
+ * Make sure your logic can load all required dependencies without relying on the warmup trigger.
+ * Lazy loading is a good pattern to achieve this goal.
+ * The warmup trigger isn't available to apps running on the Consumption plan.
+ * For more information, please see the [Azure Functions warmup trigger documentation](https://learn.microsoft.com/azure/azure-functions/functions-bindings-warmup?tabs=isolated-process&pivots=programming-language-javascript).
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the inputs, outputs, and handler for this function
+ */
+export function warmup(name: string, options: WarmupFunctionOptions): void;
 
 /**
  * Registers a generic function in your app that will be triggered based on the type specified in `options.trigger.type`

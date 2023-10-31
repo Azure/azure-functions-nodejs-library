@@ -20,6 +20,7 @@ export * from './storage';
 export * from './table';
 export * from './timer';
 export * as trigger from './trigger';
+export * from './warmup';
 
 /**
  * Void if no `return` output is registered
