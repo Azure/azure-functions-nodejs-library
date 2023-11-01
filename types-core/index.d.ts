@@ -278,7 +278,7 @@ declare module '@azure/functions-core' {
         inputs: unknown[];
     }
 
-    type FunctionCallback = (context: unknown, ...inputs: unknown[]) => unknown;
+    type FunctionCallback = (...args: unknown[]) => unknown;
 
     // #region rpc types
     interface RpcFunctionMetadata {

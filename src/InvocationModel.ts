@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { FunctionHandler } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import {
     CoreInvocationContext,
@@ -79,10 +78,13 @@ export class InvocationModel implements coreTypes.InvocationModel {
         return { context, inputs };
     }
 
-    async invokeFunction(context: InvocationContext, inputs: unknown[], handler: FunctionHandler): Promise<unknown> {
+    async invokeFunction(
+        context: InvocationContext,
+        inputs: unknown[],
+        handler: coreTypes.FunctionCallback
+    ): Promise<unknown> {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-            return await Promise.resolve(handler(inputs[0], context));
+            return await Promise.resolve(handler(...inputs, context));
         } finally {
             this.#isDone = true;
         }
