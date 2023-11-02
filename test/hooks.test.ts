@@ -23,13 +23,6 @@ describe('hooks', () => {
         registeredHook.dispose();
     });
 
-    function validateHookContext(context: HookContext) {
-        expect(context.hookData).to.deep.equal({});
-        expect(() => {
-            context.hookData = {};
-        }).to.throw();
-    }
-
     it('AppTerminateContext', () => {
         const context = new AppTerminateContext();
         validateHookContext(context);
@@ -39,18 +32,6 @@ describe('hooks', () => {
         const context = new AppStartContext();
         validateHookContext(context);
     });
-
-    function validateInvocationHookContext(context: InvocationHookContext): void {
-        validateHookContext(context);
-        expect(context.inputs).to.deep.equal([]);
-        expect(context.invocationContext).to.deep.equal(new InvocationContext());
-
-        expect(() => {
-            context.invocationContext = <any>{};
-        }).to.throw();
-        context.inputs = ['change'];
-        expect(context.inputs).to.deep.equal(['change']);
-    }
 
     it('PreInvocationContext', () => {
         const context = new PreInvocationContext();
@@ -76,4 +57,23 @@ describe('hooks', () => {
         expect(context.error).to.equal(newError);
         expect(context.result).to.equal('test2');
     });
+
+    function validateInvocationHookContext(context: InvocationHookContext): void {
+        validateHookContext(context);
+        expect(context.inputs).to.deep.equal([]);
+        expect(context.invocationContext).to.deep.equal(new InvocationContext());
+
+        expect(() => {
+            context.invocationContext = <any>{};
+        }).to.throw();
+        context.inputs = ['change'];
+        expect(context.inputs).to.deep.equal(['change']);
+    }
+
+    function validateHookContext(context: HookContext) {
+        expect(context.hookData).to.deep.equal({});
+        expect(() => {
+            context.hookData = {};
+        }).to.throw();
+    }
 });

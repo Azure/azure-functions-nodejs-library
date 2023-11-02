@@ -12,7 +12,7 @@ export declare class HookContext {
 
     /**
      * The recommended place to store and share data between hooks in the same scope (app-level vs invocation-level).
-     * You should use a relatively unique property name so that it doesn't conflict with other hooks' data.
+     * You should use a unique property name so that it doesn't conflict with other hooks' data.
      * This object is readonly. You may modify it, but attempting to overwrite it will throw an error
      */
     readonly hookData: Record<string, unknown>;
