@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 /**
- * Based off of the Node worker
- * https://github.com/Azure/azure-functions-nodejs-worker/blob/bf28d9c5ad4ed22c5e42c082471d16108abee140/src/Disposable.ts
+ * Based off of VS Code
+ * https://github.com/microsoft/vscode/blob/7bed4ce3e9f5059b5fc638c348f064edabcce5d2/src/vs/workbench/api/common/extHostTypes.ts#L65
  */
 export class Disposable {
     static from(...inDisposables: { dispose(): any }[]): Disposable {
@@ -27,7 +27,7 @@ export class Disposable {
     }
 
     dispose(): any {
-        if (this.#callOnDispose instanceof Function) {
+        if (typeof this.#callOnDispose === 'function') {
             this.#callOnDispose();
             this.#callOnDispose = undefined;
         }
