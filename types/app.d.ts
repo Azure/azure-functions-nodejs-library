@@ -163,3 +163,5 @@ export function warmup(name: string, options: WarmupFunctionOptions): void;
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function generic(name: string, options: GenericFunctionOptions): void;
+
+export * as hook from './hooks/registerHook';

@@ -29,19 +29,9 @@ import { toRpcDuration } from './converters/toRpcDuration';
 import * as output from './output';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';
+import { tryGetCoreApiLazy } from './utils/tryGetCoreApiLazy';
 
-let coreApi: typeof coreTypes | undefined | null;
-function tryGetCoreApiLazy(): typeof coreTypes | null {
-    if (coreApi === undefined) {
-        try {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            coreApi = <typeof coreTypes>require('@azure/functions-core');
-        } catch {
-            coreApi = null;
-        }
-    }
-    return coreApi;
-}
+export * as hook from './hooks/registerHook';
 
 class ProgrammingModel implements coreTypes.ProgrammingModel {
     name = '@azure/functions';
