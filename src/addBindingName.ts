@@ -1,9 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-export { InvocationContext } from './InvocationContext';
 export { HttpRequest } from './http/HttpRequest';
 export { HttpResponse } from './http/HttpResponse';
+export { InvocationContext } from './InvocationContext';
 
 const bindingCounts: Record<string, number> = {};
 /**

@@ -23,9 +23,9 @@ import {
 } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
-import { InvocationModel } from './InvocationModel';
 import { returnBindingKey, version } from './constants';
 import { toRpcDuration } from './converters/toRpcDuration';
+import { InvocationModel } from './InvocationModel';
 import * as output from './output';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';

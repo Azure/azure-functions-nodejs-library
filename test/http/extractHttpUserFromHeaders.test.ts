@@ -1,9 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import 'mocha';
 import { HttpRequestUser } from '@azure/functions';
 import { expect } from 'chai';
-import 'mocha';
 import { Headers } from 'undici';
 import { extractHttpUserFromHeaders } from '../../src/http/extractHttpUserFromHeaders';
 

@@ -12,7 +12,6 @@ import {
     RpcTypedData,
 } from '@azure/functions-core';
 import { format } from 'util';
-import { InvocationContext } from './InvocationContext';
 import { returnBindingKey } from './constants';
 import { fromRpcBindings } from './converters/fromRpcBindings';
 import { fromRpcRetryContext, fromRpcTraceContext } from './converters/fromRpcContext';
@@ -21,6 +20,7 @@ import { fromRpcTypedData } from './converters/fromRpcTypedData';
 import { toCamelCaseValue } from './converters/toCamelCase';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
+import { InvocationContext } from './InvocationContext';
 import { isHttpTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
 import { isDefined, nonNullProp, nonNullValue } from './utils/nonNull';
 

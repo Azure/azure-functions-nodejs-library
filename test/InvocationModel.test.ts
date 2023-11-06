@@ -1,9 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import 'mocha';
 import { RpcLogCategory, RpcLogLevel } from '@azure/functions-core';
 import { expect } from 'chai';
-import 'mocha';
 import { InvocationContext } from '../src';
 import { InvocationModel } from '../src/InvocationModel';
 
