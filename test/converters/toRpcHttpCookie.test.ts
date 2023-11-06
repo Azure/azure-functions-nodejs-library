@@ -1,9 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import 'mocha';
 import { Cookie } from '@azure/functions';
 import { expect } from 'chai';
-import 'mocha';
 import { toRpcHttpCookie } from '../../src/converters/toRpcHttpCookie';
 
 describe('toRpcHttpCookie', () => {

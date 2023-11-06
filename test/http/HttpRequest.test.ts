@@ -1,12 +1,13 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import 'mocha';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import 'mocha';
 import { File } from 'undici';
 import { HttpRequest } from '../../src/http/HttpRequest';
+
 chai.use(chaiAsPromised);
 
 describe('HttpRequest', () => {

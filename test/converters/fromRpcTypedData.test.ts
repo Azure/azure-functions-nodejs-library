@@ -1,9 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import 'mocha';
 import { expect } from 'chai';
 import { fromString } from 'long';
-import 'mocha';
 import { HttpRequest } from '../../src';
 import { fromRpcTypedData } from '../../src/converters/fromRpcTypedData';
 import Long = require('long');

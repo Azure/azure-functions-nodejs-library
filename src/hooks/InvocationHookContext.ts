@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { InvocationContext } from '../InvocationContext';
 import { ReadOnlyError } from '../errors';
+import { InvocationContext } from '../InvocationContext';
 import { nonNullProp } from '../utils/nonNull';
 import { HookContext } from './HookContext';
 
