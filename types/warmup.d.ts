@@ -4,8 +4,8 @@
 import { FunctionOptions, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export interface WarmupContextOptions {}
-export type WarmupHandler = (warmupContext: WarmupContextOptions, context: InvocationContext) => FunctionResult;
+export interface WarmupContext {}
+export type WarmupHandler = (warmupContext: WarmupContext, context: InvocationContext) => FunctionResult;
 
 export interface WarmupFunctionOptions extends WarmupTriggerOptions, Partial<FunctionOptions> {
     handler: WarmupHandler;
