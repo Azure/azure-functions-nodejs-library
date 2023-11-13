@@ -164,8 +164,7 @@ export function generic(name: string, options: GenericFunctionOptions): void {
     }
 
     if (options.return) {
-        options.return.name = returnBindingKey;
-        bindings[options.return.name] = {
+        bindings[returnBindingKey] = {
             ...options.return,
             direction: 'out',
         };
