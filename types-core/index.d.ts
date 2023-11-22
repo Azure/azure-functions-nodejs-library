@@ -353,11 +353,17 @@ declare module '@azure/functions-core' {
         direction?: RpcBindingDirection | null;
 
         dataType?: RpcBindingDataType | null;
+
+        properties?: RpcBindingProperties | null;
     }
 
     type RpcBindingDirection = 'in' | 'out' | 'inout';
 
     type RpcBindingDataType = 'undefined' | 'string' | 'binary' | 'stream';
+
+    interface RpcBindingProperties {
+        supportsDeferredBinding?: boolean | null;
+    }
 
     interface RpcRetryOptions {
         maxRetryCount?: number | null;
