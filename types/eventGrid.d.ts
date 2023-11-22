@@ -3,6 +3,7 @@
 
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
+import { Either } from './utils/either';
 
 export type EventGridHandler = (event: EventGridEvent, context: InvocationContext) => FunctionResult;
 
@@ -31,12 +32,11 @@ export interface EventGridOutputKeyOptions {
 }
 export interface EventGridOutputConnectionOptions {
     /**
-     * The value of the common prefix for the app setting that contains the `topicEndpointUri`.
-     * When setting the `connection` property, the `topicEndpointUri` and `topicKeySetting` properties should NOT be set.
+     * The value of the common prefix for the app setting that contains the `topicEndpointUri`
      */
     connection: string;
 }
-export type EventGridOutputOptions = EventGridOutputKeyOptions | EventGridOutputConnectionOptions;
+export type EventGridOutputOptions = Either<EventGridOutputKeyOptions, EventGridOutputConnectionOptions>;
 export type EventGridOutput = FunctionOutput & EventGridOutputOptions;
 
 /**
