@@ -7,7 +7,7 @@ export function fromNullableMapping(
     nullableMapping: Record<string, RpcNullableString> | null | undefined,
     originalMapping?: Record<string, string> | null
 ): Record<string, string> {
-    let converted = {};
+    let converted: Record<string, string> = {};
     if (nullableMapping && Object.keys(nullableMapping).length > 0) {
         for (const key in nullableMapping) {
             converted[key] = nullableMapping[key].value || '';

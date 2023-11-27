@@ -7,7 +7,7 @@ export function toCamelCaseValue(data: unknown): unknown {
     } else if (Array.isArray(data)) {
         return data.map(toCamelCaseValue);
     } else {
-        const result = {};
+        const result: Record<string, any> = {};
         for (const [key, value] of Object.entries(data)) {
             result[toCamelCaseKey(key)] = toCamelCaseValue(value);
         }
