@@ -30,6 +30,8 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
         return data.collectionDouble.double;
     } else if (data.collectionSint64 && isDefined(data.collectionSint64.sint64)) {
         return data.collectionSint64.sint64;
+    } else if (data.modelBindingData && isDefined(data.modelBindingData.content)) {
+        return data.modelBindingData;
     } else {
         return undefined;
     }

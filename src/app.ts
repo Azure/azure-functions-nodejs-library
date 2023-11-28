@@ -152,9 +152,6 @@ export function generic(name: string, options: GenericFunctionOptions): void {
         ...trigger,
         direction: 'in',
         type: isTrigger(trigger.type) ? trigger.type : trigger.type + 'Trigger',
-        properties: {
-            supportsDeferredBinding: true,
-        },
     };
 
     if (options.extraInputs) {

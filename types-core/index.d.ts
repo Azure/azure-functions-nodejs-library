@@ -401,22 +401,36 @@ declare module '@azure/functions-core' {
         collectionDouble?: RpcCollectionDouble | null;
 
         collectionSint64?: RpcCollectionSInt64 | null;
-    }
 
-    interface RpcCollectionSInt64 {
-        sint64?: (number | Long)[] | null;
-    }
-
-    interface RpcCollectionString {
-        string?: string[] | null;
+        modelBindingData?: ModelBindingData | null;
     }
 
     interface RpcCollectionBytes {
         bytes?: Uint8Array[] | null;
     }
 
+    interface RpcCollectionString {
+        string?: string[] | null;
+    }
+
     interface RpcCollectionDouble {
         double?: number[] | null;
+    }
+
+    interface RpcCollectionSInt64 {
+        sint64?: (number | Long)[] | null;
+    }
+
+    interface ModelBindingData {
+        content?: ModelBindingDataContent | null;
+    }
+
+    interface ModelBindingDataContent {
+        connection: string | null;
+
+        containerName: string | null;
+
+        blobName: string | null;
     }
 
     interface RpcInvocationRequest {
