@@ -22,6 +22,10 @@ export function toRpcTypedData(data: unknown): RpcTypedData | null | undefined {
         } else {
             return { double: data };
         }
+    } else if (typeof data === 'object') {
+        if ('data' in data) {
+            return { modelBindingData: data } as RpcTypedData;
+        }
     } else {
         return { json: JSON.stringify(data) };
     }
