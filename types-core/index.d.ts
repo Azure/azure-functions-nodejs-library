@@ -422,7 +422,7 @@ declare module '@azure/functions-core' {
     }
 
     interface ModelBindingData {
-        content?: ModelBindingDataContent | null;
+        data?: ModelBindingDataContent | null;
     }
 
     interface ModelBindingDataContent {
