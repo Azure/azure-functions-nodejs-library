@@ -27,7 +27,7 @@ npm install @azure/functions
   - _**Runtime**_: Defines underlying behavior of Azure Functions and is shared across all languages.
 - The programming model version is strictly tied to the version of the [`@azure/functions`](https://www.npmjs.com/package/@azure/functions) npm package, and is versioned independently of the [runtime](https://learn.microsoft.com/azure/azure-functions/functions-versions?pivots=programming-language-javascript). Both the runtime and the programming model use "4" as their latest major version, but that is purely a coincidence.
 - You can't mix the v3 and v4 programming models in the same function app. As soon as you register one v4 function in your app, any v3 functions registered in _function.json_ files are ignored.
-- If using a bundler such as `esbuild`, you may encounter the following type of error: `[ERROR] Could not resolve "@azure/functions-core"`. `@azure/functions-core` is a built-in module that ships directly in Azure, not through npm. If you need to use a bundler, our recommendation is to list `@azure/functions-core` as an external package so that your bundler will ignore it.
+- If using a bundler such as `esbuild`, you may encounter the following type of error: `[ERROR] Could not resolve "@azure/functions-core"`. This is a built-in module that ships directly in Azure, not through npm. If you need to use a bundler, our recommendation is to list `@azure/functions-core` as an external package so that your bundler will ignore it.
 
 ## Usage
 
