@@ -6,27 +6,33 @@ import { RpcTypedData } from '@azure/functions-core';
 export function toRpcTypedData(data: unknown): RpcTypedData | null | undefined {
     if (data === null || data === undefined) {
         return data;
-    } else if (typeof data === 'string') {
+    }
+
+    if (typeof data === 'string') {
         return { string: data };
-    } else if (Buffer.isBuffer(data)) {
+    }
+
+    if (Buffer.isBuffer(data)) {
         return { bytes: data };
-    } else if (ArrayBuffer.isView(data)) {
+    }
+
+    if (ArrayBuffer.isView(data)) {
         const bytes = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
         return { bytes: bytes };
-    } else if (data instanceof ArrayBuffer) {
+    }
+
+    if (data instanceof ArrayBuffer) {
         const bytes = new Uint8Array(data);
         return { bytes: bytes };
-    } else if (typeof data === 'number') {
-        if (Number.isInteger(data)) {
-            return { int: data };
-        } else {
-            return { double: data };
-        }
-    } else if (typeof data === 'object') {
-        if ('data' in data) {
-            return { modelBindingData: data } as RpcTypedData;
-        }
-    } else {
-        return { json: JSON.stringify(data) };
     }
+
+    if (typeof data === 'number') {
+        return Number.isInteger(data) ? { int: data } : { double: data };
+    }
+
+    if (typeof data === 'object' && 'data' in data) {
+        return { modelBindingData: data } as RpcTypedData;
+    }
+
+    return { json: JSON.stringify(data) };
 }
