@@ -17,12 +17,11 @@ export function fromRpcTriggerMetadata(
     // 3. We can represent that information on the request & timer objects instead
     if (!triggerMetadata || isHttpTrigger(triggerType) || isTimerTrigger(triggerType)) {
         return undefined;
+    } else {
+        const result: TriggerMetadata = {};
+        for (const [key, value] of Object.entries(triggerMetadata)) {
+            result[toCamelCaseKey(key)] = toCamelCaseValue(fromRpcTypedData(value));
+        }
+        return result;
     }
-
-    const result: TriggerMetadata = {};
-    for (const [key, value] of Object.entries(triggerMetadata)) {
-        result[toCamelCaseKey(key)] = toCamelCaseValue(fromRpcTypedData(value));
-    }
-
-    return result;
 }

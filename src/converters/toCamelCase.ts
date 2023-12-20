@@ -4,18 +4,15 @@
 export function toCamelCaseValue(data: unknown): unknown {
     if (typeof data !== 'object' || data === null) {
         return data;
-    }
-
-    if (Array.isArray(data)) {
+    } else if (Array.isArray(data)) {
         return data.map(toCamelCaseValue);
+    } else {
+        const result = {};
+        for (const [key, value] of Object.entries(data)) {
+            result[toCamelCaseKey(key)] = toCamelCaseValue(value);
+        }
+        return result;
     }
-
-    const result = {};
-    for (const [key, value] of Object.entries(data)) {
-        result[toCamelCaseKey(key)] = toCamelCaseValue(value);
-    }
-
-    return result;
 }
 
 export function toCamelCaseKey(key: string): string {
