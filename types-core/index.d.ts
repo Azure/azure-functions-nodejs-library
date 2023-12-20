@@ -362,7 +362,7 @@ declare module '@azure/functions-core' {
     type RpcBindingDataType = 'undefined' | 'string' | 'binary' | 'stream';
 
     interface RpcBindingProperties {
-        supportsDeferredBinding?: boolean | null;
+        supportsDeferredBinding?: 'true' | 'false' | null;
     }
 
     interface RpcRetryOptions {
@@ -422,15 +422,15 @@ declare module '@azure/functions-core' {
     }
 
     interface ModelBindingData {
-        data?: ModelBindingDataContent | null;
+        content?: ModelBindingDataContent | null;
+        contentType?: string | null;
+        source?: string | null;
+        version?: string | null;
     }
 
     interface ModelBindingDataContent {
-        connection: string | null;
-
-        containerName: string | null;
-
-        blobName: string | null;
+        data?: Uint8Array | null;
+        type?: string | null;
     }
 
     interface RpcInvocationRequest {
