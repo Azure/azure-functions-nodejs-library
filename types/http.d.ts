@@ -145,6 +145,12 @@ export declare class HttpRequest {
      * Returns a promise fulfilled with the body as a string
      */
     readonly text: () => Promise<string>;
+
+    /**
+     * Creates a copy of the request object, with special handling of the body.
+     * [Learn more here](https://developer.mozilla.org/docs/Web/API/Request/clone)
+     */
+    readonly clone: () => HttpRequest;
 }
 
 /**
@@ -293,6 +299,12 @@ export declare class HttpResponse {
      * Returns a promise fulfilled with the body as a string
      */
     readonly text: () => Promise<string>;
+
+    /**
+     * Creates a copy of the response object, with special handling of the body.
+     * [Learn more here](https://developer.mozilla.org/docs/Web/API/Response/clone)
+     */
+    readonly clone: () => HttpResponse;
 }
 
 /**
@@ -368,7 +380,7 @@ export interface HttpRequestBodyInit {
     bytes?: Uint8Array;
 
     /**
-     * The body as a buffer. You only need to specify one of the `bytes` or `string` properties
+     * The body as a string. You only need to specify one of the `bytes` or `string` properties
      */
     string?: string;
 }

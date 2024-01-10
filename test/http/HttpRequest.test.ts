@@ -11,6 +11,34 @@ import { HttpRequest } from '../../src/http/HttpRequest';
 chai.use(chaiAsPromised);
 
 describe('HttpRequest', () => {
+    it('clone', async () => {
+        const req = new HttpRequest({
+            method: 'POST',
+            url: 'http://localhost:7071/api/helloWorld',
+            body: {
+                string: 'body1',
+            },
+            headers: {
+                a: 'b',
+            },
+            params: {
+                c: 'd',
+            },
+            query: {
+                e: 'f',
+            },
+        });
+        const req2 = req.clone();
+        expect(await req.text()).to.equal('body1');
+        expect(await req2.text()).to.equal('body1');
+        expect(req.headers).to.not.equal(req2.headers);
+        expect(req.headers).to.deep.equal(req2.headers);
+        expect(req.params).to.not.equal(req2.params);
+        expect(req.params).to.deep.equal(req2.params);
+        expect(req.query).to.not.equal(req2.query);
+        expect(req.query).to.deep.equal(req2.query);
+    });
+
     describe('formData', () => {
         const multipartContentType = 'multipart/form-data; boundary=----WebKitFormBoundaryeJGMO2YP65ZZXRmv';
         function createFormRequest(data: string, contentType: string = multipartContentType): HttpRequest {
