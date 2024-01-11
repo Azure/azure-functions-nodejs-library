@@ -422,15 +422,10 @@ declare module '@azure/functions-core' {
     }
 
     interface ModelBindingData {
-        content?: ModelBindingDataContent | null;
+        content?: Buffer | null;
         contentType?: string | null;
         source?: string | null;
         version?: string | null;
-    }
-
-    interface ModelBindingDataContent {
-        data?: Uint8Array | null;
-        type?: string | null;
     }
 
     interface RpcInvocationRequest {

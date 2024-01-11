@@ -4,6 +4,7 @@
 import { InvocationContext } from './InvocationContext';
 
 export * as app from './app';
+export * from './connectionInfo';
 export * from './cosmosDB';
 export * from './cosmosDB.v3';
 export * from './cosmosDB.v4';

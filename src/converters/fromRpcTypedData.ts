@@ -3,6 +3,7 @@
 
 import { RpcTypedData } from '@azure/functions-core';
 import { HttpRequest } from '../http/HttpRequest';
+import { ConnectionInfo } from '../utils/ConnectionInfo';
 import { isDefined } from '../utils/nonNull';
 
 export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown {
@@ -31,7 +32,7 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
     } else if (data.collectionSint64 && isDefined(data.collectionSint64.sint64)) {
         return data.collectionSint64.sint64;
     } else if (data.modelBindingData && isDefined(data.modelBindingData.content)) {
-        return data.modelBindingData.content;
+        return new ConnectionInfo(data.modelBindingData);
     } else {
         return undefined;
     }
