@@ -27,11 +27,11 @@ export class HttpRequest implements types.HttpRequest {
     constructor(init: InternalHttpRequestInit) {
         this.#init = init;
 
-        const url = nonNullProp(init, 'url');
-
         if (init.undiciRequest) {
             this.#uReq = init.undiciRequest;
         } else {
+            const url = nonNullProp(init, 'url');
+
             let body: Buffer | string | undefined;
             if (init.body?.bytes) {
                 body = Buffer.from(init.body?.bytes);

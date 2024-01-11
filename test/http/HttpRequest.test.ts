@@ -31,10 +31,13 @@ describe('HttpRequest', () => {
         const req2 = req.clone();
         expect(await req.text()).to.equal('body1');
         expect(await req2.text()).to.equal('body1');
+
         expect(req.headers).to.not.equal(req2.headers);
         expect(req.headers).to.deep.equal(req2.headers);
+
         expect(req.params).to.not.equal(req2.params);
         expect(req.params).to.deep.equal(req2.params);
+
         expect(req.query).to.not.equal(req2.query);
         expect(req.query).to.deep.equal(req2.query);
     });

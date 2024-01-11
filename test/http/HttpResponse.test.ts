@@ -26,8 +26,10 @@ describe('HttpResponse', () => {
         const res2 = res.clone();
         expect(await res.text()).to.equal('body1');
         expect(await res2.text()).to.equal('body1');
+
         expect(res.headers).to.not.equal(res2.headers);
         expect(res.headers).to.deep.equal(res2.headers);
+
         expect(res.cookies).to.not.equal(res2.cookies);
         expect(res.cookies).to.deep.equal(res2.cookies);
     });
