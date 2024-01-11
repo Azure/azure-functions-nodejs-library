@@ -8,22 +8,34 @@ import { ReadableStream } from 'stream/web';
 import { FormData, Headers, Response as uResponse, ResponseInit as uResponseInit } from 'undici';
 import { isDefined } from '../utils/nonNull';
 
+interface InternalHttpResponseInit extends HttpResponseInit {
+    undiciResponse?: uResponse;
+}
+
 export class HttpResponse implements types.HttpResponse {
     readonly cookies: types.Cookie[];
     readonly enableContentNegotiation: boolean;
 
     #uRes: uResponse;
+    #init: InternalHttpResponseInit;
 
-    constructor(resInit?: HttpResponseInit) {
-        const uResInit: uResponseInit = { status: resInit?.status, headers: resInit?.headers };
-        if (isDefined(resInit?.jsonBody)) {
-            this.#uRes = uResponse.json(resInit?.jsonBody, uResInit);
+    constructor(init?: InternalHttpResponseInit) {
+        init ??= {};
+        this.#init = init;
+
+        if (init.undiciResponse) {
+            this.#uRes = init.undiciResponse;
         } else {
-            this.#uRes = new uResponse(resInit?.body, uResInit);
+            const uResInit: uResponseInit = { status: init.status, headers: init.headers };
+            if (isDefined(init.jsonBody)) {
+                this.#uRes = uResponse.json(init.jsonBody, uResInit);
+            } else {
+                this.#uRes = new uResponse(init.body, uResInit);
+            }
         }
 
-        this.cookies = resInit?.cookies || [];
-        this.enableContentNegotiation = !!resInit?.enableContentNegotiation;
+        this.cookies = init.cookies ?? [];
+        this.enableContentNegotiation = !!init.enableContentNegotiation;
     }
 
     get status(): number {
@@ -60,5 +72,11 @@ export class HttpResponse implements types.HttpResponse {
 
     async text(): Promise<string> {
         return this.#uRes.text();
+    }
+
+    clone(): HttpResponse {
+        const newInit = structuredClone(this.#init);
+        newInit.undiciResponse = this.#uRes.clone();
+        return new HttpResponse(newInit);
     }
 }

@@ -12,31 +12,42 @@ import { fromNullableMapping } from '../converters/fromRpcNullable';
 import { nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
+interface InternalHttpRequestInit extends RpcHttpData {
+    undiciRequest?: uRequest;
+}
+
 export class HttpRequest implements types.HttpRequest {
     readonly query: URLSearchParams;
     readonly params: HttpRequestParams;
 
     #cachedUser?: HttpRequestUser | null;
     #uReq: uRequest;
-    #body?: Buffer | string;
+    #init: InternalHttpRequestInit;
 
-    constructor(rpcHttp: RpcHttpData) {
-        const url = nonNullProp(rpcHttp, 'url');
+    constructor(init: InternalHttpRequestInit) {
+        this.#init = init;
 
-        if (rpcHttp.body?.bytes) {
-            this.#body = Buffer.from(rpcHttp.body?.bytes);
-        } else if (rpcHttp.body?.string) {
-            this.#body = rpcHttp.body.string;
+        if (init.undiciRequest) {
+            this.#uReq = init.undiciRequest;
+        } else {
+            const url = nonNullProp(init, 'url');
+
+            let body: Buffer | string | undefined;
+            if (init.body?.bytes) {
+                body = Buffer.from(init.body?.bytes);
+            } else if (init.body?.string) {
+                body = init.body.string;
+            }
+
+            this.#uReq = new uRequest(url, {
+                body,
+                method: nonNullProp(init, 'method'),
+                headers: fromNullableMapping(init.nullableHeaders, init.headers),
+            });
         }
 
-        this.#uReq = new uRequest(url, {
-            body: this.#body,
-            method: nonNullProp(rpcHttp, 'method'),
-            headers: fromNullableMapping(rpcHttp.nullableHeaders, rpcHttp.headers),
-        });
-
-        this.query = new URLSearchParams(fromNullableMapping(rpcHttp.nullableQuery, rpcHttp.query));
-        this.params = fromNullableMapping(rpcHttp.nullableParams, rpcHttp.params);
+        this.query = new URLSearchParams(fromNullableMapping(init.nullableQuery, init.query));
+        this.params = fromNullableMapping(init.nullableParams, init.params);
     }
 
     get url(): string {
@@ -85,5 +96,11 @@ export class HttpRequest implements types.HttpRequest {
 
     async text(): Promise<string> {
         return this.#uReq.text();
+    }
+
+    clone(): HttpRequest {
+        const newInit = structuredClone(this.#init);
+        newInit.undiciRequest = this.#uReq.clone();
+        return new HttpRequest(newInit);
     }
 }
