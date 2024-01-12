@@ -17,7 +17,11 @@ export function toRpcTypedData(data: unknown): RpcTypedData | null | undefined {
         const bytes = new Uint8Array(data);
         return { bytes: bytes };
     } else if (typeof data === 'number') {
-        return Number.isInteger(data) ? { int: data } : { double: data };
+        if (Number.isInteger(data)) {
+            return { int: data };
+        } else {
+            return { double: data };
+        }
     } else {
         return { json: JSON.stringify(data) };
     }
