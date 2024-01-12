@@ -18,8 +18,6 @@ export function toRpcTypedData(data: unknown): RpcTypedData | null | undefined {
         return { bytes: bytes };
     } else if (typeof data === 'number') {
         return Number.isInteger(data) ? { int: data } : { double: data };
-    } else if (typeof data === 'object') {
-        return { modelBindingData: data } as RpcTypedData;
     } else {
         return { json: JSON.stringify(data) };
     }
