@@ -78,12 +78,12 @@ function convertToGenericOptions<T extends Omit<FunctionOptions, 'trigger'> & Pa
     };
 }
 
-function addDeferredBindingsFlag(triggerType: string): { [key: string]: string } | undefined {
+function addDeferredBindingsFlag(triggerType: string): { [key: string]: string } {
     if (triggerType === 'blobTrigger') {
         return { supportsDeferredBinding: 'true' };
     }
 
-    return undefined;
+    return { supportsDeferredBinding: 'false' };
 }
 
 export function get(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
