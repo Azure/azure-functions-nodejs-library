@@ -22,8 +22,8 @@ function validateRelease(publishTag: string, dropPath: string): void {
         throw new Error('Drop path should have one tgz file');
     }
 
-    const match = files[0].match(/^azure-functions-(.*)\.tgz$/);
-    if (!match) {
+    const match = files[0]?.match(/^azure-functions-(.*)\.tgz$/);
+    if (!match || !match[1]) {
         throw new Error(`Unrecognized tgz file name "${files[0]}"`);
     }
 

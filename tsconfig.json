@@ -4,6 +4,7 @@
         "target": "es6",
         "strict": true,
         "noUnusedLocals": true,
+        "noUncheckedIndexedAccess": true,
         "outDir": "out",
         "sourceMap": true,
         "baseUrl": "./",

@@ -42,7 +42,7 @@ export async function run(): Promise<void> {
 function addEnvVarsToMochaOptions(options: Mocha.MochaOptions): void {
     for (const envVar of Object.keys(process.env)) {
         const match: RegExpMatchArray | null = envVar.match(/^mocha_(.+)/i);
-        if (match) {
+        if (match && match[1]) {
             const [, option] = match;
             let value: string | number = process.env[envVar] || '';
             if (typeof value === 'string' && !isNaN(parseInt(value))) {
