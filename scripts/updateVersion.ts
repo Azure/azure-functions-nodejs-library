@@ -82,8 +82,7 @@ function updateVersionByRegex(filePath: string, regex: RegExp, newVersion: strin
     if (!match || !match[0] || !match[1]) {
         throw new Error(`Failed to find match for "${regex.source}".`);
     }
-    const oldLine = match[0];
-    const oldVersion = match[1];
+    const [oldLine, oldVersion] = match;
     const newLine = oldLine.replace(oldVersion, newVersion);
     const newFileContents = oldFileContents.replace(oldLine, newLine);
     writeFileSync(filePath, newFileContents);
