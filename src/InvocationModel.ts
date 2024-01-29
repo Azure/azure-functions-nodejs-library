@@ -62,7 +62,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
                 const bindingName = nonNullProp(binding, 'name');
                 let input: unknown = fromRpcTypedData(binding.data);
 
-                const bindingType = this.#bindings[bindingName].type;
+                const bindingType = nonNullProp(this.#bindings, bindingName).type;
                 if (isTimerTrigger(bindingType)) {
                     input = toCamelCaseValue(input);
                 }

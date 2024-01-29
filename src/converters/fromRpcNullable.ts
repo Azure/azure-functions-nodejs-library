@@ -10,7 +10,7 @@ export function fromNullableMapping(
     let converted: Record<string, string> = {};
     if (nullableMapping && Object.keys(nullableMapping).length > 0) {
         for (const key in nullableMapping) {
-            converted[key] = nullableMapping[key].value || '';
+            converted[key] = nullableMapping[key]?.value || '';
         }
     } else if (originalMapping && Object.keys(originalMapping).length > 0) {
         converted = originalMapping;

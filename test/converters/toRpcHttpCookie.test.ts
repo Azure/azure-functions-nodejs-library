@@ -28,18 +28,18 @@ describe('toRpcHttpCookie', () => {
         ];
 
         const rpcCookies = cookieInputs.map(toRpcHttpCookie);
-        expect(rpcCookies[0].name).to.equal('mycookie');
-        expect(rpcCookies[0].value).to.equal('myvalue');
-        expect((<any>rpcCookies[0].maxAge).value).to.equal(200000);
+        expect(rpcCookies[0]?.name).to.equal('mycookie');
+        expect(rpcCookies[0]?.value).to.equal('myvalue');
+        expect((<any>rpcCookies[0]?.maxAge).value).to.equal(200000);
 
-        expect(rpcCookies[1].name).to.equal('mycookie2');
-        expect(rpcCookies[1].value).to.equal('myvalue2');
-        expect((<any>rpcCookies[1].path).value).to.equal('/');
-        expect((<any>rpcCookies[1].maxAge).value).to.equal(200000);
+        expect(rpcCookies[1]?.name).to.equal('mycookie2');
+        expect(rpcCookies[1]?.value).to.equal('myvalue2');
+        expect((<any>rpcCookies[1]?.path).value).to.equal('/');
+        expect((<any>rpcCookies[1]?.maxAge).value).to.equal(200000);
 
-        expect(rpcCookies[2].name).to.equal('mycookie3-expires');
-        expect(rpcCookies[2].value).to.equal('myvalue3-expires');
-        expect((<any>rpcCookies[2].expires).value.seconds).to.equal(819199440);
+        expect(rpcCookies[2]?.name).to.equal('mycookie3-expires');
+        expect(rpcCookies[2]?.value).to.equal('myvalue3-expires');
+        expect((<any>rpcCookies[2]?.expires).value.seconds).to.equal(819199440);
     });
 
     it('http cookie SameSite', () => {
@@ -66,17 +66,17 @@ describe('toRpcHttpCookie', () => {
         ];
 
         const rpcCookies = cookieInputs.map(toRpcHttpCookie);
-        expect(rpcCookies[0].name).to.equal('none-cookie');
-        expect(rpcCookies[0].sameSite).to.equal('explicitNone');
+        expect(rpcCookies[0]?.name).to.equal('none-cookie');
+        expect(rpcCookies[0]?.sameSite).to.equal('explicitNone');
 
-        expect(rpcCookies[1].name).to.equal('lax-cookie');
-        expect(rpcCookies[1].sameSite).to.equal('lax');
+        expect(rpcCookies[1]?.name).to.equal('lax-cookie');
+        expect(rpcCookies[1]?.sameSite).to.equal('lax');
 
-        expect(rpcCookies[2].name).to.equal('strict-cookie');
-        expect(rpcCookies[2].sameSite).to.equal('strict');
+        expect(rpcCookies[2]?.name).to.equal('strict-cookie');
+        expect(rpcCookies[2]?.sameSite).to.equal('strict');
 
-        expect(rpcCookies[3].name).to.equal('default-cookie');
-        expect(rpcCookies[3].sameSite).to.equal('none');
+        expect(rpcCookies[3]?.name).to.equal('default-cookie');
+        expect(rpcCookies[3]?.sameSite).to.equal('none');
     });
 
     it('throws on invalid input', () => {

@@ -59,7 +59,7 @@ function validateVersion(): string {
 function getVersion(filePath: string, regex: RegExp): string {
     const fileContents = readFileSync(filePath).toString();
     const match = fileContents.match(regex);
-    if (!match) {
+    if (!match || !match[1]) {
         throw new Error(`Failed to find match for "${regex.source}".`);
     }
     return match[1];
@@ -79,11 +79,10 @@ function updatePackageJsonVersion(cwd: string, newVersion: string) {
 function updateVersionByRegex(filePath: string, regex: RegExp, newVersion: string) {
     const oldFileContents = readFileSync(filePath).toString();
     const match = oldFileContents.match(regex);
-    if (!match) {
+    if (!match || !match[0] || !match[1]) {
         throw new Error(`Failed to find match for "${regex.source}".`);
     }
-    const oldLine = match[0];
-    const oldVersion = match[1];
+    const [oldLine, oldVersion] = match;
     const newLine = oldLine.replace(oldVersion, newVersion);
     const newFileContents = oldFileContents.replace(oldLine, newLine);
     writeFileSync(filePath, newFileContents);
