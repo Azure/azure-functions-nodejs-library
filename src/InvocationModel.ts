@@ -66,7 +66,9 @@ export class InvocationModel implements coreTypes.InvocationModel {
                 const rpcBinding = this.#bindings[bindingName];
                 if (!rpcBinding) {
                     throw new AzFuncSystemError(
-                        `Failed to find binding "${bindingName}" in bindings "${Object.keys(this.#bindings).join()}".`
+                        `Failed to find binding "${bindingName}" in bindings "${Object.keys(this.#bindings).join(
+                            ', '
+                        )}".`
                     );
                 }
                 const bindingType = rpcBinding.type;

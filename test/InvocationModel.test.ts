@@ -107,7 +107,7 @@ describe('InvocationModel', () => {
                 log: testLog,
             });
             await expect(model.getArguments()).to.be.rejectedWith(
-                'Failed to find binding "httpTriggerMissing" in bindings "httpTrigger1,$return".'
+                'Failed to find binding "httpTriggerMissing" in bindings "httpTrigger1, $return".'
             );
         });
     });
