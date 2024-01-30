@@ -20,7 +20,10 @@ import { fromRpcTypedData } from './converters/fromRpcTypedData';
 import { toCamelCaseValue } from './converters/toCamelCase';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
+import { waitForRequest } from './http/httpProxy';
+import { HttpRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
+import { isHttpStreamEnabled } from './setup';
 import { isHttpTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
 import { isDefined, nonNullProp, nonNullValue } from './utils/nonNull';
 
@@ -60,9 +63,17 @@ export class InvocationModel implements coreTypes.InvocationModel {
         if (req.inputData) {
             for (const binding of req.inputData) {
                 const bindingName = nonNullProp(binding, 'name');
-                let input: unknown = fromRpcTypedData(binding.data);
 
                 const bindingType = nonNullProp(this.#bindings, bindingName).type;
+
+                let input: unknown;
+                if (isHttpTrigger(bindingType) && isHttpStreamEnabled()) {
+                    const proxyRequest = await waitForRequest(this.#coreCtx.invocationId);
+                    input = new HttpRequest({ ...binding.data?.http, proxyRequest });
+                } else {
+                    input = fromRpcTypedData(binding.data);
+                }
+
                 if (isTimerTrigger(bindingType)) {
                     input = toCamelCaseValue(input);
                 }
@@ -98,10 +109,14 @@ export class InvocationModel implements coreTypes.InvocationModel {
         for (const [name, binding] of Object.entries(this.#bindings)) {
             if (binding.direction === 'out') {
                 if (name === returnBindingKey) {
-                    response.returnValue = await this.#convertOutput(binding, result);
+                    response.returnValue = await this.#convertOutput(context.invocationId, binding, result);
                     usedReturnValue = true;
                 } else {
-                    const outputValue = await this.#convertOutput(binding, context.extraOutputs.get(name));
+                    const outputValue = await this.#convertOutput(
+                        context.invocationId,
+                        binding,
+                        context.extraOutputs.get(name)
+                    );
                     if (isDefined(outputValue)) {
                         response.outputData.push({ name, data: outputValue });
                     }
@@ -120,9 +135,13 @@ export class InvocationModel implements coreTypes.InvocationModel {
         return response;
     }
 
-    async #convertOutput(binding: RpcBindingInfo, value: unknown): Promise<RpcTypedData | null | undefined> {
+    async #convertOutput(
+        invocId: string,
+        binding: RpcBindingInfo,
+        value: unknown
+    ): Promise<RpcTypedData | null | undefined> {
         if (binding.type?.toLowerCase() === 'http') {
-            return toRpcHttp(value);
+            return toRpcHttp(invocId, value);
         } else {
             return toRpcTypedData(value);
         }

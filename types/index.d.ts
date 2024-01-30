@@ -18,6 +18,7 @@ export * as input from './input';
 export * from './InvocationContext';
 export * as output from './output';
 export * from './serviceBus';
+export * from './setup';
 export * from './sql';
 export * from './storage';
 export * from './table';

@@ -41,12 +41,14 @@
         "watch": "webpack --watch --mode development"
     },
     "dependencies": {
+        "cookie": "^0.6.0",
         "long": "^4.0.0",
         "undici": "^5.13.0"
     },
     "devDependencies": {
         "@types/chai": "^4.2.22",
         "@types/chai-as-promised": "^7.1.5",
+        "@types/cookie": "^0.6.0",
         "@types/fs-extra": "^9.0.13",
         "@types/long": "^4.0.2",
         "@types/minimist": "^1.2.2",

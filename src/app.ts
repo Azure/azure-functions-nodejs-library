@@ -22,27 +22,20 @@ import {
     WarmupFunctionOptions,
 } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
-import { CoreInvocationContext, FunctionCallback } from '@azure/functions-core';
-import { returnBindingKey, version } from './constants';
+import { FunctionCallback } from '@azure/functions-core';
+import { returnBindingKey } from './constants';
 import { toRpcDuration } from './converters/toRpcDuration';
-import { InvocationModel } from './InvocationModel';
 import * as output from './output';
+import { ProgrammingModel } from './ProgrammingModel';
 import * as trigger from './trigger';
 import { isTrigger } from './utils/isTrigger';
 import { tryGetCoreApiLazy } from './utils/tryGetCoreApiLazy';
 
 export * as hook from './hooks/registerHook';
+export { setup } from './setup';
 
-class ProgrammingModel implements coreTypes.ProgrammingModel {
-    name = '@azure/functions';
-    version = version;
-    getInvocationModel(coreCtx: CoreInvocationContext): InvocationModel {
-        return new InvocationModel(coreCtx);
-    }
-}
-
-let hasSetup = false;
-function setup() {
+let hasSetModel = false;
+function setProgrammingModel() {
     const coreApi = tryGetCoreApiLazy();
     if (!coreApi) {
         console.warn(
@@ -51,7 +44,7 @@ function setup() {
     } else {
         coreApi.setProgrammingModel(new ProgrammingModel());
     }
-    hasSetup = true;
+    hasSetModel = true;
 }
 
 function convertToHttpOptions(
@@ -141,8 +134,8 @@ export function warmup(name: string, options: WarmupFunctionOptions): void {
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {
-    if (!hasSetup) {
-        setup();
+    if (!hasSetModel) {
+        setProgrammingModel();
     }
 
     const bindings: Record<string, coreTypes.RpcBindingInfo> = {};

@@ -10,6 +10,7 @@ import {
     TraceContext,
     TriggerMetadata,
 } from '@azure/functions';
+import { fallbackLogHandler } from './utils/fallbackLogHandler';
 
 export class InvocationContext implements types.InvocationContext {
     invocationId: string;
@@ -90,28 +91,5 @@ class InvocationContextExtraOutputs implements types.InvocationContextExtraOutpu
     set(outputOrName: types.FunctionOutput | string, value: unknown): void {
         const name = typeof outputOrName === 'string' ? outputOrName : outputOrName.name;
         this.#outputs[name] = value;
-    }
-}
-
-function fallbackLogHandler(level: types.LogLevel, ...args: unknown[]): void {
-    switch (level) {
-        case 'trace':
-            console.trace(...args);
-            break;
-        case 'debug':
-            console.debug(...args);
-            break;
-        case 'information':
-            console.info(...args);
-            break;
-        case 'warning':
-            console.warn(...args);
-            break;
-        case 'critical':
-        case 'error':
-            console.error(...args);
-            break;
-        default:
-            console.log(...args);
     }
 }
