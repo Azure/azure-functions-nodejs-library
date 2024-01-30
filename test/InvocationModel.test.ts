@@ -79,5 +79,36 @@ describe('InvocationModel', () => {
             const response = await model.getResponse(context, undefined);
             expect(response).to.deep.equal({ invocationId: 'testInvocId', outputData: [], returnValue: undefined });
         });
+
+        // https://github.com/Azure/azure-functions-nodejs-library/issues/210
+        it('Missing binding', async () => {
+            const model = new InvocationModel({
+                invocationId: 'testInvocId',
+                metadata: {
+                    name: 'testFuncName',
+                    bindings: {
+                        httpTrigger1: {
+                            type: 'httpTrigger',
+                            direction: 'in',
+                        },
+                        $return: {
+                            type: 'http',
+                            direction: 'out',
+                        },
+                    },
+                },
+                request: {
+                    inputData: [
+                        {
+                            name: 'httpTriggerMissing',
+                        },
+                    ],
+                },
+                log: testLog,
+            });
+            await expect(model.getArguments()).to.be.rejectedWith(
+                'Failed to find binding "httpTriggerMissing" in bindings "httpTrigger1, $return".'
+            );
+        });
     });
 });

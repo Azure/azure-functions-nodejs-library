@@ -20,6 +20,7 @@ import { fromRpcTypedData } from './converters/fromRpcTypedData';
 import { toCamelCaseValue } from './converters/toCamelCase';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
+import { AzFuncSystemError } from './errors';
 import { InvocationContext } from './InvocationContext';
 import { isHttpTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
 import { isDefined, nonNullProp, nonNullValue } from './utils/nonNull';
@@ -62,7 +63,15 @@ export class InvocationModel implements coreTypes.InvocationModel {
                 const bindingName = nonNullProp(binding, 'name');
                 let input: unknown = fromRpcTypedData(binding.data);
 
-                const bindingType = nonNullProp(this.#bindings, bindingName).type;
+                const rpcBinding = this.#bindings[bindingName];
+                if (!rpcBinding) {
+                    throw new AzFuncSystemError(
+                        `Failed to find binding "${bindingName}" in bindings "${Object.keys(this.#bindings).join(
+                            ', '
+                        )}".`
+                    );
+                }
+                const bindingType = rpcBinding.type;
                 if (isTimerTrigger(bindingType)) {
                     input = toCamelCaseValue(input);
                 }
