@@ -14,7 +14,7 @@ const responses: Record<string, http.ServerResponse> = {};
 
 const invocRequestEmitter = new EventEmitter();
 
-export async function waitForRequest(invocationId: string): Promise<http.IncomingMessage> {
+export async function waitForProxyRequest(invocationId: string): Promise<http.IncomingMessage> {
     return new Promise((resolve, _reject) => {
         const req = requests[invocationId];
         if (req) {
@@ -33,7 +33,7 @@ export async function waitForRequest(invocationId: string): Promise<http.Incomin
 }
 
 const invocationIdHeader = 'x-ms-invocation-id';
-export async function sendResponse(invocationId: string, userRes: HttpResponse): Promise<void> {
+export async function sendProxyResponse(invocationId: string, userRes: HttpResponse): Promise<void> {
     const proxyRes = nonNullProp(responses, invocationId);
     delete responses[invocationId];
     for (const [key, val] of userRes.headers.entries()) {

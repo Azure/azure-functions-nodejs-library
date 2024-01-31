@@ -20,7 +20,7 @@ import { fromRpcTypedData } from './converters/fromRpcTypedData';
 import { toCamelCaseValue } from './converters/toCamelCase';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
-import { waitForRequest } from './http/httpProxy';
+import { waitForProxyRequest } from './http/httpProxy';
 import { HttpRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
 import { isHttpStreamEnabled } from './setup';
@@ -68,7 +68,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
 
                 let input: unknown;
                 if (isHttpTrigger(bindingType) && isHttpStreamEnabled()) {
-                    const proxyRequest = await waitForRequest(this.#coreCtx.invocationId);
+                    const proxyRequest = await waitForProxyRequest(this.#coreCtx.invocationId);
                     input = new HttpRequest({ ...binding.data?.http, proxyRequest });
                 } else {
                     input = fromRpcTypedData(binding.data);

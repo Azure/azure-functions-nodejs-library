@@ -20,6 +20,8 @@ interface InternalHttpRequestInit extends RpcHttpData {
     proxyRequest?: IncomingMessage;
 }
 
+type RequestInitResult = [uRequest, URLSearchParams, HttpRequestParams];
+
 export class HttpRequest implements types.HttpRequest {
     readonly query: URLSearchParams;
     readonly params: HttpRequestParams;
@@ -38,7 +40,7 @@ export class HttpRequest implements types.HttpRequest {
         }
     }
 
-    #initInMemoryRequest(init: InternalHttpRequestInit): [uRequest, URLSearchParams, HttpRequestParams] {
+    #initInMemoryRequest(init: InternalHttpRequestInit): RequestInitResult {
         let uReq = init.undiciRequest;
         if (!uReq) {
             const url = nonNullProp(init, 'url');
@@ -63,7 +65,7 @@ export class HttpRequest implements types.HttpRequest {
         return [uReq, query, params];
     }
 
-    #initStreamRequest(init: InternalHttpRequestInit): [uRequest, URLSearchParams, HttpRequestParams] {
+    #initStreamRequest(init: InternalHttpRequestInit): RequestInitResult {
         const proxyReq = nonNullProp(init, 'proxyRequest');
 
         const hostHeaderName = 'x-forwarded-host';
