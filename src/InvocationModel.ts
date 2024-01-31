@@ -20,6 +20,7 @@ import { fromRpcTypedData } from './converters/fromRpcTypedData';
 import { toCamelCaseValue } from './converters/toCamelCase';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
+import { AzFuncSystemError } from './errors';
 import { waitForProxyRequest } from './http/httpProxy';
 import { HttpRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
@@ -64,7 +65,15 @@ export class InvocationModel implements coreTypes.InvocationModel {
             for (const binding of req.inputData) {
                 const bindingName = nonNullProp(binding, 'name');
 
-                const bindingType = nonNullProp(this.#bindings, bindingName).type;
+                const rpcBinding = this.#bindings[bindingName];
+                if (!rpcBinding) {
+                    throw new AzFuncSystemError(
+                        `Failed to find binding "${bindingName}" in bindings "${Object.keys(this.#bindings).join(
+                            ', '
+                        )}".`
+                    );
+                }
+                const bindingType = rpcBinding.type;
 
                 let input: unknown;
                 if (isHttpTrigger(bindingType) && isHttpStreamEnabled()) {
