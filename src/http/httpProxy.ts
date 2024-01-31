@@ -14,32 +14,32 @@ const responses: Record<string, http.ServerResponse> = {};
 
 const invocRequestEmitter = new EventEmitter();
 
-export async function waitForRequest(invocId: string): Promise<http.IncomingMessage> {
+export async function waitForRequest(invocationId: string): Promise<http.IncomingMessage> {
     return new Promise((resolve, _reject) => {
-        const req = requests[invocId];
+        const req = requests[invocationId];
         if (req) {
             resolve(req);
-            delete requests[invocId];
+            delete requests[invocationId];
         } else {
-            invocRequestEmitter.once(invocId, () => {
-                const req = requests[invocId];
+            invocRequestEmitter.once(invocationId, () => {
+                const req = requests[invocationId];
                 if (req) {
                     resolve(req);
-                    delete requests[invocId];
+                    delete requests[invocationId];
                 }
             });
         }
     });
 }
 
-const invocIdHeader = 'x-ms-invocation-id';
-export async function sendResponse(invocId: string, userRes: HttpResponse): Promise<void> {
-    const proxyRes = nonNullProp(responses, invocId);
-    delete responses[invocId];
+const invocationIdHeader = 'x-ms-invocation-id';
+export async function sendResponse(invocationId: string, userRes: HttpResponse): Promise<void> {
+    const proxyRes = nonNullProp(responses, invocationId);
+    delete responses[invocationId];
     for (const [key, val] of userRes.headers.entries()) {
         proxyRes.setHeader(key, val);
     }
-    proxyRes.setHeader(invocIdHeader, invocId);
+    proxyRes.setHeader(invocationIdHeader, invocationId);
     proxyRes.statusCode = userRes.status;
 
     if (userRes.cookies.length > 0) {
@@ -88,13 +88,13 @@ export async function setupHttpProxy(): Promise<string> {
         const server = http.createServer();
 
         server.on('request', (req, res) => {
-            const invocId = req.headers[invocIdHeader];
-            if (typeof invocId === 'string') {
-                requests[invocId] = req;
-                responses[invocId] = res;
-                invocRequestEmitter.emit(invocId);
+            const invocationId = req.headers[invocationIdHeader];
+            if (typeof invocationId === 'string') {
+                requests[invocationId] = req;
+                responses[invocationId] = res;
+                invocRequestEmitter.emit(invocationId);
             } else {
-                workerSystemLog('error', `Http proxy request missing header ${invocIdHeader}`);
+                workerSystemLog('error', `Http proxy request missing header ${invocationIdHeader}`);
             }
         });
 

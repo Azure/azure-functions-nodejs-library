@@ -9,7 +9,7 @@ import { isHttpStreamEnabled } from '../setup';
 import { toRpcHttpCookie } from './toRpcHttpCookie';
 import { toRpcTypedData } from './toRpcTypedData';
 
-export async function toRpcHttp(invocId: string, data: unknown): Promise<RpcTypedData | null | undefined> {
+export async function toRpcHttp(invocationId: string, data: unknown): Promise<RpcTypedData | null | undefined> {
     if (data === null || data === undefined) {
         return data;
     } else if (typeof data !== 'object') {
@@ -20,7 +20,7 @@ export async function toRpcHttp(invocId: string, data: unknown): Promise<RpcType
 
     const response = data instanceof HttpResponse ? data : new HttpResponse(data);
     if (isHttpStreamEnabled()) {
-        await sendResponse(invocId, response);
+        await sendResponse(invocationId, response);
         return undefined;
     }
 
