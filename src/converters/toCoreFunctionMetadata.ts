@@ -4,11 +4,13 @@
 import { ExponentialBackoffRetryOptions, FixedDelayRetryOptions, GenericFunctionOptions } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import { returnBindingKey } from '../constants';
+import { AzFuncSystemError } from '../errors';
 import { isTrigger } from '../utils/isTrigger';
 import { toRpcDuration } from './toRpcDuration';
 
 export function toCoreFunctionMetadata(name: string, options: GenericFunctionOptions): coreTypes.FunctionMetadata {
     const bindings: Record<string, coreTypes.RpcBindingInfo> = {};
+    const bindingNames: string[] = [];
 
     const trigger = options.trigger;
     bindings[trigger.name] = {
@@ -16,6 +18,7 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
         direction: 'in',
         type: isTrigger(trigger.type) ? trigger.type : trigger.type + 'Trigger',
     };
+    bindingNames.push(trigger.name);
 
     if (options.extraInputs) {
         for (const input of options.extraInputs) {
@@ -23,6 +26,7 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
                 ...input,
                 direction: 'in',
             };
+            bindingNames.push(input.name);
         }
     }
 
@@ -31,6 +35,7 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
             ...options.return,
             direction: 'out',
         };
+        bindingNames.push(returnBindingKey);
     }
 
     if (options.extraOutputs) {
@@ -39,7 +44,15 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
                 ...output,
                 direction: 'out',
             };
+            bindingNames.push(output.name);
         }
+    }
+
+    const dupeBindings = bindingNames.filter((v, i) => bindingNames.indexOf(v) !== i);
+    if (dupeBindings.length > 0) {
+        throw new AzFuncSystemError(
+            `Duplicate bindings found for function "${name}". Remove a duplicate binding or manually specify the "name" property to make it unique.`
+        );
     }
 
     let retryOptions: coreTypes.RpcRetryOptions | undefined;
