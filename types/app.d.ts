@@ -7,9 +7,16 @@ import { EventHubFunctionOptions } from './eventHub';
 import { GenericFunctionOptions } from './generic';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
+import { SetupOptions } from './setup';
 import { StorageBlobFunctionOptions, StorageQueueFunctionOptions } from './storage';
 import { TimerFunctionOptions } from './timer';
 import { WarmupFunctionOptions } from './warmup';
+
+/**
+ * Optional method to configure the behavior of your app.
+ * This can only be done during app startup, before invocations occur
+ */
+export declare function setup(options: SetupOptions): void;
 
 /**
  * Registers an http function in your app that will be triggered by making a request to the function url

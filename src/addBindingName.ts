@@ -1,10 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-export { HttpRequest } from './http/HttpRequest';
-export { HttpResponse } from './http/HttpResponse';
-export { InvocationContext } from './InvocationContext';
-
 const bindingCounts: Record<string, number> = {};
 /**
  * If the host spawns multiple workers, it expects the metadata (including binding name) to be the same across workers.

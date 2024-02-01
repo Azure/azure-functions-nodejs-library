@@ -3,11 +3,13 @@
 
 import { RpcHttpData, RpcTypedData } from '@azure/functions-core';
 import { AzFuncSystemError } from '../errors';
+import { sendProxyResponse } from '../http/httpProxy';
 import { HttpResponse } from '../http/HttpResponse';
+import { isHttpStreamEnabled } from '../setup';
 import { toRpcHttpCookie } from './toRpcHttpCookie';
 import { toRpcTypedData } from './toRpcTypedData';
 
-export async function toRpcHttp(data: unknown): Promise<RpcTypedData | null | undefined> {
+export async function toRpcHttp(invocationId: string, data: unknown): Promise<RpcTypedData | null | undefined> {
     if (data === null || data === undefined) {
         return data;
     } else if (typeof data !== 'object') {
@@ -17,6 +19,12 @@ export async function toRpcHttp(data: unknown): Promise<RpcTypedData | null | un
     }
 
     const response = data instanceof HttpResponse ? data : new HttpResponse(data);
+    if (isHttpStreamEnabled()) {
+        // send http data over http proxy instead of rpc
+        await sendProxyResponse(invocationId, response);
+        return;
+    }
+
     const rpcResponse: RpcHttpData = {};
     rpcResponse.statusCode = response.status.toString();
 
