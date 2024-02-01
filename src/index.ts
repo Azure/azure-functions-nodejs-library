@@ -14,4 +14,5 @@ export * as input from './input';
 export { InvocationContext } from './InvocationContext';
 export * as output from './output';
 export * as trigger from './trigger';
+export { ConnectionInfo } from './utils/ConnectionInfo';
 export { Disposable } from './utils/Disposable';

@@ -71,6 +71,14 @@ function convertToGenericOptions<T extends Omit<FunctionOptions, 'trigger'> & Pa
     };
 }
 
+function addDeferredBindingsFlag(triggerType: string): { [key: string]: string } {
+    if (triggerType === 'blobTrigger') {
+        return { supportsDeferredBinding: 'true' };
+    }
+
+    return { supportsDeferredBinding: 'false' };
+}
+
 export function get(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
     http(name, convertToHttpOptions(optionsOrHandler, 'GET'));
 }
@@ -145,6 +153,7 @@ export function generic(name: string, options: GenericFunctionOptions): void {
         ...trigger,
         direction: 'in',
         type: isTrigger(trigger.type) ? trigger.type : trigger.type + 'Trigger',
+        properties: addDeferredBindingsFlag(options.trigger.type),
     };
 
     if (options.extraInputs) {
