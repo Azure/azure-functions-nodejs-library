@@ -5,8 +5,6 @@ import {
     CosmosDBFunctionOptions,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
-    ExponentialBackoffRetryOptions,
-    FixedDelayRetryOptions,
     FunctionOptions,
     FunctionTrigger,
     GenericFunctionOptions,
@@ -21,14 +19,11 @@ import {
     TimerFunctionOptions,
     WarmupFunctionOptions,
 } from '@azure/functions';
-import * as coreTypes from '@azure/functions-core';
 import { FunctionCallback } from '@azure/functions-core';
-import { returnBindingKey } from './constants';
-import { toRpcDuration } from './converters/toRpcDuration';
+import { toCoreFunctionMetadata } from './converters/toCoreFunctionMetadata';
 import * as output from './output';
 import { ProgrammingModel } from './ProgrammingModel';
 import * as trigger from './trigger';
-import { isTrigger } from './utils/isTrigger';
 import { tryGetCoreApiLazy } from './utils/tryGetCoreApiLazy';
 
 export * as hook from './hooks/registerHook';
@@ -138,63 +133,12 @@ export function generic(name: string, options: GenericFunctionOptions): void {
         setProgrammingModel();
     }
 
-    const bindings: Record<string, coreTypes.RpcBindingInfo> = {};
-
-    const trigger = options.trigger;
-    bindings[trigger.name] = {
-        ...trigger,
-        direction: 'in',
-        type: isTrigger(trigger.type) ? trigger.type : trigger.type + 'Trigger',
-    };
-
-    if (options.extraInputs) {
-        for (const input of options.extraInputs) {
-            bindings[input.name] = {
-                ...input,
-                direction: 'in',
-            };
-        }
-    }
-
-    if (options.return) {
-        bindings[returnBindingKey] = {
-            ...options.return,
-            direction: 'out',
-        };
-    }
-
-    if (options.extraOutputs) {
-        for (const output of options.extraOutputs) {
-            bindings[output.name] = {
-                ...output,
-                direction: 'out',
-            };
-        }
-    }
-
-    let retryOptions: coreTypes.RpcRetryOptions | undefined;
-    if (options.retry) {
-        retryOptions = {
-            ...options.retry,
-            retryStrategy: options.retry.strategy,
-            delayInterval: toRpcDuration((<FixedDelayRetryOptions>options.retry).delayInterval, 'retry.delayInterval'),
-            maximumInterval: toRpcDuration(
-                (<ExponentialBackoffRetryOptions>options.retry).maximumInterval,
-                'retry.maximumInterval'
-            ),
-            minimumInterval: toRpcDuration(
-                (<ExponentialBackoffRetryOptions>options.retry).minimumInterval,
-                'retry.minimumInterval'
-            ),
-        };
-    }
-
     const coreApi = tryGetCoreApiLazy();
     if (!coreApi) {
         console.warn(
             `WARNING: Skipping call to register function "${name}" because the "@azure/functions" package is in test mode.`
         );
     } else {
-        coreApi.registerFunction({ name, bindings, retryOptions }, <FunctionCallback>options.handler);
+        coreApi.registerFunction(toCoreFunctionMetadata(name, options), <FunctionCallback>options.handler);
     }
 }

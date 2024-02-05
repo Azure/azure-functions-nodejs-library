@@ -1,13 +1,15 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-const bindingCounts: Record<string, number> = {};
+import { getStringHash } from './utils/getRandomHexString';
+
 /**
  * If the host spawns multiple workers, it expects the metadata (including binding name) to be the same across workers.
- * That means we need to generate binding names in a deterministic fashion, so we'll do that using a count
- * There's a tiny risk users register bindings in a non-deterministic order (i.e. async race conditions), but it's okay considering the following:
- * 1. We will track the count individually for each binding type. This makes the names more readable and reduces the chances a race condition will matter
- * 2. Users can manually specify the name themselves (aka if they're doing weird async stuff) and we will respect that
+ * That means we need to generate binding names in a deterministic fashion, so we'll do that using a string hash of the binding data
+ * A few considerations:
+ * 1. We will include the binding type in the name to make it more readable
+ * 2. Users can manually specify the name themselves and we will respect that
+ * 3. The only time the hash should cause a conflict is if a single function has duplicate bindings. Not sure why someone would do that, but we will throw an error at function registration time
  * More info here: https://github.com/Azure/azure-functions-nodejs-worker/issues/638
  */
 export function addBindingName<T extends { type: string; name?: string }>(
@@ -19,10 +21,7 @@ export function addBindingName<T extends { type: string; name?: string }>(
         if (!bindingType.toLowerCase().endsWith(suffix.toLowerCase())) {
             bindingType += suffix;
         }
-        let count = bindingCounts[bindingType] || 0;
-        count += 1;
-        bindingCounts[bindingType] = count;
-        binding.name = bindingType + count.toString();
+        binding.name = bindingType + getStringHash(JSON.stringify(binding));
     }
     return <T & { name: string }>binding;
 }
