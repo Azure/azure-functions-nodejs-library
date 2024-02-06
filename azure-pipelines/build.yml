@@ -1,74 +1,74 @@
 parameters:
-- name: IsPrerelease
-  type: boolean
-  default: true
+    - name: IsPrerelease
+      type: boolean
+      default: true
 
 pr:
-  branches:
-    include:
-      - v4.x
+    branches:
+        include:
+            - v4.x
 
 trigger:
-- v4.x
+    - v4.x
 
 jobs:
-- job: BuildArtifacts  
-  pool:
-    name: '1ES-Hosted-AzFunc'
-    demands:
-    - ImageOverride -equals MMS2019TLS
-  steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: 18.x
-    displayName: 'Install Node.js'
-  - script: npm ci
-    displayName: 'npm ci'
-  - script: npm run updateVersion -- --buildNumber $(Build.BuildNumber)
-    displayName: 'npm run updateVersion'
-    condition: and(succeeded(), eq(${{ parameters.IsPrerelease }}, true))
-  - script: npm run build
-    displayName: 'npm run build'
-  - script: npm run minify
-    displayName: 'npm run minify'
-  - task: CopyFiles@2
-    displayName: 'Copy files to staging'
-    inputs:
-      sourceFolder: '$(Build.SourcesDirectory)'
-      contents: |
-        dist/**
-        src/**
-        types/**
-        LICENSE
-        package.json
-        README.md
-      targetFolder: '$(Build.ArtifactStagingDirectory)'
-      cleanTargetFolder: true
-  - script: npm prune --production
-    displayName: 'npm prune --production' # so that only production dependencies are included in SBOM
-  - task: ManifestGeneratorTask@0
-    displayName: 'Generate SBOM'
-    inputs:
-      BuildDropPath: '$(Build.ArtifactStagingDirectory)'
-      # The list of components can't be determined from the webpacked file in the staging dir, so reference the original node_modules folder
-      BuildComponentPath: '$(Build.SourcesDirectory)/node_modules'
-      PackageName: 'Azure Functions Node.js Framework'
-  - script: npm pack
-    displayName: 'npm pack'
-    workingDirectory: '$(Build.ArtifactStagingDirectory)'
-  - task: CopyFiles@2
-    displayName: 'Copy package to staging drop folder'
-    inputs:
-      sourceFolder: '$(Build.ArtifactStagingDirectory)'
-      contents: |
-        *.tgz
-      targetFolder: '$(Build.ArtifactStagingDirectory)/drop'
-      cleanTargetFolder: true
-  - task: PublishPipelineArtifact@1
-    displayName: 'Publish drop'
-    inputs:
-      targetPath: '$(Build.ArtifactStagingDirectory)/drop'
-      artifact: 'drop'
-      publishLocation: 'pipeline'
-  - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-    displayName: 'Component Detection'
+    - job: BuildArtifacts
+      pool:
+          name: '1ES-Hosted-AzFunc'
+          demands:
+              - ImageOverride -equals MMS2019TLS
+      steps:
+          - task: NodeTool@0
+            inputs:
+                versionSpec: 18.x
+            displayName: 'Install Node.js'
+          - script: npm ci
+            displayName: 'npm ci'
+          - script: npm run updateVersion -- --buildNumber $(Build.BuildNumber)
+            displayName: 'npm run updateVersion'
+            condition: and(succeeded(), eq(${{ parameters.IsPrerelease }}, true))
+          - script: npm run build
+            displayName: 'npm run build'
+          - script: npm run minify
+            displayName: 'npm run minify'
+          - task: CopyFiles@2
+            displayName: 'Copy files to staging'
+            inputs:
+                sourceFolder: '$(Build.SourcesDirectory)'
+                contents: |
+                    dist/**
+                    src/**
+                    types/**
+                    LICENSE
+                    package.json
+                    README.md
+                targetFolder: '$(Build.ArtifactStagingDirectory)'
+                cleanTargetFolder: true
+          - script: npm prune --production
+            displayName: 'npm prune --production' # so that only production dependencies are included in SBOM
+          - task: ManifestGeneratorTask@0
+            displayName: 'Generate SBOM'
+            inputs:
+                BuildDropPath: '$(Build.ArtifactStagingDirectory)'
+                # The list of components can't be determined from the webpacked file in the staging dir, so reference the original node_modules folder
+                BuildComponentPath: '$(Build.SourcesDirectory)/node_modules'
+                PackageName: 'Azure Functions Node.js Framework'
+          - script: npm pack
+            displayName: 'npm pack'
+            workingDirectory: '$(Build.ArtifactStagingDirectory)'
+          - task: CopyFiles@2
+            displayName: 'Copy package to staging drop folder'
+            inputs:
+                sourceFolder: '$(Build.ArtifactStagingDirectory)'
+                contents: |
+                    *.tgz
+                targetFolder: '$(Build.ArtifactStagingDirectory)/drop'
+                cleanTargetFolder: true
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish drop'
+            inputs:
+                targetPath: '$(Build.ArtifactStagingDirectory)/drop'
+                artifact: 'drop'
+                publishLocation: 'pipeline'
+          - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
+            displayName: 'Component Detection'

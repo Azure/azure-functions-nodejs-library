@@ -6,9 +6,7 @@
         "outDir": "dist",
         "baseUrl": "./",
         "paths": {
-            "@azure/functions": [
-                "../../types"
-            ]
+            "@azure/functions": ["../../types"]
         }
     }
 }

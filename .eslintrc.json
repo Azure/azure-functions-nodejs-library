@@ -1,12 +1,6 @@
 {
     "parser": "@typescript-eslint/parser",
-    "plugins": [
-        "@typescript-eslint",
-        "header",
-        "deprecation",
-        "simple-import-sort",
-        "import"
-    ],
+    "plugins": ["@typescript-eslint", "header", "deprecation", "simple-import-sort", "import"],
     "parserOptions": {
         "project": "tsconfig.json",
         "sourceType": "module"
@@ -21,10 +15,7 @@
         "header/header": [
             2,
             "line",
-            [
-                " Copyright (c) .NET Foundation. All rights reserved.",
-                " Licensed under the MIT License."
-            ],
+            [" Copyright (c) .NET Foundation. All rights reserved.", " Licensed under the MIT License."],
             2
         ],
         "deprecation/deprecation": "error",
@@ -34,7 +25,8 @@
         "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
         "prefer-const": ["error", { "destructuring": "all" }],
         "@typescript-eslint/explicit-member-accessibility": [
-            "error", {
+            "error",
+            {
                 "accessibility": "no-public"
             }
         ],
@@ -53,11 +45,5 @@
         "import/newline-after-import": "error",
         "import/no-duplicates": "error"
     },
-    "ignorePatterns": [
-        "**/*.js",
-        "**/*.mjs",
-        "**/*.cjs",
-        "out",
-        "dist"
-    ]
+    "ignorePatterns": ["**/*.js", "**/*.mjs", "**/*.cjs", "out", "dist"]
 }
