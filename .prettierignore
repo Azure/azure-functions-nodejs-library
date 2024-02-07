@@ -1,0 +1,6 @@
+out
+dist
+node_modules
+
+# Exclude markdown until this bug is fixed: https://github.com/prettier/prettier/issues/5019
+*.md
