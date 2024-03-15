@@ -78,7 +78,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
                 let input: unknown;
                 if (isHttpTrigger(bindingType) && isHttpStreamEnabled()) {
                     const proxyRequest = await waitForProxyRequest(this.#coreCtx.invocationId);
-                    input = createStreamRequest(proxyRequest);
+                    input = createStreamRequest(proxyRequest, nonNullProp(req, 'triggerMetadata'));
                 } else {
                     input = fromRpcTypedData(binding.data);
                 }

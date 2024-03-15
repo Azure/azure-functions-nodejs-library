@@ -3,16 +3,17 @@
 
 import * as types from '@azure/functions';
 import { HttpRequestParams, HttpRequestUser } from '@azure/functions';
-import { RpcHttpData } from '@azure/functions-core';
+import { RpcHttpData, RpcTypedData } from '@azure/functions-core';
 import { Blob } from 'buffer';
 import { IncomingMessage } from 'http';
 import * as stream from 'stream';
 import { ReadableStream } from 'stream/web';
-import { FormData, Headers, Request as uRequest } from 'undici';
+import { FormData, Headers, HeadersInit, Request as uRequest } from 'undici';
 import { URLSearchParams } from 'url';
 import { fromNullableMapping } from '../converters/fromRpcNullable';
+import { fromRpcTypedData } from '../converters/fromRpcTypedData';
 import { AzFuncSystemError } from '../errors';
-import { nonNullProp } from '../utils/nonNull';
+import { isDefined, nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
 interface InternalHttpRequestInit extends RpcHttpData {
@@ -113,7 +114,10 @@ export class HttpRequest implements types.HttpRequest {
     }
 }
 
-export function createStreamRequest(proxyReq: IncomingMessage): HttpRequest {
+export function createStreamRequest(
+    proxyReq: IncomingMessage,
+    triggerMetadata: Record<string, RpcTypedData>
+): HttpRequest {
     const hostHeaderName = 'x-forwarded-host';
     const protoHeaderName = 'x-forwarded-proto';
     const host = proxyReq.headers[hostHeaderName];
@@ -129,14 +133,34 @@ export function createStreamRequest(proxyReq: IncomingMessage): HttpRequest {
         body = proxyReq;
     }
 
+    // Get headers and params from trigger metadata
+    // See here for more info: https://github.com/Azure/azure-functions-host/issues/9840
+    // NOTE: We ignore query info because it has this bug: https://github.com/Azure/azure-functions-nodejs-library/issues/168
+    const { Query: rpcQueryIgnored, Headers: rpcHeaders, ...rpcParams } = triggerMetadata;
+
+    let headers: HeadersInit | undefined;
+    const headersData = fromRpcTypedData(rpcHeaders);
+    if (typeof headersData === 'object' && isDefined(headersData)) {
+        headers = <HeadersInit>headersData;
+    }
+
     const uReq = new uRequest(url, {
-        body: body,
+        body,
         duplex: 'half',
         method: nonNullProp(proxyReq, 'method'),
-        headers: <Record<string, string | ReadonlyArray<string>>>proxyReq.headers,
+        headers,
     });
+
+    const params: Record<string, string> = {};
+    for (const [key, rpcValue] of Object.entries(rpcParams)) {
+        const value = fromRpcTypedData(rpcValue);
+        if (typeof value === 'string') {
+            params[key] = value;
+        }
+    }
 
     return new HttpRequest({
         undiciRequest: uReq,
+        params,
     });
 }
