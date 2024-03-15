@@ -22,7 +22,7 @@ import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
 import { AzFuncSystemError } from './errors';
 import { waitForProxyRequest } from './http/httpProxy';
-import { HttpRequest } from './http/HttpRequest';
+import { createStreamRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
 import { isHttpStreamEnabled } from './setup';
 import { isHttpTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
@@ -78,7 +78,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
                 let input: unknown;
                 if (isHttpTrigger(bindingType) && isHttpStreamEnabled()) {
                     const proxyRequest = await waitForProxyRequest(this.#coreCtx.invocationId);
-                    input = new HttpRequest({ ...binding.data?.http, proxyRequest });
+                    input = createStreamRequest(proxyRequest);
                 } else {
                     input = fromRpcTypedData(binding.data);
                 }

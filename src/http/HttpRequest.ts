@@ -17,10 +17,7 @@ import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
 interface InternalHttpRequestInit extends RpcHttpData {
     undiciRequest?: uRequest;
-    proxyRequest?: IncomingMessage;
 }
-
-type RequestInitResult = [uRequest, URLSearchParams, HttpRequestParams];
 
 export class HttpRequest implements types.HttpRequest {
     readonly query: URLSearchParams;
@@ -33,14 +30,6 @@ export class HttpRequest implements types.HttpRequest {
     constructor(init: InternalHttpRequestInit) {
         this.#init = init;
 
-        if (init.proxyRequest) {
-            [this.#uReq, this.query, this.params] = this.#initStreamRequest(init);
-        } else {
-            [this.#uReq, this.query, this.params] = this.#initInMemoryRequest(init);
-        }
-    }
-
-    #initInMemoryRequest(init: InternalHttpRequestInit): RequestInitResult {
         let uReq = init.undiciRequest;
         if (!uReq) {
             const url = nonNullProp(init, 'url');
@@ -58,45 +47,15 @@ export class HttpRequest implements types.HttpRequest {
                 headers: fromNullableMapping(init.nullableHeaders, init.headers),
             });
         }
+        this.#uReq = uReq;
 
-        const query = new URLSearchParams(fromNullableMapping(init.nullableQuery, init.query));
-        const params = fromNullableMapping(init.nullableParams, init.params);
-
-        return [uReq, query, params];
-    }
-
-    #initStreamRequest(init: InternalHttpRequestInit): RequestInitResult {
-        const proxyReq = nonNullProp(init, 'proxyRequest');
-
-        const hostHeaderName = 'x-forwarded-host';
-        const protoHeaderName = 'x-forwarded-proto';
-        const host = proxyReq.headers[hostHeaderName];
-        const proto = proxyReq.headers[protoHeaderName];
-        if (typeof host !== 'string' || typeof proto !== 'string') {
-            throw new AzFuncSystemError(`Expected headers "${hostHeaderName}" and "${protoHeaderName}" to be set.`);
-        }
-        const url = `${proto}://${host}${nonNullProp(proxyReq, 'url')}`;
-
-        let uReq = init.undiciRequest;
-        if (!uReq) {
-            let body: stream.Readable | undefined;
-            const lowerMethod = proxyReq.method?.toLowerCase();
-            if (lowerMethod !== 'get' && lowerMethod !== 'head') {
-                body = proxyReq;
-            }
-
-            uReq = new uRequest(url, {
-                body: body,
-                duplex: 'half',
-                method: nonNullProp(proxyReq, 'method'),
-                headers: <Record<string, string | ReadonlyArray<string>>>proxyReq.headers,
-            });
+        if (init.nullableQuery || init.query) {
+            this.query = new URLSearchParams(fromNullableMapping(init.nullableQuery, init.query));
+        } else {
+            this.query = new URL(this.#uReq.url).searchParams;
         }
 
-        const query = new URL(url).searchParams;
-        const params = fromNullableMapping(init.nullableParams, init.params);
-
-        return [uReq, query, params];
+        this.params = fromNullableMapping(init.nullableParams, init.params);
     }
 
     get url(): string {
@@ -152,4 +111,32 @@ export class HttpRequest implements types.HttpRequest {
         newInit.undiciRequest = this.#uReq.clone();
         return new HttpRequest(newInit);
     }
+}
+
+export function createStreamRequest(proxyReq: IncomingMessage): HttpRequest {
+    const hostHeaderName = 'x-forwarded-host';
+    const protoHeaderName = 'x-forwarded-proto';
+    const host = proxyReq.headers[hostHeaderName];
+    const proto = proxyReq.headers[protoHeaderName];
+    if (typeof host !== 'string' || typeof proto !== 'string') {
+        throw new AzFuncSystemError(`Expected headers "${hostHeaderName}" and "${protoHeaderName}" to be set.`);
+    }
+    const url = `${proto}://${host}${nonNullProp(proxyReq, 'url')}`;
+
+    let body: stream.Readable | undefined;
+    const lowerMethod = proxyReq.method?.toLowerCase();
+    if (lowerMethod !== 'get' && lowerMethod !== 'head') {
+        body = proxyReq;
+    }
+
+    const uReq = new uRequest(url, {
+        body: body,
+        duplex: 'half',
+        method: nonNullProp(proxyReq, 'method'),
+        headers: <Record<string, string | ReadonlyArray<string>>>proxyReq.headers,
+    });
+
+    return new HttpRequest({
+        undiciRequest: uReq,
+    });
 }
