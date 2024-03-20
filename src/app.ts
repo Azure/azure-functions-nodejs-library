@@ -12,6 +12,7 @@ import {
     HttpHandler,
     HttpMethod,
     HttpMethodFunctionOptions,
+    KafkaFunctionOptions,
     ServiceBusQueueFunctionOptions,
     ServiceBusTopicFunctionOptions,
     StorageBlobFunctionOptions,
@@ -122,6 +123,10 @@ export function eventGrid(name: string, options: EventGridFunctionOptions): void
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     generic(name, convertToGenericOptions(options, <any>trigger.cosmosDB));
+}
+
+export function kafka(name: string, options: KafkaFunctionOptions): void {
+    generic(name, convertToGenericOptions(options, trigger.kafka));
 }
 
 export function warmup(name: string, options: WarmupFunctionOptions): void {
