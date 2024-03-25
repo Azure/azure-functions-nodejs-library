@@ -8,6 +8,7 @@ import { GenericFunctionOptions } from './generic';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
 import { SetupOptions } from './setup';
+import { SqlFunctionOptions } from './sql';
 import { StorageBlobFunctionOptions, StorageQueueFunctionOptions } from './storage';
 import { TimerFunctionOptions } from './timer';
 import { WarmupFunctionOptions } from './warmup';
@@ -162,6 +163,13 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function warmup(name: string, options: WarmupFunctionOptions): void;
+
+/**
+ * Registers a SQL function in your app that will be triggered when a row is created, updated, or deleted
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the inputs, outputs, and handler for this function
+ */
+export function sql(name: string, options: SqlFunctionOptions): void;
 
 /**
  * Registers a generic function in your app that will be triggered based on the type specified in `options.trigger.type`

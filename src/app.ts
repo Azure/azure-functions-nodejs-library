@@ -14,6 +14,7 @@ import {
     HttpMethodFunctionOptions,
     ServiceBusQueueFunctionOptions,
     ServiceBusTopicFunctionOptions,
+    SqlFunctionOptions,
     StorageBlobFunctionOptions,
     StorageQueueFunctionOptions,
     TimerFunctionOptions,
@@ -126,6 +127,10 @@ export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
 
 export function warmup(name: string, options: WarmupFunctionOptions): void {
     generic(name, convertToGenericOptions(options, trigger.warmup));
+}
+
+export function sql(name: string, options: SqlFunctionOptions): void {
+    generic(name, convertToGenericOptions(options, trigger.sql));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {
