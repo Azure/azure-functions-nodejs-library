@@ -16,6 +16,8 @@ import {
     ServiceBusQueueTriggerOptions,
     ServiceBusTopicTrigger,
     ServiceBusTopicTriggerOptions,
+    SqlTrigger,
+    SqlTriggerOptions,
     StorageBlobTrigger,
     StorageBlobTriggerOptions,
     StorageQueueTrigger,
@@ -96,6 +98,13 @@ export function warmup(options: WarmupTriggerOptions): WarmupTrigger {
     return addTriggerBindingName({
         ...options,
         type: 'warmupTrigger',
+    });
+}
+
+export function sql(options: SqlTriggerOptions): SqlTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'sqlTrigger',
     });
 }
 

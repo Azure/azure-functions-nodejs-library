@@ -13,6 +13,7 @@ import {
     ServiceBusTopicTrigger,
     ServiceBusTopicTriggerOptions,
 } from './serviceBus';
+import { SqlTrigger, SqlTriggerOptions } from './sql';
 import {
     StorageBlobTrigger,
     StorageBlobTriggerOptions,
@@ -71,6 +72,11 @@ export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
  * [Link to docs and examples](https://learn.microsoft.com/azure/azure-functions/functions-bindings-warmup?tabs=isolated-process&pivots=programming-language-javascript)
  */
 export function warmup(options: WarmupTriggerOptions): WarmupTrigger;
+
+/**
+ * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-azure-sql-trigger?pivots=programming-language-javascript)
+ */
+export function sql(options: SqlTriggerOptions): SqlTrigger;
 
 /**
  * A generic option that can be used for any trigger type
