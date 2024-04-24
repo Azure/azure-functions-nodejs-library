@@ -5,7 +5,6 @@ import {
     CosmosDBFunctionOptions,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
-    FunctionOptions,
     FunctionTrigger,
     GenericFunctionOptions,
     HttpFunctionOptions,
@@ -53,14 +52,17 @@ function convertToHttpOptions(
     return options;
 }
 
-function convertToGenericOptions<T extends Omit<FunctionOptions, 'trigger'> & Partial<FunctionOptions>>(
+function convertToGenericOptions<T extends Omit<GenericFunctionOptions, 'trigger'> & Partial<GenericFunctionOptions>>(
     options: T,
-    triggerMethod: (o: Omit<T, 'handler' | 'return' | 'trigger' | 'extraInputs' | 'extraOutputs'>) => FunctionTrigger
-): FunctionOptions {
-    const { handler, return: ret, trigger, extraInputs, extraOutputs, ...triggerOptions } = options;
+    triggerMethod: (
+        o: Omit<T, 'handler' | 'return' | 'trigger' | 'extraInputs' | 'extraOutputs' | 'retry'>
+    ) => FunctionTrigger
+): GenericFunctionOptions {
+    const { handler, return: ret, trigger, extraInputs, extraOutputs, retry, ...triggerOptions } = options;
     return {
         trigger: trigger ?? triggerMethod(triggerOptions),
         return: ret,
+        retry,
         extraInputs,
         extraOutputs,
         handler,
