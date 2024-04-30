@@ -1,12 +1,19 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { AppStartHandler, AppTerminateHandler, PostInvocationHandler, PreInvocationHandler } from '@azure/functions';
+import {
+    AppStartHandler,
+    AppTerminateHandler,
+    LogHookHandler,
+    PostInvocationHandler,
+    PreInvocationHandler,
+} from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import { Disposable } from '../utils/Disposable';
 import { tryGetCoreApiLazy } from '../utils/tryGetCoreApiLazy';
 import { AppStartContext } from './AppStartContext';
 import { AppTerminateContext } from './AppTerminateContext';
+import { LogHookContext } from './LogHookContext';
 import { PostInvocationContext } from './PostInvocationContext';
 import { PreInvocationContext } from './PreInvocationContext';
 
@@ -47,5 +54,11 @@ export function preInvocation(handler: PreInvocationHandler): Disposable {
 export function postInvocation(handler: PostInvocationHandler): Disposable {
     return registerHook('postInvocation', (coreContext) => {
         return handler(new PostInvocationContext(coreContext));
+    });
+}
+
+export function log(handler: LogHookHandler): Disposable {
+    return registerHook('log', (coreContext) => {
+        return handler(new LogHookContext(coreContext));
     });
 }
