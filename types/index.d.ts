@@ -13,6 +13,7 @@ export * from './generic';
 export * from './hooks/appHooks';
 export * from './hooks/HookContext';
 export * from './hooks/invocationHooks';
+export * from './hooks/logHooks';
 export * from './http';
 export * as input from './input';
 export * from './InvocationContext';
@@ -198,3 +199,5 @@ export declare class Disposable {
      */
     dispose(): any;
 }
+
+export type LogLevel = 'trace' | 'debug' | 'information' | 'warning' | 'error' | 'critical' | 'none';

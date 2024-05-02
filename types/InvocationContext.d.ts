@@ -5,7 +5,7 @@ import { CosmosDBInput, CosmosDBOutput } from './cosmosDB';
 import { EventGridOutput, EventGridPartialEvent } from './eventGrid';
 import { EventHubOutput } from './eventHub';
 import { HttpOutput, HttpResponse } from './http';
-import { FunctionInput, FunctionOutput, FunctionTrigger } from './index';
+import { FunctionInput, FunctionOutput, FunctionTrigger, LogLevel } from './index';
 import { ServiceBusQueueOutput, ServiceBusTopicOutput } from './serviceBus';
 import { SqlInput, SqlOutput } from './sql';
 import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './storage';
@@ -342,5 +342,3 @@ export interface InvocationContextInit {
 }
 
 export type LogHandler = (level: LogLevel, ...args: unknown[]) => void;
-
-export type LogLevel = 'trace' | 'debug' | 'information' | 'warning' | 'error' | 'critical' | 'none';
