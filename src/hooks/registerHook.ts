@@ -9,6 +9,7 @@ import {
     PreInvocationHandler,
 } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
+import { AzFuncSystemError, ensureErrorType } from '../errors';
 import { Disposable } from '../utils/Disposable';
 import { tryGetCoreApiLazy } from '../utils/tryGetCoreApiLazy';
 import { AppStartContext } from './AppStartContext';
@@ -58,7 +59,16 @@ export function postInvocation(handler: PostInvocationHandler): Disposable {
 }
 
 export function log(handler: LogHookHandler): Disposable {
-    return registerHook('log', (coreContext) => {
-        return handler(new LogHookContext(coreContext));
-    });
+    try {
+        return registerHook('log', (coreContext) => {
+            return handler(new LogHookContext(coreContext));
+        });
+    } catch (err) {
+        const error = ensureErrorType(err);
+        if (error.name === 'RangeError' && error.isAzureFunctionsSystemError) {
+            throw new AzFuncSystemError(`Log hooks require Azure Functions Host v4.34 or higher.`);
+        } else {
+            throw err;
+        }
+    }
 }
