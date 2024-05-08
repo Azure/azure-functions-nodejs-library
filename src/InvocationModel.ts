@@ -24,7 +24,7 @@ import { AzFuncSystemError } from './errors';
 import { waitForProxyRequest } from './http/httpProxy';
 import { createStreamRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
-import { isHttpStreamEnabled } from './setup';
+import { enableHttpStream } from './setup';
 import { isHttpTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
 import { isDefined, nonNullProp, nonNullValue } from './utils/nonNull';
 
@@ -76,7 +76,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
                 const bindingType = rpcBinding.type;
 
                 let input: unknown;
-                if (isHttpTrigger(bindingType) && isHttpStreamEnabled()) {
+                if (isHttpTrigger(bindingType) && enableHttpStream) {
                     const proxyRequest = await waitForProxyRequest(this.#coreCtx.invocationId);
                     input = createStreamRequest(proxyRequest, nonNullProp(req, 'triggerMetadata'));
                 } else {

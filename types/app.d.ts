@@ -15,7 +15,8 @@ import { WarmupFunctionOptions } from './warmup';
 
 /**
  * Optional method to configure the behavior of your app.
- * This can only be done during app startup, before invocations occur
+ * This can only be done during app startup, before invocations occur.
+ * If called multiple times, options will be merged with the previous options specified.
  */
 export declare function setup(options: SetupOptions): void;
 

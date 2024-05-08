@@ -5,7 +5,7 @@ import { RpcHttpData, RpcTypedData } from '@azure/functions-core';
 import { AzFuncSystemError } from '../errors';
 import { sendProxyResponse } from '../http/httpProxy';
 import { HttpResponse } from '../http/HttpResponse';
-import { isHttpStreamEnabled } from '../setup';
+import { enableHttpStream } from '../setup';
 import { toRpcHttpCookie } from './toRpcHttpCookie';
 import { toRpcTypedData } from './toRpcTypedData';
 
@@ -19,7 +19,7 @@ export async function toRpcHttp(invocationId: string, data: unknown): Promise<Rp
     }
 
     const response = data instanceof HttpResponse ? data : new HttpResponse(data);
-    if (isHttpStreamEnabled()) {
+    if (enableHttpStream) {
         // send http data over http proxy instead of rpc
         await sendProxyResponse(invocationId, response);
         return;

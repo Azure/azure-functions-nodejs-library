@@ -6,7 +6,7 @@ import { CoreInvocationContext, WorkerCapabilities } from '@azure/functions-core
 import { version } from './constants';
 import { setupHttpProxy } from './http/httpProxy';
 import { InvocationModel } from './InvocationModel';
-import { isHttpStreamEnabled, lockSetup } from './setup';
+import { capabilities as libraryCapabilities, enableHttpStream, lockSetup } from './setup';
 
 export class ProgrammingModel implements coreTypes.ProgrammingModel {
     name = '@azure/functions';
@@ -19,10 +19,12 @@ export class ProgrammingModel implements coreTypes.ProgrammingModel {
     async getCapabilities(capabilities: WorkerCapabilities): Promise<WorkerCapabilities> {
         lockSetup();
 
-        if (isHttpStreamEnabled()) {
+        if (enableHttpStream) {
             const httpUri = await setupHttpProxy();
             capabilities.HttpUri = httpUri;
         }
+
+        Object.assign(capabilities, libraryCapabilities);
 
         return capabilities;
     }
