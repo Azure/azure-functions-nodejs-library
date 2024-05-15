@@ -16,16 +16,16 @@ export class ProgrammingModel implements coreTypes.ProgrammingModel {
         return new InvocationModel(coreCtx);
     }
 
-    async getCapabilities(capabilities: WorkerCapabilities): Promise<WorkerCapabilities> {
+    async getCapabilities(workerCapabilities: WorkerCapabilities): Promise<WorkerCapabilities> {
         lockSetup();
 
         if (enableHttpStream) {
             const httpUri = await setupHttpProxy();
-            capabilities.HttpUri = httpUri;
+            workerCapabilities.HttpUri = httpUri;
         }
 
-        Object.assign(capabilities, libraryCapabilities);
+        Object.assign(workerCapabilities, libraryCapabilities);
 
-        return capabilities;
+        return workerCapabilities;
     }
 }

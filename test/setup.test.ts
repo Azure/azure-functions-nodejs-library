@@ -20,7 +20,7 @@ describe('setup', () => {
         setup({ capabilities: {} });
         expect(enableHttpStream).to.equal(true);
 
-        // set to true
+        // set to false
         setup({ enableHttpStream: false });
         expect(enableHttpStream).to.equal(false);
     });
