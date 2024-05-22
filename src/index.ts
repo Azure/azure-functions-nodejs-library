@@ -6,6 +6,7 @@ export { AppStartContext } from './hooks/AppStartContext';
 export { AppTerminateContext } from './hooks/AppTerminateContext';
 export { HookContext } from './hooks/HookContext';
 export { InvocationHookContext } from './hooks/InvocationHookContext';
+export { LogHookContext } from './hooks/LogHookContext';
 export { PostInvocationContext } from './hooks/PostInvocationContext';
 export { PreInvocationContext } from './hooks/PreInvocationContext';
 export { HttpRequest } from './http/HttpRequest';
