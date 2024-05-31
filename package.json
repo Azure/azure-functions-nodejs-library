@@ -25,8 +25,7 @@
         "src/",
         "types/",
         "LICENSE",
-        "README.md",
-        "_manifest"
+        "README.md"
     ],
     "engines": {
         "node": ">=18.0"
