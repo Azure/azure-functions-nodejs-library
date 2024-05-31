@@ -40,3 +40,10 @@ extends:
                   name: 1es-pool-azfunc-public
                   image: 1es-ubuntu-22.04
                   os: linux
+
+            - stage: Build
+              dependsOn: []
+              jobs:
+                  - template: /azure-pipelines/templates/build.yml@self
+                    parameters:
+                        IsPrerelease: true
