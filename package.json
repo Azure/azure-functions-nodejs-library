@@ -25,8 +25,7 @@
         "src/",
         "types/",
         "LICENSE",
-        "README.md",
-        "_manifest"
+        "README.md"
     ],
     "scripts": {
         "build": "webpack --mode development",
