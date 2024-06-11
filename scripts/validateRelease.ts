@@ -17,7 +17,7 @@ npm run validateRelease -- --publishTag preview --dropPath /example/path/`);
 }
 
 function validateRelease(publishTag: string, dropPath: string): void {
-    const files = readdirSync(dropPath);
+    const files = readdirSync(dropPath).filter((f) => f.endsWith('.tgz'));
     if (files.length !== 1) {
         throw new Error('Drop path should have one tgz file');
     }
