@@ -11,6 +11,14 @@ pr:
         include:
             - v4.x
 
+schedules:
+    - cron: '30 10 * * *'
+      displayName: Nightly build
+      always: true
+      branches:
+          include:
+              - v4.x
+
 resources:
     repositories:
         - repository: 1es
