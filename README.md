@@ -3,7 +3,7 @@
 |Branch|Status|Support level|Node.js Versions|
 |---|---|---|---|
 |v4.x (default)|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/public/514/v4.x)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v4.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/public/514/v4.x?compact_message)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v4.x)|GA|20, 18|
-|v3.x|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/public/514/v3.x)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v3.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/public/514/v3.x?compact_message)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v3.x)|GA|20, 18, 16, 14|
+|v3.x|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/public/514/v3.x)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v3.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/public/514/v3.x?compact_message)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v3.x)|GA|20, 18|
 
 > _**Version 4 is Generally Available! 🎉✨ Read our [blog post](https://aka.ms/AzFuncNodeV4) and let us know what you think by reacting or commenting on our [GA discussion thread](https://aka.ms/AzFuncNodeV4Discussion)**_
 
