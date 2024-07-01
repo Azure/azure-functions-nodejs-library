@@ -3,7 +3,7 @@
 
 import 'mocha';
 import { expect } from 'chai';
-import { ensureErrorType } from '../src/errors';
+import { ensureErrorType, trySetErrorMessage } from '../src/errors';
 
 describe('ensureErrorType', () => {
     it('null', () => {
@@ -42,6 +42,13 @@ describe('ensureErrorType', () => {
         expect(ensureErrorType(actualError)).to.equal(actualError);
     });
 
+    it('modify error message', () => {
+        const actualError = new Error('test2');
+        trySetErrorMessage(actualError, 'modified message');
+
+        expect(actualError.message).to.equal('modified message');
+    });
+
     it('readonly error', () => {
         class ReadOnlyError extends Error {
             get message(): string {
@@ -55,10 +62,11 @@ describe('ensureErrorType', () => {
         expect(() => (actualError.message = 'exception')).to.throw();
 
         const wrappedError = ensureErrorType(actualError);
-        wrappedError.message = 'Readonly error has been modified';
+        const message = 'Readonly error has not been modified';
+        trySetErrorMessage(wrappedError, message);
 
-        expect(wrappedError.message).to.equal('Readonly error has been modified');
-        expect(wrappedError.stack).to.contain('Readonly error has been modified');
+        expect(wrappedError.message).to.equal('a readonly message');
+        expect(wrappedError.stack).to.not.contain('Readonly error has been modified');
     });
 
     function validateError(actual: Error, expectedMessage: string): void {

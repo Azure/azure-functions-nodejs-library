@@ -9,6 +9,13 @@ export interface AzFuncError {
     isAzureFunctionsSystemError: boolean;
 }
 
+export interface ValidatedError extends Error, Partial<AzFuncError> {
+    /**
+     * Use `trySetErrorMessage` to set the error message
+     */
+    readonly message: string;
+}
+
 export class AzFuncSystemError extends Error {
     isAzureFunctionsSystemError = true;
 }
@@ -27,22 +34,8 @@ export class ReadOnlyError extends AzFuncTypeError {
     }
 }
 
-export function ensureErrorType(err: unknown): Error & Partial<AzFuncError> {
+export function ensureErrorType(err: unknown): ValidatedError {
     if (err instanceof Error) {
-        const writable = Object.getOwnPropertyDescriptor(err, 'message')?.writable;
-        if (!writable) {
-            // The motivation for this branch can be found in the below issue:
-            // https://github.com/Azure/azure-functions-nodejs-library/issues/205
-            let readableMessage = err.message;
-            Object.defineProperty(err, 'message', {
-                get() {
-                    return readableMessage;
-                },
-                set(val: string) {
-                    readableMessage = val;
-                },
-            });
-        }
         return err;
     } else {
         let message: string;
@@ -56,6 +49,14 @@ export function ensureErrorType(err: unknown): Error & Partial<AzFuncError> {
             message = String(err);
         }
         return new Error(message);
+    }
+}
+
+export function trySetErrorMessage(err: Error, message: string): void {
+    try {
+        err.message = message;
+    } catch {
+        // If we can't set the message, we'll keep the error as is
     }
 }
 
