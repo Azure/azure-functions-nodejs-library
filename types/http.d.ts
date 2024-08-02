@@ -139,7 +139,7 @@ export declare class HttpRequest {
     /**
      * Returns a promise fulfilled with the body parsed as JSON
      */
-    readonly json: () => Promise<unknown>;
+    readonly json: <T = unknown>() => Promise<T>;
 
     /**
      * Returns a promise fulfilled with the body as a string
@@ -293,7 +293,7 @@ export declare class HttpResponse {
     /**
      * Returns a promise fulfilled with the body parsed as JSON
      */
-    readonly json: () => Promise<unknown>;
+    readonly json: <T = unknown>() => Promise<T>;
 
     /**
      * Returns a promise fulfilled with the body as a string

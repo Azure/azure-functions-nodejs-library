@@ -99,7 +99,7 @@ export class HttpRequest implements types.HttpRequest {
         return this.#uReq.formData();
     }
 
-    async json(): Promise<unknown> {
+    async json<T = unknown>(): Promise<T> {
         return this.#uReq.json();
     }
 

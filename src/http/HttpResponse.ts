@@ -66,7 +66,7 @@ export class HttpResponse implements types.HttpResponse {
         return this.#uRes.formData();
     }
 
-    async json(): Promise<unknown> {
+    async json<T = unknown>(): Promise<T> {
         return this.#uRes.json();
     }
 
