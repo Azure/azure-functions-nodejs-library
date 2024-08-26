@@ -153,9 +153,8 @@ export function createStreamRequest(
 
     const params: Record<string, string> = {};
     for (const [key, rpcValue] of Object.entries(rpcParams)) {
-        const value = fromRpcTypedData(rpcValue);
-        if (typeof value === 'string') {
-            params[key] = value;
+        if (isDefined(rpcValue.string)) {
+            params[key] = rpcValue.string;
         }
     }
 
