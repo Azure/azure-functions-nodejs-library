@@ -12,6 +12,8 @@ import {
     GenericTriggerOptions,
     HttpTrigger,
     HttpTriggerOptions,
+    KafkaTrigger,
+    KafkaTriggerOptions,
     ServiceBusQueueTrigger,
     ServiceBusQueueTriggerOptions,
     ServiceBusTopicTrigger,
@@ -91,6 +93,13 @@ export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
     return addTriggerBindingName({
         ...options,
         type: 'cosmosDBTrigger',
+    });
+}
+
+export function kafka(options: KafkaTriggerOptions): KafkaTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'kafkaTrigger',
     });
 }
 

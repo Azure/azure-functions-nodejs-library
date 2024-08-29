@@ -7,6 +7,7 @@ import { EventHubTrigger, EventHubTriggerOptions } from './eventHub';
 import { GenericTriggerOptions } from './generic';
 import { HttpTrigger, HttpTriggerOptions } from './http';
 import { FunctionTrigger } from './index';
+import { KafkaTrigger, KafkaTriggerOptions } from './kafka';
 import {
     ServiceBusQueueTrigger,
     ServiceBusQueueTriggerOptions,
@@ -67,6 +68,11 @@ export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger?pivots=programming-language-javascript)
  */
 export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
+
+/**
+ * [Link to docs and examples](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-kafka-trigger&pivots=programming-language-javascript)
+ */
+export function kafka(options: KafkaTriggerOptions): KafkaTrigger;
 
 /**
  * [Link to docs and examples](https://learn.microsoft.com/azure/azure-functions/functions-bindings-warmup?tabs=isolated-process&pivots=programming-language-javascript)

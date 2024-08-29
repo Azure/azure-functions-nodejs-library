@@ -6,6 +6,7 @@ import { EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
 import { GenericFunctionOptions } from './generic';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
+import { KafkaFunctionOptions } from './kafka';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
 import { SetupOptions } from './setup';
 import { SqlFunctionOptions } from './sql';
@@ -152,6 +153,13 @@ export function eventGrid(name: string, options: EventGridFunctionOptions): void
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
+
+/**
+ * Registers a kafka function in your app that will be triggered whenever a message is added to a kafka topic
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the inputs, outputs, and handler for this function
+ */
+export function kafka(name: string, options: KafkaFunctionOptions): void;
 
 /**
  * Registers a function in your app that will be triggered when an instance is added to scale a running function app.
