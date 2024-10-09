@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { serialize as serializeCookie } from 'cookie';
 import { EventEmitter } from 'events';
 import * as http from 'http';
 import { AzFuncSystemError, ensureErrorType } from '../errors';
@@ -42,45 +41,12 @@ export async function sendProxyResponse(invocationId: string, userRes: HttpRespo
     proxyRes.setHeader(invocationIdHeader, invocationId);
     proxyRes.statusCode = userRes.status;
 
-    if (userRes.cookies.length > 0) {
-        setCookies(userRes, proxyRes);
-    }
-
     if (userRes.body) {
         for await (const chunk of userRes.body.values()) {
             proxyRes.write(chunk);
         }
     }
     proxyRes.end();
-}
-
-function setCookies(userRes: HttpResponse, proxyRes: http.ServerResponse): void {
-    const serializedCookies: string[] = userRes.cookies.map((c) => {
-        let sameSite: true | false | 'lax' | 'strict' | 'none' | undefined;
-        switch (c.sameSite) {
-            case 'Lax':
-                sameSite = 'lax';
-                break;
-            case 'None':
-                sameSite = 'none';
-                break;
-            case 'Strict':
-                sameSite = 'strict';
-                break;
-            default:
-                sameSite = c.sameSite;
-        }
-        return serializeCookie(c.name, c.value, {
-            domain: c.domain,
-            path: c.path,
-            expires: typeof c.expires === 'number' ? new Date(c.expires) : c.expires,
-            secure: c.secure,
-            httpOnly: c.httpOnly,
-            sameSite: sameSite,
-            maxAge: c.maxAge,
-        });
-    });
-    proxyRes.setHeader('Set-Cookie', serializedCookies);
 }
 
 export async function setupHttpProxy(): Promise<string> {

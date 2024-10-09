@@ -2,13 +2,12 @@
 // Licensed under the MIT License.
 
 import * as types from '@azure/functions';
-import { HttpRequestParams, HttpRequestUser } from '@azure/functions';
+import { HeadersInit, HttpRequestParams, HttpRequestUser } from '@azure/functions';
 import { RpcHttpData, RpcTypedData } from '@azure/functions-core';
 import { Blob } from 'buffer';
 import { IncomingMessage } from 'http';
 import * as stream from 'stream';
 import { ReadableStream } from 'stream/web';
-import { FormData, Headers, HeadersInit, Request as uRequest } from 'undici';
 import { URLSearchParams } from 'url';
 import { fromNullableMapping } from '../converters/fromRpcNullable';
 import { fromRpcTypedData } from '../converters/fromRpcTypedData';
@@ -17,7 +16,7 @@ import { isDefined, nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
 interface InternalHttpRequestInit extends RpcHttpData {
-    undiciRequest?: uRequest;
+    undiciRequest?: Request;
 }
 
 export class HttpRequest implements types.HttpRequest {
@@ -25,7 +24,7 @@ export class HttpRequest implements types.HttpRequest {
     readonly params: HttpRequestParams;
 
     #cachedUser?: HttpRequestUser | null;
-    #uReq: uRequest;
+    #uReq: Request;
     #init: InternalHttpRequestInit;
 
     constructor(init: InternalHttpRequestInit) {
@@ -42,7 +41,7 @@ export class HttpRequest implements types.HttpRequest {
                 body = init.body.string;
             }
 
-            uReq = new uRequest(url, {
+            uReq = new Request(url, {
                 body,
                 method: nonNullProp(init, 'method'),
                 headers: fromNullableMapping(init.nullableHeaders, init.headers),
@@ -96,6 +95,8 @@ export class HttpRequest implements types.HttpRequest {
     }
 
     async formData(): Promise<FormData> {
+        // Temporarily disabling deprecation notice, but should consider moving off this in the future
+        // eslint-disable-next-line deprecation/deprecation
         return this.#uReq.formData();
     }
 
@@ -144,7 +145,7 @@ export function createStreamRequest(
         headers = <HeadersInit>headersData;
     }
 
-    const uReq = new uRequest(url, {
+    const uReq = new Request(url, {
         body,
         duplex: 'half',
         method: nonNullProp(proxyReq, 'method'),

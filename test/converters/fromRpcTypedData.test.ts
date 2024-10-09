@@ -3,10 +3,8 @@
 
 import 'mocha';
 import { expect } from 'chai';
-import { fromString } from 'long';
 import { HttpRequest } from '../../src';
 import { fromRpcTypedData } from '../../src/converters/fromRpcTypedData';
-import Long = require('long');
 
 describe('fromRpcTypedData', () => {
     it('null', () => {
@@ -104,9 +102,7 @@ describe('fromRpcTypedData', () => {
     });
 
     it('collectionSint64', () => {
-        const result: any = fromRpcTypedData({ collectionSint64: { sint64: [123, fromString('9007199254740992')] } });
+        const result: any = fromRpcTypedData({ collectionSint64: { sint64: [123] } });
         expect(result[0]).to.equal(123);
-        expect(result[1]).to.be.instanceOf(Long);
-        expect(result[1].toString()).to.equal('9007199254740992');
     });
 });

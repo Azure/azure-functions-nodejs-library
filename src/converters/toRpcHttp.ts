@@ -6,7 +6,6 @@ import { AzFuncSystemError } from '../errors';
 import { sendProxyResponse } from '../http/httpProxy';
 import { HttpResponse } from '../http/HttpResponse';
 import { enableHttpStream } from '../setup';
-import { toRpcHttpCookie } from './toRpcHttpCookie';
 import { toRpcTypedData } from './toRpcTypedData';
 
 export async function toRpcHttp(invocationId: string, data: unknown): Promise<RpcTypedData | null | undefined> {
@@ -14,7 +13,7 @@ export async function toRpcHttp(invocationId: string, data: unknown): Promise<Rp
         return data;
     } else if (typeof data !== 'object') {
         throw new AzFuncSystemError(
-            'The HTTP response must be an object with optional properties "body", "status", "headers", and "cookies".'
+            'The HTTP response must be an object with optional properties "body", "status", and "headers".'
         );
     }
 
@@ -31,11 +30,6 @@ export async function toRpcHttp(invocationId: string, data: unknown): Promise<Rp
     rpcResponse.headers = {};
     for (const [key, value] of response.headers.entries()) {
         rpcResponse.headers[key] = value;
-    }
-
-    rpcResponse.cookies = [];
-    for (const cookie of response.cookies) {
-        rpcResponse.cookies.push(toRpcHttpCookie(cookie));
     }
 
     rpcResponse.enableContentNegotiation = response.enableContentNegotiation;

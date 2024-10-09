@@ -8,6 +8,7 @@
         "outDir": "out",
         "sourceMap": true,
         "baseUrl": "./",
+        "lib": ["es6"],
         "paths": {
             "@azure/functions": ["types"],
             "@azure/functions-core": ["types-core"]

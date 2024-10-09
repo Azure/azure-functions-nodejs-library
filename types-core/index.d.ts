@@ -422,7 +422,7 @@ declare module '@azure/functions-core' {
 
         http?: RpcHttpData | null;
 
-        int?: number | Long | null;
+        int?: number | null;
 
         double?: number | null;
 
@@ -436,7 +436,7 @@ declare module '@azure/functions-core' {
     }
 
     interface RpcCollectionSInt64 {
-        sint64?: (number | Long)[] | null;
+        sint64?: number[] | null;
     }
 
     interface RpcCollectionString {
@@ -562,13 +562,13 @@ declare module '@azure/functions-core' {
     }
 
     interface RpcTimestamp {
-        seconds?: number | Long | null;
+        seconds?: number | null;
 
         nanos?: number | null;
     }
 
     interface RpcDuration {
-        seconds?: number | Long | null;
+        seconds?: number | null;
 
         nanos?: number | null;
     }

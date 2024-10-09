@@ -4,7 +4,6 @@
 import 'mocha';
 import { HttpRequestUser } from '@azure/functions';
 import { expect } from 'chai';
-import { Headers } from 'undici';
 import { extractHttpUserFromHeaders } from '../../src/http/extractHttpUserFromHeaders';
 
 describe('Extract Http User Claims Principal from Headers', () => {

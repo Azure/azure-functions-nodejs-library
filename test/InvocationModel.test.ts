@@ -42,7 +42,6 @@ describe('InvocationModel', () => {
                         body: {
                             bytes: Buffer.from('Hello, world!'),
                         },
-                        cookies: [],
                         enableContentNegotiation: false,
                         headers: {
                             'content-type': 'text/plain;charset=UTF-8',
