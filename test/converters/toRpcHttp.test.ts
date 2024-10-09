@@ -23,7 +23,6 @@ describe('toRpcHttp', () => {
                 },
                 headers: headers,
                 enableContentNegotiation: false,
-                cookies: [],
             },
         };
     }

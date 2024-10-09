@@ -224,11 +224,6 @@ export interface HttpResponseInit {
     headers?: HeadersInit;
 
     /**
-     * HTTP response cookies
-     */
-    cookies?: Cookie[];
-
-    /**
      * Enable content negotiation of response body if true
      * If false, treat response body as raw
      * @default false
@@ -252,11 +247,6 @@ export declare class HttpResponse {
      * HTTP response headers.
      */
     readonly headers: Headers;
-
-    /**
-     * HTTP response cookies
-     */
-    readonly cookies: Cookie[];
 
     /**
      * Enable content negotiation of response body if true
@@ -305,52 +295,6 @@ export declare class HttpResponse {
      * [Learn more here](https://developer.mozilla.org/docs/Web/API/Response/clone)
      */
     readonly clone: () => HttpResponse;
-}
-
-/**
- * Http response cookie object to "Set-Cookie"
- */
-export interface Cookie {
-    name: string;
-
-    value: string;
-
-    /**
-     * Specifies allowed hosts to receive the cookie
-     */
-    domain?: string;
-
-    /**
-     * Specifies URL path that must exist in the requested URL
-     */
-    path?: string;
-
-    /**
-     * NOTE: It is generally recommended that you use maxAge over expires.
-     * Sets the cookie to expire at a specific date instead of when the client closes.
-     * This can be a Javascript Date or Unix time in milliseconds.
-     */
-    expires?: Date | number;
-
-    /**
-     * Sets the cookie to only be sent with an encrypted request
-     */
-    secure?: boolean;
-
-    /**
-     * Sets the cookie to be inaccessible to JavaScript's Document.cookie API
-     */
-    httpOnly?: boolean;
-
-    /**
-     * Can restrict the cookie to not be sent with cross-site requests
-     */
-    sameSite?: 'Strict' | 'Lax' | 'None' | undefined;
-
-    /**
-     * Number of seconds until the cookie expires. A zero or negative number will expire the cookie immediately.
-     */
-    maxAge?: number;
 }
 
 /**

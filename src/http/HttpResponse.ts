@@ -13,7 +13,6 @@ interface InternalHttpResponseInit extends HttpResponseInit {
 }
 
 export class HttpResponse implements types.HttpResponse {
-    readonly cookies: types.Cookie[];
     readonly enableContentNegotiation: boolean;
 
     #uRes: uResponse;
@@ -34,7 +33,6 @@ export class HttpResponse implements types.HttpResponse {
             }
         }
 
-        this.cookies = init.cookies ?? [];
         this.enableContentNegotiation = !!init.enableContentNegotiation;
     }
 
