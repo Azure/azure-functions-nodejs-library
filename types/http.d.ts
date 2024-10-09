@@ -3,10 +3,22 @@
 
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
-import { BodyInit, FormData, Headers, HeadersInit } from 'undici';
 import { URLSearchParams } from 'url';
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
+
+type HeadersInit = string[][] | Record<string, string | ReadonlyArray<string>> | Headers;
+
+type BodyInit =
+    | ArrayBuffer
+    | AsyncIterable<Uint8Array>
+    | Blob
+    | FormData
+    | Iterable<Uint8Array>
+    | NodeJS.ArrayBufferView
+    | URLSearchParams
+    | null
+    | string;
 
 export type HttpHandler = (
     request: HttpRequest,

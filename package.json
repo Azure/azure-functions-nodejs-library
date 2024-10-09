@@ -28,7 +28,7 @@
         "README.md"
     ],
     "engines": {
-        "node": ">=18.0"
+        "node": ">=22.0"
     },
     "scripts": {
         "build": "webpack --mode development",
@@ -42,8 +42,7 @@
     },
     "dependencies": {
         "cookie": "^0.6.0",
-        "long": "^4.0.0",
-        "undici": "^5.13.0"
+        "long": "^4.0.0"
     },
     "devDependencies": {
         "@types/chai": "^4.2.22",
@@ -53,7 +52,7 @@
         "@types/long": "^4.0.2",
         "@types/minimist": "^1.2.2",
         "@types/mocha": "^9.1.1",
-        "@types/node": "^18.0.0",
+        "@types/node": "^22.0.0",
         "@types/semver": "^7.3.9",
         "@typescript-eslint/eslint-plugin": "^5.12.1",
         "@typescript-eslint/parser": "^5.12.1",
@@ -78,8 +77,8 @@
         "semver": "^7.3.5",
         "ts-loader": "^9.3.1",
         "ts-node": "^3.3.0",
-        "typescript": "^4.5.5",
-        "typescript4": "npm:typescript@~4.0.0",
+        "typescript": "^4.9.5",
+        "typescript4": "npm:typescript@~4.9.5",
         "webpack": "^5.74.0",
         "webpack-cli": "^4.10.0"
     }

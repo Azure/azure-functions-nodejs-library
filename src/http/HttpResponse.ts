@@ -5,18 +5,17 @@ import * as types from '@azure/functions';
 import { HttpResponseInit } from '@azure/functions';
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
-import { FormData, Headers, Response as uResponse, ResponseInit as uResponseInit } from 'undici';
 import { isDefined } from '../utils/nonNull';
 
 interface InternalHttpResponseInit extends HttpResponseInit {
-    undiciResponse?: uResponse;
+    undiciResponse?: Response;
 }
 
 export class HttpResponse implements types.HttpResponse {
     readonly cookies: types.Cookie[];
     readonly enableContentNegotiation: boolean;
 
-    #uRes: uResponse;
+    #uRes: Response;
     #init: InternalHttpResponseInit;
 
     constructor(init?: InternalHttpResponseInit) {
@@ -26,11 +25,11 @@ export class HttpResponse implements types.HttpResponse {
         if (init.undiciResponse) {
             this.#uRes = init.undiciResponse;
         } else {
-            const uResInit: uResponseInit = { status: init.status, headers: init.headers };
+            const uResInit: ResponseInit = { status: init.status, headers: init.headers };
             if (isDefined(init.jsonBody)) {
-                this.#uRes = uResponse.json(init.jsonBody, uResInit);
+                this.#uRes = Response.json(init.jsonBody, uResInit);
             } else {
-                this.#uRes = new uResponse(init.body, uResInit);
+                this.#uRes = new Response(init.body, uResInit);
             }
         }
 
@@ -63,6 +62,8 @@ export class HttpResponse implements types.HttpResponse {
     }
 
     async formData(): Promise<FormData> {
+        // Temporarily disabling deprecation notice, but should consider moving off this in the future
+        // eslint-disable-next-line deprecation/deprecation
         return this.#uRes.formData();
     }
 

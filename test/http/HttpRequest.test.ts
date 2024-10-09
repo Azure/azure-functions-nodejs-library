@@ -5,7 +5,6 @@ import 'mocha';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import { File } from 'undici';
 import { HttpRequest } from '../../src/http/HttpRequest';
 
 chai.use(chaiAsPromised);
