@@ -41,7 +41,7 @@
         "watch": "webpack --watch --mode development"
     },
     "dependencies": {
-        "cookie": "^0.6.0",
+        "cookie": "^0.7.0",
         "long": "^4.0.0",
         "undici": "^5.13.0"
     },
