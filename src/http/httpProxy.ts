@@ -135,14 +135,20 @@ export async function setupHttpProxy(): Promise<string> {
     });
 }
 
+// Function to get a random port within a specified range
+function getRandomPort(minPort = 55000, maxPort = 65535): number {
+    return Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort;
+}
+
 // Function to find an open port starting from a specified port
 function findOpenPort(startingPort: number, callback: (port: number) => void): void {
     const server = net.createServer();
 
     function tryPort(port: number) {
         server.once('error', () => {
-            // If the port is unavailable, increment and try the next one
-            tryPort(port + 1);
+            // If the port is unavailable, get a random port and try again
+            const randomPort = getRandomPort();
+            tryPort(randomPort);
         });
 
         // If the port is available, return it
