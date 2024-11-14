@@ -115,22 +115,24 @@ export async function setupHttpProxy(): Promise<string> {
 
         server.listen(() => {
             const address = server.address();
-            if (address !== null && address.port === 0) {
-                // Auto-assigned port is 0, find and bind to an open port
-                workerSystemLog('debug', `VICTORIA: Port 0 assigned. Finding open port.`);
-                findOpenPort(51929, (openPort) => {
-                    workerSystemLog('debug', `VICTORIA: found open port: ${openPort}`);
-                    // Close the server and re-listen on the found open port
-                    server.close();
-                    server.listen(openPort, () => {
-                        workerSystemLog('debug', `VICTORIA: server is now listening on found open port: ${openPort}`);
+            // Valid address has been created
+            if (address !== null && typeof address === 'object') {
+                if (address.port === 0) {
+                    // Auto-assigned port is 0, find and bind to an open port
+                    workerSystemLog('debug', `Port 0 assigned. Finding open port.`);
+                    findOpenPort(51929, (openPort: number) => {
+                        // Close the server and re-listen on the found open port
+                        server.close();
+                        server.listen(openPort, () => {
+                            workerSystemLog('debug', `Server is now listening on found open port: ${openPort}`);
+                        });
+                        resolve(`http://localhost:${openPort}/`);
                     });
-                    resolve(`http://localhost:${openPort}/`);
-                });
-            } else if (address !== null && typeof address === 'object') {
-                // Auto-assigned port is not 0
-                workerSystemLog('debug', `VICTORIA: auto-assigned port is valid. Port: ${address.port}`);
-                resolve(`http://localhost:${address.port}/`);
+                } else {
+                    // Auto-assigned port is not 0
+                    workerSystemLog('debug', `Auto-assigned port is valid. Port: ${address.port}`);
+                    resolve(`http://localhost:${address.port}/`);
+                }
             } else {
                 reject(new AzFuncSystemError('Unexpected server address during http proxy setup'));
             }
@@ -143,10 +145,10 @@ export async function setupHttpProxy(): Promise<string> {
 }
 
 // Function to find an open port starting from a specified port
-function findOpenPort(startingPort, callback) {
+function findOpenPort(startingPort: number, callback: (port: number) => void): void {
     const server = net.createServer();
 
-    function tryPort(port) {
+    function tryPort(port: number) {
         server.once('error', () => {
             // If the port is unavailable, increment and try the next one
             tryPort(port + 1);
@@ -154,9 +156,12 @@ function findOpenPort(startingPort, callback) {
 
         // If the port is available, return it
         server.once('listening', () => {
-            const port = server.address().port;
-            server.close();
-            callback(port);
+            const address = server.address();
+            if (address !== null && typeof address === 'object') {
+                port = address.port;
+                server.close();
+                callback(port);
+            }
         });
 
         // Try binding to the given port
