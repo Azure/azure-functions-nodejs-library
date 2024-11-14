@@ -113,22 +113,26 @@ export async function setupHttpProxy(): Promise<string> {
             workerSystemLog('error', `Http proxy error: ${err.stack || err.message}`);
         });
 
-        server.listen(0, () => {
-            workerSystemLog('debug', `VICTORIA: auto-assigned port: ${server.address().port}`);
-
-            // If port is still 0, find and bind to an open port
-            if (server.address().port === 0) {
+        server.listen(() => {
+            const address = server.address();
+            if (address !== null && address.port === 0) {
+                // Auto-assigned port is 0, find and bind to an open port
                 workerSystemLog('debug', `VICTORIA: Port 0 assigned. Finding open port.`);
                 findOpenPort(51929, (openPort) => {
                     workerSystemLog('debug', `VICTORIA: found open port: ${openPort}`);
-                    server.close();  // Close the server
+                    // Close the server and re-listen on the found open port
+                    server.close();
                     server.listen(openPort, () => {
                         workerSystemLog('debug', `VICTORIA: server is now listening on found open port: ${openPort}`);
                     });
                     resolve(`http://localhost:${openPort}/`);
                 });
+            } else if (address !== null && typeof address === 'object') {
+                // Auto-assigned port is not 0
+                workerSystemLog('debug', `VICTORIA: auto-assigned port is valid. Port: ${address.port}`);
+                resolve(`http://localhost:${address.port}/`);
             } else {
-                resolve(`http://localhost:${server.address().port}/`);
+                reject(new AzFuncSystemError('Unexpected server address during http proxy setup'));
             }
         });
 
@@ -138,27 +142,27 @@ export async function setupHttpProxy(): Promise<string> {
     });
 }
 
-
 // Function to find an open port starting from a specified port
 function findOpenPort(startingPort, callback) {
     const server = net.createServer();
 
     function tryPort(port) {
-      server.once('error', () => {
-        // If the port is unavailable, increment and try the next one
-        tryPort(port + 1);
-      });
+        server.once('error', () => {
+            // If the port is unavailable, increment and try the next one
+            tryPort(port + 1);
+        });
 
-      server.once('listening', () => {
-        const port = server.address().port;
-        server.close();
-        callback(port);
-      });
+        // If the port is available, return it
+        server.once('listening', () => {
+            const port = server.address().port;
+            server.close();
+            callback(port);
+        });
 
-      // Try binding to the given port
-      server.listen(port);
+        // Try binding to the given port
+        server.listen(port);
     }
 
     // Start trying from the specified starting port
     tryPort(startingPort);
-  }
+}
