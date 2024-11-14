@@ -17,16 +17,13 @@ const invocRequestEmitter = new EventEmitter();
 
 export async function waitForProxyRequest(invocationId: string): Promise<http.IncomingMessage> {
     return new Promise((resolve, _reject) => {
-        workerSystemLog('debug', 'Waiting for proxy request', { invocationId });
         const req = requests[invocationId];
         if (req) {
             resolve(req);
-            workerSystemLog('debug', 'Proxy request found', { invocationId });
             delete requests[invocationId];
         } else {
             invocRequestEmitter.once(invocationId, () => {
                 const req = requests[invocationId];
-                workerSystemLog('debug', 'Proxy request else statement');
                 if (req) {
                     resolve(req);
                     delete requests[invocationId];
@@ -38,13 +35,11 @@ export async function waitForProxyRequest(invocationId: string): Promise<http.In
 
 const invocationIdHeader = 'x-ms-invocation-id';
 export async function sendProxyResponse(invocationId: string, userRes: HttpResponse): Promise<void> {
-    workerSystemLog('debug', 'Sending proxy response', { invocationId });
     const proxyRes = nonNullProp(responses, invocationId);
     delete responses[invocationId];
     for (const [key, val] of userRes.headers.entries()) {
         proxyRes.setHeader(key, val);
     }
-    workerSystemLog('debug', 'Http proxy headers set');
     proxyRes.setHeader(invocationIdHeader, invocationId);
     proxyRes.statusCode = userRes.status;
 
@@ -54,9 +49,7 @@ export async function sendProxyResponse(invocationId: string, userRes: HttpRespo
 
     if (userRes.body) {
         for await (const chunk of userRes.body.values()) {
-            workerSystemLog('debug', 'Writing proxy response chunk');
             proxyRes.write(chunk);
-            workerSystemLog('debug', 'Http proxy response chunks written');
         }
     }
     proxyRes.end();
@@ -94,12 +87,10 @@ function setCookies(userRes: HttpResponse, proxyRes: http.ServerResponse): void 
 export async function setupHttpProxy(): Promise<string> {
     return new Promise((resolve, reject) => {
         const server = http.createServer();
-        workerSystemLog('debug', 'Http proxy server created');
 
         server.on('request', (req, res) => {
             const invocationId = req.headers[invocationIdHeader];
             if (typeof invocationId === 'string') {
-                workerSystemLog('debug', 'Http proxy request received', { invocationId });
                 requests[invocationId] = req;
                 responses[invocationId] = res;
                 invocRequestEmitter.emit(invocationId);
