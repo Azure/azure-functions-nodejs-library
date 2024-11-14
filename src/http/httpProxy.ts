@@ -12,6 +12,8 @@ import { HttpResponse } from './HttpResponse';
 
 const requests: Record<string, http.IncomingMessage> = {};
 const responses: Record<string, http.ServerResponse> = {};
+const minPort = 55000;
+const maxPort = 65535;
 
 const invocRequestEmitter = new EventEmitter();
 
@@ -111,7 +113,7 @@ export async function setupHttpProxy(): Promise<string> {
                 if (address.port === 0) {
                     // Auto-assigned port is 0, find and bind to an open port
                     workerSystemLog('debug', `Port 0 assigned. Finding open port.`);
-                    findOpenPort(51929, (openPort: number) => {
+                    findOpenPort((openPort: number) => {
                         // Close the server and re-listen on the found open port
                         server.close();
                         server.listen(openPort, () => {
@@ -136,12 +138,12 @@ export async function setupHttpProxy(): Promise<string> {
 }
 
 // Function to get a random port within a specified range
-function getRandomPort(minPort = 55000, maxPort = 65535): number {
+function getRandomPort(): number {
     return Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort;
 }
 
 // Function to find an open port starting from a specified port
-function findOpenPort(startingPort: number, callback: (port: number) => void): void {
+function findOpenPort(callback: (port: number) => void): void {
     const server = net.createServer();
 
     function tryPort(port: number) {
@@ -166,5 +168,5 @@ function findOpenPort(startingPort: number, callback: (port: number) => void): v
     }
 
     // Start trying from the specified starting port
-    tryPort(startingPort);
+    tryPort(minPort);
 }
