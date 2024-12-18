@@ -13,7 +13,7 @@ import { HttpResponse } from './HttpResponse';
 const requests: Record<string, http.IncomingMessage> = {};
 const responses: Record<string, http.ServerResponse> = {};
 const minPort = 55000;
-const maxPort = 65535;
+const maxPort = 55025;
 
 const invocRequestEmitter = new EventEmitter();
 
@@ -137,20 +137,21 @@ export async function setupHttpProxy(): Promise<string> {
     });
 }
 
-// Function to get a random port within a specified range
-function getRandomPort(): number {
-    return Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort;
-}
-
 // Function to find an open port starting from a specified port
 function findOpenPort(callback: (port: number) => void): void {
     const server = net.createServer();
 
     function tryPort(port: number) {
+        if (port > maxPort) {
+            // If we've reached the maximum port, throw an error
+            throw new AzFuncSystemError(
+                `No available ports found between ${minPort} and ${maxPort}. To enable HTTP streaming, please open a port in this range.`
+            );
+        }
+
         server.once('error', () => {
-            // If the port is unavailable, get a random port and try again
-            const randomPort = getRandomPort();
-            tryPort(randomPort);
+            // If the port is unavailable, increment and try the next one
+            tryPort(port + 1);
         });
 
         // If the port is available, return it
