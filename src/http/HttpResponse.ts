@@ -27,7 +27,7 @@ export class HttpResponse implements types.HttpResponse {
             this.#uRes = init.undiciResponse;
         } else {
             const uResInit: uResponseInit = { status: init.status, headers: init.headers };
-            if (isDefined(init.jsonBody)) {
+            if (init.jsonBody !== undefined) {
                 this.#uRes = uResponse.json(init.jsonBody, uResInit);
             } else {
                 this.#uRes = new uResponse(init.body, uResInit);
