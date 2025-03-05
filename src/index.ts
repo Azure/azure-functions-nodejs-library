@@ -22,3 +22,7 @@ export enum SqlChangeOperation {
     Update = 1,
     Delete = 2,
 }
+
+export enum MySqlChangeOperation {
+    Update = 0,
+}

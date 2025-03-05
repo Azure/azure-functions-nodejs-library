@@ -12,6 +12,8 @@ import {
     GenericTriggerOptions,
     HttpTrigger,
     HttpTriggerOptions,
+    MySqlTrigger,
+    MySqlTriggerOptions,	
     ServiceBusQueueTrigger,
     ServiceBusQueueTriggerOptions,
     ServiceBusTopicTrigger,
@@ -107,6 +109,13 @@ export function sql(options: SqlTriggerOptions): SqlTrigger {
     return addTriggerBindingName({
         ...options,
         type: 'sqlTrigger',
+    });
+}
+
+export function mySql(options: MySqlTriggerOptions): MySqlTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'mysqlTrigger',
     });
 }
 

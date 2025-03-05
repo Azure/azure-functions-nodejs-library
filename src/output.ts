@@ -12,6 +12,8 @@ import {
     GenericOutputOptions,
     HttpOutput,
     HttpOutputOptions,
+    MySqlOutput,
+    MySqlOutputOptions,
     ServiceBusQueueOutput,
     ServiceBusQueueOutputOptions,
     ServiceBusTopicOutput,
@@ -96,6 +98,13 @@ export function sql(options: SqlOutputOptions): SqlOutput {
     return addOutputBindingName({
         ...options,
         type: 'sql',
+    });
+}
+
+export function mySql(options: MySqlOutputOptions): MySqlOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'mysql',
     });
 }
 

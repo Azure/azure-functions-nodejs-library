@@ -6,6 +6,7 @@ import { EventGridOutput, EventGridPartialEvent } from './eventGrid';
 import { EventHubOutput } from './eventHub';
 import { HttpOutput, HttpResponse } from './http';
 import { FunctionInput, FunctionOutput, FunctionTrigger, LogLevel } from './index';
+import { MySqlInput, MySqlOutput } from './mySql';
 import { ServiceBusQueueOutput, ServiceBusTopicOutput } from './serviceBus';
 import { SqlInput, SqlOutput } from './sql';
 import { StorageBlobInput, StorageBlobOutput, StorageQueueOutput } from './storage';
@@ -128,6 +129,12 @@ export interface InvocationContextExtraInputs {
      * @input the configuration object for this SQL input
      */
     get(input: SqlInput): unknown;
+	
+    /**
+     * Get a secondary MySql items input for this invocation
+     * @input the configuration object for this MySql input
+     */
+    get(input: MySqlInput): unknown;
 
     /**
      * Get a secondary generic input for this invocation
@@ -216,6 +223,13 @@ export interface InvocationContextExtraOutputs {
      * @message the output event(s) value
      */
     set(output: EventGridOutput, events: EventGridPartialEvent | EventGridPartialEvent[]): void;
+	
+    /**
+     * Set a secondary MySql items output for this invocation
+     * @output the configuration object for this MySql output
+     * @documents the output item(s) value
+     */
+    set(output: MySqlOutput, items: unknown): void;
 
     /**
      * Set a secondary Web PubSub output for this invocation

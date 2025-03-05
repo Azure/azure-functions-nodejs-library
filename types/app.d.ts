@@ -6,6 +6,7 @@ import { EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
 import { GenericFunctionOptions } from './generic';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
+import { MySqlFunctionOptions } from './mySql';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
 import { SetupOptions } from './setup';
 import { SqlFunctionOptions } from './sql';
@@ -172,6 +173,13 @@ export function warmup(name: string, options: WarmupFunctionOptions): void;
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function sql(name: string, options: SqlFunctionOptions): void;
+
+/**
+ * Registers a MySql function in your app that will be triggered when a row is created or updated
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the inputs, outputs, and handler for this function
+ */
+export function mySql(name: string, options: MySqlFunctionOptions): void;
 
 /**
  * Registers a generic function in your app that will be triggered based on the type specified in `options.trigger.type`

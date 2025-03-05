@@ -7,6 +7,7 @@ import { FunctionInput } from './index';
 import { SqlInput, SqlInputOptions } from './sql';
 import { StorageBlobInput, StorageBlobInputOptions } from './storage';
 import { TableInput, TableInputOptions } from './table';
+import { MySqlInput, MySqlInputOptions } from './mySql';
 import {
     WebPubSubConnectionInput,
     WebPubSubConnectionInputOptions,
@@ -33,6 +34,11 @@ export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-azure-sql-input?pivots=programming-language-javascript)
  */
 export function sql(options: SqlInputOptions): SqlInput;
+
+/**
+ * [Link to docs and examples](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-azure-mysql-input?pivots=programming-language-javascript)
+ */
+export function mySql(options: MySqlInputOptions): MySqlInput;
 
 /**
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-web-pubsub-input?pivots=programming-language-javascript)

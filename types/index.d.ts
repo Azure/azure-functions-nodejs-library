@@ -17,6 +17,7 @@ export * from './hooks/logHooks';
 export * from './http';
 export * as input from './input';
 export * from './InvocationContext';
+export * from './mySql';
 export * as output from './output';
 export * from './serviceBus';
 export * from './setup';
