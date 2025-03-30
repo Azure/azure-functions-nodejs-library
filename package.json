@@ -1,6 +1,34 @@
 {
     "name": "@azure/functions",
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
     "version": "4.7.2",
+=======
+    "version": "4.9.0-beta.0",
+>>>>>>> 881a6ba (4.9.0-beta.0)
+=======
+    "version": "4.10.0-alpha.0",
+>>>>>>> 1930d06 (4.10.0-alpha.0)
+=======
+    "version": "4.10.0-experimental.0",
+>>>>>>> 27680e4 (4.10.0-experimental.0)
+=======
+    "version": "4.10.0-experimental.1",
+>>>>>>> e9e6128 (4.10.0-experimental.1)
+=======
+    "version": "4.8.0-experimental.0",
+>>>>>>> 2567337 (Updating Pacakge for Release)
+=======
+    "version": "4.7.3-beta-0",
+>>>>>>> 8600841 (Fixing the property value to property name)
+=======
+    "version": "4.8.0",
+>>>>>>> 5bcba5a (Updating the version)
     "description": "Microsoft Azure Functions NodeJS Framework",
     "keywords": [
         "azure",
