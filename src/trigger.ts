@@ -12,8 +12,10 @@ import {
     GenericTriggerOptions,
     HttpTrigger,
     HttpTriggerOptions,
+    McpServerTrigger,
+    McpServerTriggerOptions,
     MySqlTrigger,
-    MySqlTriggerOptions,	
+    MySqlTriggerOptions,
     ServiceBusQueueTrigger,
     ServiceBusQueueTriggerOptions,
     ServiceBusTopicTrigger,
@@ -123,6 +125,13 @@ export function webPubSub(options: WebPubSubTriggerOptions): WebPubSubTrigger {
     return addTriggerBindingName({
         ...options,
         type: 'webPubSubTrigger',
+    });
+}
+
+export function mcpServer(options: McpServerTriggerOptions): McpServerTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'mcpToolTrigger',
     });
 }
 
