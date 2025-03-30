@@ -7,7 +7,7 @@ import { EventHubTrigger, EventHubTriggerOptions } from './eventHub';
 import { GenericTriggerOptions } from './generic';
 import { HttpTrigger, HttpTriggerOptions } from './http';
 import { FunctionTrigger } from './index';
-import { McpServerFunctionOptions, McpServerTrigger } from './mcpServer';
+import { McpToolFunctionOptions, McpToolTrigger } from './mcpTool';
 import { MySqlTrigger, MySqlTriggerOptions } from './mySql';
 import {
     ServiceBusQueueTrigger,
@@ -94,7 +94,7 @@ export function webPubSub(options: WebPubSubTriggerOptions): WebPubSubTrigger;
 /**
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-web-pubsub-trigger?pivots=programming-language-javascript)
  */
-export function mcpServer(options: McpServerFunctionOptions): McpServerTrigger;
+export function mcpTool(options: McpToolFunctionOptions): McpToolTrigger;
 
 /**
  * A generic option that can be used for any trigger type

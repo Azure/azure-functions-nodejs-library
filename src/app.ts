@@ -11,7 +11,7 @@ import {
     HttpHandler,
     HttpMethod,
     HttpMethodFunctionOptions,
-    McpServerFunctionOptions,
+    McpToolFunctionOptions,
     MySqlFunctionOptions,
     ServiceBusQueueFunctionOptions,
     ServiceBusTopicFunctionOptions,
@@ -146,8 +146,8 @@ export function webPubSub(name: string, options: WebPubSubFunctionOptions): void
     generic(name, convertToGenericOptions(options, trigger.webPubSub));
 }
 
-export function mcpServer(name: string, options: McpServerFunctionOptions): void {
-    generic(name, convertToGenericOptions(options, trigger.mcpServer));
+export function mcpTool(name: string, options: McpToolFunctionOptions): void {
+    generic(name, convertToGenericOptions(options, trigger.mcpTool));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {

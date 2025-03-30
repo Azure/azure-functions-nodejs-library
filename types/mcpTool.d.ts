@@ -4,15 +4,15 @@
 import { FunctionOptions, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type McpServerTriggerHandler = (messages: unknown, context: InvocationContext) => FunctionResult;
+export type McpToolTriggerHandler = (messages: unknown, context: InvocationContext) => FunctionResult;
 
-export interface McpServerFunctionOptions extends McpServerTriggerOptions, Partial<FunctionOptions> {
-    handler: McpServerTriggerHandler;
+export interface McpToolFunctionOptions extends McpToolTriggerOptions, Partial<FunctionOptions> {
+    handler: McpToolTriggerHandler;
 
-    trigger?: McpServerTrigger;
+    trigger?: McpToolTrigger;
 }
 
-export interface McpServerTriggerOptions {
+export interface McpToolTriggerOptions {
     /**
      * An app setting (or environment variable) with the service bus connection string
      */
@@ -28,4 +28,4 @@ export interface McpServerTriggerOptions {
      */
     toolProperties?: Record<string, unknown>;
 }
-export type McpServerTrigger = FunctionTrigger & McpServerTriggerOptions;
+export type McpToolTrigger = FunctionTrigger & McpToolTriggerOptions;

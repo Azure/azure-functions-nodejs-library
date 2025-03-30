@@ -6,7 +6,7 @@ import { EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
 import { GenericFunctionOptions } from './generic';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
-import { McpServerFunctionOptions } from './mcpServer';
+import { McpToolFunctionOptions } from './mcpTool';
 import { MySqlFunctionOptions } from './mySql';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
 import { SetupOptions } from './setup';
@@ -197,6 +197,6 @@ export function generic(name: string, options: GenericFunctionOptions): void;
  */
 export function webPubSub(name: string, options: WebPubSubFunctionOptions): void;
 
-export function mcpServer(name: string, options: McpServerFunctionOptions): void;
+export function mcpTool(name: string, options: McpToolFunctionOptions): void;
 
 export * as hook from './hooks/registerHook';
