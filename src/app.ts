@@ -146,6 +146,13 @@ export function webPubSub(name: string, options: WebPubSubFunctionOptions): void
     generic(name, convertToGenericOptions(options, trigger.webPubSub));
 }
 
+/**
+ * Registers an MCP Tool function in your app.
+ * This function is triggered by MCP Tool events and allows you to define the behavior of the function.
+ *
+ * @param name - The name of the function. This must be unique within your app and is primarily used for tracking purposes.
+ * @param options - Configuration options for the MCP Tool function, including the handler and trigger-specific settings.
+ */
 export function mcpTool(name: string, options: McpToolFunctionOptions): void {
     generic(name, convertToGenericOptions(options, trigger.mcpTool));
 }

@@ -92,7 +92,7 @@ export function mySql(options: MySqlTriggerOptions): MySqlTrigger;
 export function webPubSub(options: WebPubSubTriggerOptions): WebPubSubTrigger;
 
 /**
- * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-web-pubsub-trigger?pivots=programming-language-javascript)
+ * [Link to docs and examples](//TODO Add link to docs and examples)
  */
 export function mcpTool(options: McpToolFunctionOptions): McpToolTrigger;
 
