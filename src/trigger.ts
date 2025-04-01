@@ -14,6 +14,7 @@ import {
     HttpTriggerOptions,
     McpToolTrigger,
     McpToolTriggerOptions,
+    McpToolTriggerOptionsToRpc,
     MySqlTrigger,
     MySqlTriggerOptions,
     ServiceBusQueueTrigger,
@@ -129,6 +130,22 @@ export function webPubSub(options: WebPubSubTriggerOptions): WebPubSubTrigger {
 }
 
 /**
+ * Converts an McpToolTriggerOptions object to an McpToolTriggerOptionsToRpc object.
+ *
+ * @param mcpToolTriggerOptions - The input options to be converted.
+ * @returns The converted McpToolTriggerOptionsToRpc object.
+ */
+export function converToMcpToolTriggerOptionsToRpc(
+    mcpToolTriggerOptions: McpToolTriggerOptions
+): McpToolTriggerOptionsToRpc {
+    return {
+        toolName: mcpToolTriggerOptions.toolName,
+        description: mcpToolTriggerOptions.description,
+        toolProperties: JSON.stringify(mcpToolTriggerOptions.toolProperties),
+    };
+}
+
+/**
  * Creates an MCP Tool trigger configuration.
  * This function is used to define an MCP Tool trigger for an Azure Function.
  *
@@ -137,7 +154,7 @@ export function webPubSub(options: WebPubSubTriggerOptions): WebPubSubTrigger {
  */
 export function mcpTool(options: McpToolTriggerOptions): McpToolTrigger {
     return addTriggerBindingName({
-        ...options,
+        ...converToMcpToolTriggerOptionsToRpc(options),
         type: 'mcpToolTrigger',
     });
 }

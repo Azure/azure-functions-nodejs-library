@@ -50,6 +50,30 @@ export interface McpToolTriggerOptions {
      * Additional properties or metadata for the tool.
      * This is a dictionary of key-value pairs that can be used to configure the trigger.
      */
+    toolProperties?: McpToolProperty[];
+}
+
+/**
+ * Configuration options for an MCP Tool trigger.
+ * These options define the behavior and metadata for the trigger.
+ */
+export interface McpToolTriggerOptionsToRpc {
+    /**
+     * The name of the tool associated with the trigger.
+     * This is typically an app setting or environment variable.
+     */
+    toolName: string;
+
+    /**
+     * A description of the tool or trigger.
+     * This provides additional context about the trigger's purpose.
+     */
+    description: string;
+
+    /**
+     * Additional properties or metadata for the tool.
+     * This is a dictionary of key-value pairs that can be used to configure the trigger.
+     */
     toolProperties?: string;
 }
 
@@ -57,7 +81,7 @@ export interface McpToolTriggerOptions {
  * Represents an MCP Tool trigger, combining base function trigger options
  * with MCP Tool-specific trigger options.
  */
-export type McpToolTrigger = FunctionTrigger & McpToolTriggerOptions;
+export type McpToolTrigger = FunctionTrigger & McpToolTriggerOptionsToRpc;
 
 export interface McpToolProperty {
     /**
