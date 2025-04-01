@@ -50,7 +50,7 @@ export interface McpToolTriggerOptions {
      * Additional properties or metadata for the tool.
      * This is a dictionary of key-value pairs that can be used to configure the trigger.
      */
-    toolProperties?: Record<string, unknown>;
+    toolProperties?: string;
 }
 
 /**
@@ -58,3 +58,21 @@ export interface McpToolTriggerOptions {
  * with MCP Tool-specific trigger options.
  */
 export type McpToolTrigger = FunctionTrigger & McpToolTriggerOptions;
+
+export interface McpToolProperty {
+    /**
+     * The name of the property.
+     */
+    propertyName: string;
+
+    /**
+     * The value of the property.
+     */
+    propertyValue: string;
+
+    /**
+     * A description of the property.
+     * This provides additional context about the purpose or usage of the property.
+     */
+    description: string;
+}
