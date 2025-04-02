@@ -50,7 +50,7 @@ export interface McpToolTriggerOptions {
      * Additional properties or metadata for the tool.
      * This is a dictionary of key-value pairs that can be used to configure the trigger.
      */
-    toolProperties?: McpToolProperty[];
+    toolProperties?: any | McpToolProperty[];
 }
 
 /**

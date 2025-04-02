@@ -14,7 +14,6 @@ import {
     HttpTriggerOptions,
     McpToolTrigger,
     McpToolTriggerOptions,
-    McpToolTriggerOptionsToRpc,
     MySqlTrigger,
     MySqlTriggerOptions,
     ServiceBusQueueTrigger,
@@ -35,6 +34,7 @@ import {
     WebPubSubTriggerOptions,
 } from '@azure/functions';
 import { addBindingName } from './addBindingName';
+import { converToMcpToolTriggerOptionsToRpc } from './converters/toMcpToolTriggerOptionsToRpc';
 
 export function http(options: HttpTriggerOptions): HttpTrigger {
     return addTriggerBindingName({
@@ -127,22 +127,6 @@ export function webPubSub(options: WebPubSubTriggerOptions): WebPubSubTrigger {
         ...options,
         type: 'webPubSubTrigger',
     });
-}
-
-/**
- * Converts an McpToolTriggerOptions object to an McpToolTriggerOptionsToRpc object.
- *
- * @param mcpToolTriggerOptions - The input options to be converted.
- * @returns The converted McpToolTriggerOptionsToRpc object.
- */
-export function converToMcpToolTriggerOptionsToRpc(
-    mcpToolTriggerOptions: McpToolTriggerOptions
-): McpToolTriggerOptionsToRpc {
-    return {
-        toolName: mcpToolTriggerOptions.toolName,
-        description: mcpToolTriggerOptions.description,
-        toolProperties: JSON.stringify(mcpToolTriggerOptions.toolProperties),
-    };
 }
 
 /**
