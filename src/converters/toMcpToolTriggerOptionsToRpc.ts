@@ -15,10 +15,18 @@ import { McpToolProperty, McpToolTriggerOptions, McpToolTriggerOptionsToRpc } fr
 export function converToMcpToolTriggerOptionsToRpc(
     mcpToolTriggerOptions: McpToolTriggerOptions
 ): McpToolTriggerOptionsToRpc {
-    // Check if toolProperties is an array of McpToolProperty objects
+    //Check for null or undefined input
+    if (!mcpToolTriggerOptions?.toolProperties) {
+        return {
+            toolName: mcpToolTriggerOptions.toolName,
+            description: mcpToolTriggerOptions.description,
+            toolProperties: JSON.stringify([]), // Default to an empty array
+        };
+    }
+
+    //Check if toolProperties is an array of McpToolProperty objects
     if (Array.isArray(mcpToolTriggerOptions.toolProperties)) {
         const isValid = mcpToolTriggerOptions.toolProperties.every(isMcpToolProperty);
-
         if (isValid) {
             return {
                 toolName: mcpToolTriggerOptions.toolName,
@@ -26,7 +34,9 @@ export function converToMcpToolTriggerOptionsToRpc(
                 toolProperties: JSON.stringify(mcpToolTriggerOptions.toolProperties),
             };
         }
-    } else if (
+    }
+    // Handle cases where toolProperties is a zod schema or other object types
+    else if (
         mcpToolTriggerOptions?.toolProperties !== null &&
         typeof mcpToolTriggerOptions.toolProperties === 'object'
     ) {
