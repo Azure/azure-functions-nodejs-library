@@ -44,32 +44,38 @@ export function converToMcpToolTriggerOptionsToRpc(
 
     // Handle cases where toolProperties is an object (e.g., Zod schema)
     if (typeof mcpToolTriggerOptions.toolProperties === 'object') {
-        let isZodObject = false;
-
+        // Define the type of the ZodObject shape and ZodPropertyDef
         type ZodPropertyDef = {
             description?: string;
             typeName: string;
         };
+        type ZodObjectShape = Record<string, { _def: ZodPropertyDef }>;
 
-        // type ZodShape = Record<string, { _def: ZodPropertyDef }>;
-        // type PlainObjectShape = Record<string, any>;
-        // Narrow the type of `shape` based on whether the input is a Zod object or plain object
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        // const shape: ZodShape | PlainObjectShape = isZodObject
-        //     ? (mcpToolTriggerOptions.toolProperties as { shape: ZodShape }).shape
-        //     : typeof mcpToolTriggerOptions.toolProperties === 'object'
-        //     ? mcpToolTriggerOptions.toolProperties
-        //     : {};
+        // Define the type of the toolProperties object
+        type ToolProperties =
+            | {
+                  _def?: {
+                      typeName?: string;
+                  };
+                  shape?: ZodObjectShape;
+              }
+            | Record<string, unknown>;
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        if (mcpToolTriggerOptions.toolProperties?._def?.typeName === 'ZodObject') {
+        let isZodObject = false;
+
+        const toolProperties = mcpToolTriggerOptions.toolProperties as ToolProperties;
+
+        // Check if the object is a ZodObject
+        if ((toolProperties?._def as { typeName?: string })?.typeName === 'ZodObject') {
             isZodObject = true;
         }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const shape: Record<string, any> = isZodObject
-            ? (mcpToolTriggerOptions.toolProperties as { shape: Record<string, { _def: ZodPropertyDef }> }).shape
-            : mcpToolTriggerOptions.toolProperties; // Handle plain objects directly
 
+        // Check if shape is a valid ZodObject shape
+        const shape: ZodObjectShape | Record<string, unknown> = isZodObject
+            ? (toolProperties as { shape: ZodObjectShape }).shape
+            : toolProperties;
+
+        // Extract properties from the ZodObject shape
         const result = Object.keys(shape).map((propertyName) => {
             const property = shape[propertyName] as { _def: ZodPropertyDef };
             const description = property?._def?.description || '';
@@ -90,28 +96,6 @@ export function converToMcpToolTriggerOptionsToRpc(
     // Handle cases where toolProperties is not an array
     throw new Error('Invalid toolProperties: Expected an array of McpToolProperty objects or zod objects.');
 }
-
-// }
-// // Helper function to infer property type from zod schema
-// function getPropertyType(zodType: any): string {
-//     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-plus-operands
-//     console.log('Here: ' + zodType);
-//     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-//     switch (zodType._def.typeName) {
-//         case 'ZodNumber':
-//             return 'number';
-//         case 'ZodString':
-//             return 'string';
-//         case 'ZodBoolean':
-//             return 'boolean';
-//         case 'ZodArray':
-//             return 'array';
-//         case 'ZodObject':
-//             return 'object';
-//         default:
-//             return 'unknown';
-//     }
-// }
 
 /**
  * Type guard to check if a given object is of type McpToolProperty.
