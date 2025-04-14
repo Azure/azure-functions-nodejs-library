@@ -15,67 +15,103 @@ import { McpToolProperty, McpToolTriggerOptions, McpToolTriggerOptionsToRpc } fr
 export function converToMcpToolTriggerOptionsToRpc(
     mcpToolTriggerOptions: McpToolTriggerOptions
 ): McpToolTriggerOptionsToRpc {
-    //Check for null or undefined input
+    // Base object for the return value
+    const baseResult = {
+        toolName: mcpToolTriggerOptions.toolName,
+        description: mcpToolTriggerOptions.description,
+    };
+
+    // Check for null or undefined toolProperties
     if (!mcpToolTriggerOptions?.toolProperties) {
         return {
-            toolName: mcpToolTriggerOptions.toolName,
-            description: mcpToolTriggerOptions.description,
+            ...baseResult,
             toolProperties: JSON.stringify([]), // Default to an empty array
         };
     }
 
-    //Check if toolProperties is an array of McpToolProperty objects
+    // Check if toolProperties is an array of McpToolProperty objects
     if (Array.isArray(mcpToolTriggerOptions.toolProperties)) {
         const isValid = mcpToolTriggerOptions.toolProperties.every(isMcpToolProperty);
         if (isValid) {
             return {
-                toolName: mcpToolTriggerOptions.toolName,
-                description: mcpToolTriggerOptions.description,
+                ...baseResult,
                 toolProperties: JSON.stringify(mcpToolTriggerOptions.toolProperties),
             };
+        } else {
+            throw new Error('Invalid toolProperties: Array contains invalid McpToolProperty objects.');
         }
     }
-    // Handle cases where toolProperties is a zod schema or other object types
-    else if (
-        mcpToolTriggerOptions?.toolProperties !== null &&
-        typeof mcpToolTriggerOptions.toolProperties === 'object'
-    ) {
+
+    // Handle cases where toolProperties is an object (e.g., Zod schema)
+    if (typeof mcpToolTriggerOptions.toolProperties === 'object') {
+        let isZodObject = false;
+
+        type ZodPropertyDef = {
+            description?: string;
+            typeName: string;
+        };
+
+        // type ZodShape = Record<string, { _def: ZodPropertyDef }>;
+        // type PlainObjectShape = Record<string, any>;
+        // Narrow the type of `shape` based on whether the input is a Zod object or plain object
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // const shape: ZodShape | PlainObjectShape = isZodObject
+        //     ? (mcpToolTriggerOptions.toolProperties as { shape: ZodShape }).shape
+        //     : typeof mcpToolTriggerOptions.toolProperties === 'object'
+        //     ? mcpToolTriggerOptions.toolProperties
+        //     : {};
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        if (mcpToolTriggerOptions.toolProperties?._def?.typeName === 'ZodObject') {
+            isZodObject = true;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const shape: Record<string, any> = isZodObject
+            ? (mcpToolTriggerOptions.toolProperties as { shape: Record<string, { _def: ZodPropertyDef }> }).shape
+            : mcpToolTriggerOptions.toolProperties; // Handle plain objects directly
+
+        const result = Object.keys(shape).map((propertyName) => {
+            const property = shape[propertyName] as { _def: ZodPropertyDef };
+            const description = property?._def?.description || '';
+            const propertyType = property?._def?.typeName?.toLowerCase() || 'unknown'; // Extract type name or default to "unknown"
+
+            return {
+                propertyName,
+                propertyType,
+                description,
+            };
+        });
+
         return {
-            toolName: mcpToolTriggerOptions.toolName,
-            description: mcpToolTriggerOptions.description,
-            toolProperties: JSON.stringify(
-                Object.entries(mcpToolTriggerOptions?.toolProperties as Record<string, unknown>).map(
-                    ([key, value]) => ({
-                        propertyName: key,
-                        propertyType: getPropertyType(value),
-                        description: (value as { _def: { description: string } })._def.description,
-                    })
-                )
-            ),
+            ...baseResult,
+            toolProperties: JSON.stringify(result),
         };
     }
     // Handle cases where toolProperties is not an array
     throw new Error('Invalid toolProperties: Expected an array of McpToolProperty objects or zod objects.');
 }
 
-// Helper function to infer property type from zod schema
-function getPropertyType(zodType: any): string {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    switch (zodType._def.typeName) {
-        case 'ZodNumber':
-            return 'number';
-        case 'ZodString':
-            return 'string';
-        case 'ZodBoolean':
-            return 'boolean';
-        case 'ZodArray':
-            return 'array';
-        case 'ZodObject':
-            return 'object';
-        default:
-            return 'unknown';
-    }
-}
+// }
+// // Helper function to infer property type from zod schema
+// function getPropertyType(zodType: any): string {
+//     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-plus-operands
+//     console.log('Here: ' + zodType);
+//     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+//     switch (zodType._def.typeName) {
+//         case 'ZodNumber':
+//             return 'number';
+//         case 'ZodString':
+//             return 'string';
+//         case 'ZodBoolean':
+//             return 'boolean';
+//         case 'ZodArray':
+//             return 'array';
+//         case 'ZodObject':
+//             return 'object';
+//         default:
+//             return 'unknown';
+//     }
+// }
 
 /**
  * Type guard to check if a given object is of type McpToolProperty.
