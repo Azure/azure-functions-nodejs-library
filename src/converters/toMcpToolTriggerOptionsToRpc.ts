@@ -79,13 +79,18 @@ export function converToMcpToolTriggerOptionsToRpc(
         const result = Object.keys(shape).map((propertyName) => {
             const property = shape[propertyName] as { _def: ZodPropertyDef };
             const description = property?._def?.description || '';
-            const propertyType = property?._def?.typeName?.toLowerCase() || 'unknown'; // Extract type name or default to "unknown"
+            const propertyType = getPropertyType(property?._def?.typeName?.toLowerCase() || 'unknown'); // Extract type name or default to "unknown"
 
             return {
                 propertyName,
                 propertyType,
                 description,
             };
+        });
+
+        console.log('result', {
+            ...baseResult,
+            toolProperties: JSON.stringify(result),
         });
 
         return {
@@ -95,6 +100,31 @@ export function converToMcpToolTriggerOptionsToRpc(
     }
     // Handle cases where toolProperties is not an array
     throw new Error('Invalid toolProperties: Expected an array of McpToolProperty objects or zod objects.');
+}
+
+// Helper function to infer property type from zod schema
+function getPropertyType(zodType: string): string {
+    switch (zodType) {
+        case 'zodnumber':
+            return 'number';
+        case 'zodstring':
+            return 'string';
+        case 'zodboolean':
+            return 'boolean';
+        case 'zodarray':
+            return 'array';
+        case 'zodobject':
+            return 'object';
+        case 'zodbigint':
+            return 'long';
+        case 'zoddate':
+            return 'DateTime';
+        case 'zodtuple':
+            return 'Tuple';
+        default:
+            console.warn(`Unknown zod type: ${zodType}`);
+            return 'unknown';
+    }
 }
 
 /**
