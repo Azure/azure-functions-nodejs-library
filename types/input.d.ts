@@ -4,10 +4,10 @@
 import { CosmosDBInput, CosmosDBInputOptions } from './cosmosDB';
 import { GenericInputOptions } from './generic';
 import { FunctionInput } from './index';
+import { MySqlInput, MySqlInputOptions } from './mySql';
 import { SqlInput, SqlInputOptions } from './sql';
 import { StorageBlobInput, StorageBlobInputOptions } from './storage';
 import { TableInput, TableInputOptions } from './table';
-import { MySqlInput, MySqlInputOptions } from './mySql';
 import {
     WebPubSubConnectionInput,
     WebPubSubConnectionInputOptions,

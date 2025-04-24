@@ -29,6 +29,10 @@ export * as trigger from './trigger';
 export * from './warmup';
 export * from './webpubsub';
 
+export const enum SupportedDeferredBindingTypes {
+    BLOBTRIGGER = 'blobTrigger',
+}
+
 /**
  * Void if no `return` output is registered
  * Otherwise, the registered `return` output
@@ -69,6 +73,12 @@ export interface FunctionOptions {
      * During invocation, set these values with `context.extraOutputs.set()`
      */
     extraOutputs?: FunctionOutput[];
+
+    /**
+     * Configuration for the optional deferredBindingTypey for this function
+     * This is the retry policy that will be used if the function fails during
+     */
+    deferredBindingType?: SupportedDeferredBindingTypes;
 }
 
 /**

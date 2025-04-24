@@ -1,7 +1,12 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { ExponentialBackoffRetryOptions, FixedDelayRetryOptions, GenericFunctionOptions } from '@azure/functions';
+import {
+    ExponentialBackoffRetryOptions,
+    FixedDelayRetryOptions,
+    GenericFunctionOptions,
+    SupportedDeferredBindingTypes,
+} from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import { returnBindingKey } from '../constants';
 import { AzFuncSystemError } from '../errors';
@@ -11,12 +16,15 @@ import { toRpcDuration } from './toRpcDuration';
 export function toCoreFunctionMetadata(name: string, options: GenericFunctionOptions): coreTypes.FunctionMetadata {
     const bindings: Record<string, coreTypes.RpcBindingInfo> = {};
     const bindingNames: string[] = [];
-
     const trigger = options.trigger;
+    console.log('toCoreFunctionMetadata: Handle', JSON.stringify(options));
+    console.log('toCoreFunctionMetadata: deferredBindingType', options.trigger.deferredBindingType);
+
     bindings[trigger.name] = {
         ...trigger,
         direction: 'in',
         type: isTrigger(trigger.type) ? trigger.type : trigger.type + 'Trigger',
+        properties: addDeferredBindingsFlag(options.trigger.type, options.trigger.deferredBindingType),
     };
     bindingNames.push(trigger.name);
 
@@ -25,6 +33,7 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
             bindings[input.name] = {
                 ...input,
                 direction: 'in',
+                //properties: addDeferredBindingsFlag(input.type),
             };
             bindingNames.push(input.name);
         }
@@ -73,4 +82,18 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
     }
 
     return { name, bindings, retryOptions };
+}
+
+function addDeferredBindingsFlag(
+    triggerType: string,
+    deferredBindingType?: SupportedDeferredBindingTypes | unknown
+): { [key: string]: string } {
+    //Ensure that trigger type that is passed is valid and supported, to avoid customer misconfiguration.
+    console.log('Adding deferred binding flag: ', deferredBindingType);
+    if (deferredBindingType !== undefined && triggerType === 'blobTrigger') {
+        console.log('Adding deferred binding flag to trigger type:', triggerType);
+        return { supportsDeferredBinding: 'true' };
+    }
+
+    return { supportsDeferredBinding: 'false' };
 }
