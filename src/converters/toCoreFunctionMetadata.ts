@@ -90,7 +90,18 @@ function addDeferredBindingsFlag(
 ): { [key: string]: string } {
     //Ensure that trigger type that is passed is valid and supported, to avoid customer misconfiguration.
     console.log('Adding deferred binding flag: ', deferredBindingType);
-    if (deferredBindingType !== undefined && triggerType === 'blobTrigger') {
+    //TODO there is inherent issue with converting the enum to string, look for fix in the when other SDK biniding will be supported.
+    const deferredBindingTypesSet = new Set<string>([
+        'blobTrigger',
+        //TODO: enum memeber conversion is running into error, issue is with the typescript.
+        //SupportedDeferredBindingTypes.BLOBTRIGGER,
+    ]);
+
+    if (
+        deferredBindingType !== undefined &&
+        deferredBindingType === triggerType &&
+        deferredBindingTypesSet.has(triggerType)
+    ) {
         console.log('Adding deferred binding flag to trigger type:', triggerType);
         return { supportsDeferredBinding: 'true' };
     }

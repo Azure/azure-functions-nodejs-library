@@ -1,8 +1,10 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import { SupportedDeferredBindingTypes } from '../src/deferred-binding/supportedDeferredBindingTypes';
 import { InvocationContext } from './InvocationContext';
 
+export * from '../src/deferred-binding/supportedDeferredBindingTypes';
 export * as app from './app';
 export * from './cosmosDB';
 export * from './cosmosDB.v3';
@@ -28,10 +30,6 @@ export * from './timer';
 export * as trigger from './trigger';
 export * from './warmup';
 export * from './webpubsub';
-
-export const enum SupportedDeferredBindingTypes {
-    BLOBTRIGGER = 'blobTrigger',
-}
 
 /**
  * Void if no `return` output is registered
