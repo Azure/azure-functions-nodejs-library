@@ -13,7 +13,7 @@ import {
     HttpTrigger,
     HttpTriggerOptions,
     MySqlTrigger,
-    MySqlTriggerOptions,	
+    MySqlTriggerOptions,
     ServiceBusQueueTrigger,
     ServiceBusQueueTriggerOptions,
     ServiceBusTopicTrigger,
@@ -50,6 +50,7 @@ export function timer(options: TimerTriggerOptions): TimerTrigger {
 }
 
 export function storageBlob(options: StorageBlobTriggerOptions): StorageBlobTrigger {
+    console.log('storageBlob', options);
     return addTriggerBindingName({
         ...options,
         type: 'blobTrigger',
@@ -131,5 +132,6 @@ export function generic(options: GenericTriggerOptions): FunctionTrigger {
 }
 
 function addTriggerBindingName<T extends { type: string; name?: string }>(binding: T): T & { name: string } {
+    console.log('addTriggerBindingName', binding);
     return addBindingName(binding, 'Trigger');
 }

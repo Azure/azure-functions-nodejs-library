@@ -5,9 +5,11 @@ import 'mocha';
 import { expect } from 'chai';
 import { output, trigger } from '../../src';
 import { toCoreFunctionMetadata } from '../../src/converters/toCoreFunctionMetadata';
+import { InvocationContext } from '../../types';
 
 describe('toCoreFunctionMetadata', () => {
-    const handler = () => {};
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const handler = (blob: Buffer, context: InvocationContext) => {};
     const expectedHttpTrigger = {
         authLevel: 'anonymous',
         methods: ['GET', 'POST'],

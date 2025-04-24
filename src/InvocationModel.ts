@@ -20,6 +20,8 @@ import { fromRpcTypedData } from './converters/fromRpcTypedData';
 import { toCamelCaseValue } from './converters/toCamelCase';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
+import { buildClientFromModelBindingData } from './deferred-binding/connectionBuilder';
+import { isModelBindingData } from './deferred-binding/connectionDetails';
 import { AzFuncSystemError } from './errors';
 import { waitForProxyRequest } from './http/httpProxy';
 import { createStreamRequest } from './http/HttpRequest';
@@ -80,13 +82,18 @@ export class InvocationModel implements coreTypes.InvocationModel {
                     const proxyRequest = await waitForProxyRequest(this.#coreCtx.invocationId);
                     input = createStreamRequest(proxyRequest, nonNullProp(req, 'triggerMetadata'));
                 } else {
-                    input = fromRpcTypedData(binding.data);
+                    const inputData = fromRpcTypedData(binding.data);
+                    // Check if modelBindingData is a proper object and has a content property
+                    console.log('inputData', inputData);
+                    if (isModelBindingData(inputData)) {
+                        input = buildClientFromModelBindingData(inputData);
+                    } else {
+                        input = inputData;
+                    }
                 }
-
                 if (isTimerTrigger(bindingType)) {
                     input = toCamelCaseValue(input);
                 }
-
                 if (isTrigger(bindingType)) {
                     inputs.push(input);
                 } else {

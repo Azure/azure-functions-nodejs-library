@@ -16,6 +16,7 @@ export function addBindingName<T extends { type: string; name?: string }>(
     binding: T,
     suffix: string
 ): T & { name: string } {
+    console.log('addBindingName: binding', JSON.stringify(binding));
     if (!binding.name) {
         let bindingType = binding.type;
         if (!bindingType.toLowerCase().endsWith(suffix.toLowerCase())) {
