@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { RpcTypedData } from '@azure/functions-core';
+import { buildClientFromModelBindingData } from '../deferred-binding/connectionBuilder';
 import { HttpRequest } from '../http/HttpRequest';
 import { isDefined } from '../utils/nonNull';
 
@@ -54,7 +55,8 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
         return data.collectionSint64.sint64;
     } else if (data.modelBindingData && isDefined(data.modelBindingData.content)) {
         console.log('Here at the modelBindinData', data.modelBindingData);
-        return data.modelBindingData;
+        return buildClientFromModelBindingData(data.modelBindingData);
+        //return data.modelBindingData;
     } else {
         console.log('Condition: none matched - returning undefined');
         return undefined;

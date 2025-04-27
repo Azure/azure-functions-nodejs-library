@@ -42,6 +42,7 @@ export function parseConnectionDetails(jsonBuffer: Buffer | null | undefined): B
         throw new Error('Connection details content is null or undefined');
     }
     const parsedObject: unknown = JSON.parse(jsonBuffer.toString());
+    console.log('Parsed object:', parsedObject);
 
     if (isBlobConnectionDetails(parsedObject)) {
         return parsedObject;

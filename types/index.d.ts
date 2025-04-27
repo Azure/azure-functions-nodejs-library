@@ -6,6 +6,7 @@ import { InvocationContext } from './InvocationContext';
 
 export * from '../src/deferred-binding/supportedDeferredBindingTypes';
 export * as app from './app';
+export * from './blobStorageClient';
 export * from './cosmosDB';
 export * from './cosmosDB.v3';
 export * from './cosmosDB.v4';
