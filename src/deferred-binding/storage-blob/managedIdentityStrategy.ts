@@ -15,4 +15,6 @@ export class ManagedIdentityStrategy implements BlobServiceClientStrategy {
         const credential = new DefaultAzureCredential();
         return new BlobServiceClient(this.accountUrl, credential, options);
     }
+
+    //"AzureWebJobsStorage__serviceUri": "https://swapnil1storage.blob.core.windows.net/",
 }
