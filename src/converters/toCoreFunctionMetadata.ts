@@ -1,30 +1,24 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import {
-    ExponentialBackoffRetryOptions,
-    FixedDelayRetryOptions,
-    GenericFunctionOptions,
-    SupportedDeferredBindingTypes,
-} from '@azure/functions';
+import { ExponentialBackoffRetryOptions, FixedDelayRetryOptions, GenericFunctionOptions } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import { returnBindingKey } from '../constants';
 import { AzFuncSystemError } from '../errors';
 import { isTrigger } from '../utils/isTrigger';
+import { workerSystemLog } from '../utils/workerSystemLog';
 import { toRpcDuration } from './toRpcDuration';
 
 export function toCoreFunctionMetadata(name: string, options: GenericFunctionOptions): coreTypes.FunctionMetadata {
     const bindings: Record<string, coreTypes.RpcBindingInfo> = {};
     const bindingNames: string[] = [];
     const trigger = options.trigger;
-    console.log('toCoreFunctionMetadata: Handle', JSON.stringify(options));
-    console.log('toCoreFunctionMetadata: deferredBindingType', options.trigger.deferredBindingType);
 
     bindings[trigger.name] = {
         ...trigger,
         direction: 'in',
         type: isTrigger(trigger.type) ? trigger.type : trigger.type + 'Trigger',
-        properties: addDeferredBindingsFlag(options.trigger.type, options.trigger.deferredBindingType),
+        properties: addSdkBindingsFlag(options.trigger?.sdkBinding, name, trigger.type, trigger.name, false),
     };
     bindingNames.push(trigger.name);
 
@@ -33,7 +27,7 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
             bindings[input.name] = {
                 ...input,
                 direction: 'in',
-                //properties: addDeferredBindingsFlag(input.type),
+                properties: addSdkBindingsFlag(input?.sdkBinding, name, input.type, input.name, true),
             };
             bindingNames.push(input.name);
         }
@@ -84,25 +78,43 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
     return { name, bindings, retryOptions };
 }
 
-function addDeferredBindingsFlag(
-    triggerType: string,
-    deferredBindingType?: SupportedDeferredBindingTypes | unknown
+/**
+ * Adds the deferred binding flags to function bindings based on the binding configuration
+ * @param sdkBindingType Boolean indicating if this is an SDK binding
+ * @param functionName The name of the function for logging purposes
+ * @param triggerType The type of the trigger or binding
+ * @param bindingOrTriggerName The name of the trigger or binding
+ * @param isBinding Boolean indicating if this is a binding (vs a trigger)
+ * @returns Object with supportsDeferredBinding property set to 'true' or 'false'
+ */
+export function addSdkBindingsFlag(
+    sdkBindingType?: boolean | unknown,
+    functionName?: string,
+    triggerType?: string,
+    bindingOrTriggerName?: string,
+    isBinding?: boolean
 ): { [key: string]: string } {
-    //Ensure that trigger type that is passed is valid and supported, to avoid customer misconfiguration.
-    console.log('Adding deferred binding flag: ', deferredBindingType);
-    //TODO there is inherent issue with converting the enum to string, look for fix in the when other SDK biniding will be supported.
-    const deferredBindingTypesSet = new Set<string>([
-        'blobTrigger',
-        //TODO: enum memeber conversion is running into error, issue is with the typescript.
-        //SupportedDeferredBindingTypes.BLOBTRIGGER,
-    ]);
+    // Ensure that trigger type is valid and supported
+    if (sdkBindingType !== undefined && sdkBindingType === true) {
+        const entityType = isBinding ? 'binding' : 'trigger';
 
-    if (
-        deferredBindingType !== undefined &&
-        deferredBindingType === triggerType &&
-        deferredBindingTypesSet.has(triggerType)
-    ) {
-        console.log('Adding deferred binding flag to trigger type:', triggerType);
+        // Create structured JSON log entry
+        const logData = {
+            operation: 'EnableDeferredBinding',
+            properties: {
+                functionName: functionName || 'unknown',
+                entityType: entityType,
+                triggerType: triggerType || 'unknown',
+                bindingOrTriggerName: bindingOrTriggerName || 'unknown',
+                supportsDeferredBinding: true,
+            },
+            message: `Enabled Deferred Binding of type '${triggerType || 'unknown'}' for function '${
+                functionName || 'unknown'
+            }'`,
+        };
+        // Log both the structured data
+        console.log(JSON.stringify(logData));
+        workerSystemLog('information', JSON.stringify(logData));
         return { supportsDeferredBinding: 'true' };
     }
 

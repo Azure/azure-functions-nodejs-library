@@ -1,12 +1,9 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { SupportedDeferredBindingTypes } from '../src/deferred-binding/supportedDeferredBindingTypes';
 import { InvocationContext } from './InvocationContext';
 
-export * from '../src/deferred-binding/supportedDeferredBindingTypes';
 export * as app from './app';
-export * from './blobStorageClient';
 export * from './cosmosDB';
 export * from './cosmosDB.v3';
 export * from './cosmosDB.v4';
@@ -72,12 +69,6 @@ export interface FunctionOptions {
      * During invocation, set these values with `context.extraOutputs.set()`
      */
     extraOutputs?: FunctionOutput[];
-
-    /**
-     * Configuration for the optional deferredBindingTypey for this function
-     * This is the retry policy that will be used if the function fails during
-     */
-    deferredBindingType?: SupportedDeferredBindingTypes;
 }
 
 /**
