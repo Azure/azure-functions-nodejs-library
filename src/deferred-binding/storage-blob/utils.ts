@@ -37,9 +37,29 @@ export function getConnectionString(connectionString: string | undefined): strin
  * connection string has either of the two suffixes:
  * __serviceUri or __blobServiceUri.
  */
-export function usingManagedIdentity(connectionName: string): boolean {
+export function isSystemBasedManagedIdentity(connectionName: string): boolean {
     return (
         process.env[`${connectionName}__serviceUri`] !== undefined ||
         process.env[`${connectionName}__blobServiceUri`] !== undefined
+    );
+}
+
+/**
+ * Determines if a user-assigned managed identity is being used for authentication.
+ *
+ * User-assigned managed identities in Azure Functions are identified by the presence of:
+ * - ${connectionName}__clientId: The client ID of the user-assigned managed identity
+ * - ${connectionName}__credential: The credential type being used
+ *
+ * This differs from system-assigned managed identities, which don't require a client ID.
+ *
+ * @param connectionName - The base name of the connection setting
+ * @returns boolean indicating if a user-assigned managed identity is configured
+ */
+export function isUserBasedManagedIdentity(connectionName: string): boolean {
+    return (
+        process.env[`${connectionName}__clientId`] !== undefined &&
+        process.env[`${connectionName}__credential`] !== undefined &&
+        process.env[`${connectionName}__serviceUri`] !== undefined
     );
 }

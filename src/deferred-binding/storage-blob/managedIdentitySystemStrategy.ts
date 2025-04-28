@@ -3,18 +3,16 @@
 
 import { DefaultAzureCredential } from '@azure/identity';
 import { BlobServiceClient, StoragePipelineOptions } from '@azure/storage-blob';
-import { BlobServiceClientStrategy } from './blobServiceClientStrategy';
+import { StorageBlobServiceClientStrategy } from './storageBlobServiceClientStrategy';
 
-export class ManagedIdentityStrategy implements BlobServiceClientStrategy {
+export class ManagedIdentitySystemStrategy implements StorageBlobServiceClientStrategy {
     /**
      * @param accountUrl - URL to the storage account (e.g., https://myaccount.blob.core.windows.net)
      */
     constructor(private accountUrl: string) {}
 
-    createBlobServiceClient(options?: StoragePipelineOptions): BlobServiceClient {
+    createStroageBlobServiceClient(options?: StoragePipelineOptions): BlobServiceClient {
         const credential = new DefaultAzureCredential();
         return new BlobServiceClient(this.accountUrl, credential, options);
     }
-
-    //"AzureWebJobsStorage__serviceUri": "https://swapnil1storage.blob.core.windows.net/",
 }

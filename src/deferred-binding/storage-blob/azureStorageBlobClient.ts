@@ -2,29 +2,29 @@
 // Licensed under the MIT License.
 
 import { BlobClient, ContainerClient, StoragePipelineOptions } from '@azure/storage-blob';
-import { BlobServiceClientStrategy } from './blobServiceClientStrategy';
+import { StorageBlobServiceClientStrategy } from './storageBlobServiceClientStrategy';
 
-export class AzureBlobStorageClient {
+export class AzureStorageBlobClient {
     private blobClient: BlobClient | undefined;
     private containerClient: ContainerClient | undefined;
 
     /**
-     * Creates a new AzureBlobStorageClient instance
+     * Creates a new AzureStorageBlobClient instance
      *
      * @param strategyOrAccountUrl - The strategy to use for creating the BlobServiceClient or the account URL
      * @param credentialOrOptions - The credential to use for authentication or storage pipeline options
      * @param options - Storage pipeline options (optional, only used when the first parameter is an account URL)
      */
     constructor(
-        strategy: BlobServiceClientStrategy,
+        strategy: StorageBlobServiceClientStrategy,
         containerName?: string,
         blobName?: string,
         options?: StoragePipelineOptions
     ) {
-        const blobServiceClient = strategy.createBlobServiceClient(options);
+        const storageBlobServiceClient = strategy.createStroageBlobServiceClient(options);
         // Initialize container and blob clients if names are provided
         if (containerName) {
-            this.containerClient = blobServiceClient.getContainerClient(containerName);
+            this.containerClient = storageBlobServiceClient.getContainerClient(containerName);
 
             if (blobName) {
                 this.blobClient = this.containerClient.getBlobClient(blobName);
