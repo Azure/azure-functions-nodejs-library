@@ -64,18 +64,15 @@ export class AzureStorageBlobClientFactory {
             if (!clientId) {
                 throw new Error(`Environment variable ${connectionName}__clientId is not defined.`);
             }
-            console.log(`Using user-assigned managed identity with client ID: ${clientId.substring(0, 8)}...`);
             return new ManagedIdentityUserStrategy(connectionUrl, clientId);
         }
 
         // Next, check for system-assigned managed identity
         if (isSystemBasedManagedIdentity(connectionName)) {
-            console.log('Using system-assigned managed identity for connection');
             return new ManagedIdentitySystemStrategy(connectionUrl);
         }
 
         // Default to connection string
-        console.log('Using connection string authentication');
         return new ConnectionStringStrategy(connectionUrl);
     }
 }

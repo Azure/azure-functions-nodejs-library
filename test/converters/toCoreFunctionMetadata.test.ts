@@ -240,8 +240,6 @@ describe('toCoreFunctionMetadata deferred binding tests', () => {
             return: output.http({}),
         });
 
-        console.log('Blob trigger result: 3 : ', result);
-
         expect(result).to.deep.equal({
             name: 'blobFunction',
             bindings: {
@@ -275,8 +273,6 @@ describe('toCoreFunctionMetadata deferred binding tests', () => {
                 },
             ],
         });
-
-        console.log('Blob trigger result: 4 : ', result);
 
         expect(result).to.deep.equal({
             name: 'funcName',

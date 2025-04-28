@@ -10,33 +10,23 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
     if (!data) {
         return undefined;
     } else if (isDefined(data.string)) {
-        const result = tryJsonParse(data.string);
-        return result;
+        return tryJsonParse(data.string);
     } else if (isDefined(data.json)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const result = JSON.parse(data.json);
-        return result;
+        return JSON.parse(data.json);
     } else if (isDefined(data.bytes)) {
-        const result = Buffer.from(data.bytes);
-        return result;
+        return Buffer.from(data.bytes);
     } else if (isDefined(data.stream)) {
-        const result = Buffer.from(data.stream);
-        return result;
+        return Buffer.from(data.stream);
     } else if (isDefined(data.http)) {
-        const result = new HttpRequest(data.http);
-        return result;
+        return new HttpRequest(data.http);
     } else if (isDefined(data.int)) {
-        console.log('Condition: data.int - returning:', data.int);
         return data.int;
     } else if (isDefined(data.double)) {
-        console.log('Condition: data.double - returning:', data.double);
         return data.double;
     } else if (data.collectionBytes && isDefined(data.collectionBytes.bytes)) {
-        const result = data.collectionBytes.bytes.map((d) => Buffer.from(d));
-        return result;
+        return data.collectionBytes.bytes.map((d) => Buffer.from(d));
     } else if (data.collectionString && isDefined(data.collectionString.string)) {
-        const result = data.collectionString.string.map(tryJsonParse);
-        return result;
+        return data.collectionString.string.map(tryJsonParse);
     } else if (data.collectionDouble && isDefined(data.collectionDouble.double)) {
         return data.collectionDouble.double;
     } else if (data.collectionSint64 && isDefined(data.collectionSint64.sint64)) {
@@ -51,9 +41,7 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
 
 function tryJsonParse(data: string): unknown {
     try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const parsed = JSON.parse(data);
-        return parsed;
+        return JSON.parse(data);
     } catch {
         return data;
     }

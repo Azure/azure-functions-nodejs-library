@@ -1,9 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-// Copyright (c) .NET Foundation. All rights reserved.
-// Licensed under the MIT License.
-
 import { RpcTypedData } from '@azure/functions-core';
 
 export function toRpcTypedData(data: unknown): RpcTypedData | null | undefined {
@@ -26,7 +23,6 @@ export function toRpcTypedData(data: unknown): RpcTypedData | null | undefined {
             return { double: data };
         }
     } else {
-        const jsonString = JSON.stringify(data);
-        return { json: jsonString };
+        return { json: JSON.stringify(data) };
     }
 }

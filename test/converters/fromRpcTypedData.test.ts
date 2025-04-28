@@ -117,9 +117,6 @@ describe('modelBindingData scenario', () => {
     let mockBlobClient: any;
 
     beforeEach(() => {
-        // Suppress console.log output during tests
-        console.log = () => {};
-
         // Create mock blob client for testing
         mockBlobClient = {
             blobClient: { url: 'https://test.blob.core.windows.net/container/blob' },
