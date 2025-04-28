@@ -12,8 +12,6 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
     const bindings: Record<string, coreTypes.RpcBindingInfo> = {};
     const bindingNames: string[] = [];
     const trigger = options.trigger;
-    console.log('toCoreFunctionMetadata: Handle', JSON.stringify(options));
-    console.log('toCoreFunctionMetadata: deferredBindingType', options.trigger.deferredBindingType);
 
     bindings[trigger.name] = {
         ...trigger,
@@ -80,10 +78,8 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
 }
 
 function addDeferredBindingsFlag(deferredBindingType?: boolean | unknown): { [key: string]: string } {
-    //Ensure that trigger type that is passed is valid and supported, to avoid customer misconfiguration.
-    console.log('Deferred binding flag value is: ', deferredBindingType);
+    //Ensure that trigger type that is passed is valid and supported.
     if (deferredBindingType !== undefined && deferredBindingType === true) {
-        console.log('Adding deferred binding propertyu to trigger type:', deferredBindingType);
         return { supportsDeferredBinding: 'true' };
     }
 

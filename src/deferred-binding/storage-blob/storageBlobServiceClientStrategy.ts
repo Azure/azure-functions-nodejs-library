@@ -7,5 +7,5 @@ import { BlobServiceClient, StoragePipelineOptions } from '@azure/storage-blob';
  * Strategy interface for creating StorageBlobServiceClient instances
  */
 export interface StorageBlobServiceClientStrategy {
-    createStroageBlobServiceClient(options?: StoragePipelineOptions): BlobServiceClient;
+    createStorageBlobServiceClient(options?: StoragePipelineOptions): BlobServiceClient;
 }

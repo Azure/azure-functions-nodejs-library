@@ -7,6 +7,8 @@ import { fromString } from 'long';
 import { HttpRequest } from '../../src';
 import { fromRpcTypedData } from '../../src/converters/fromRpcTypedData';
 import Long = require('long');
+import { ModelBindingData, RpcTypedData } from '@azure/functions-core';
+import { AzureStorageBlobClientFactory } from '../../src/deferred-binding/storage-blob/azureStorageBlobClientFactory';
 
 describe('fromRpcTypedData', () => {
     it('null', () => {
@@ -108,5 +110,76 @@ describe('fromRpcTypedData', () => {
         expect(result[0]).to.equal(123);
         expect(result[1]).to.be.instanceOf(Long);
         expect(result[1].toString()).to.equal('9007199254740992');
+    });
+});
+
+describe('modelBindingData scenario', () => {
+    let mockBlobClient: any;
+
+    beforeEach(() => {
+        // Suppress console.log output during tests
+        console.log = () => {};
+
+        // Create mock blob client for testing
+        mockBlobClient = {
+            blobClient: { url: 'https://test.blob.core.windows.net/container/blob' },
+            containerClient: { url: 'https://test.blob.core.windows.net/container' },
+        };
+
+        // Replace the factory method with a mock implementation
+        AzureStorageBlobClientFactory.buildClientFromModelBindingData = () => {
+            return mockBlobClient;
+        };
+    });
+
+    it('should call AzureStorageBlobClientFactory with modelBindingData', () => {
+        let capturedModelBindingData: ModelBindingData | null = null;
+
+        // Override the mock to capture the input parameter
+        AzureStorageBlobClientFactory.buildClientFromModelBindingData = (modelBindingData: ModelBindingData) => {
+            capturedModelBindingData = modelBindingData;
+            return mockBlobClient;
+        };
+
+        const modelBindingData: ModelBindingData = {
+            content: Buffer.from(
+                JSON.stringify({
+                    Connection: 'test-connection',
+                    ContainerName: 'test-container',
+                    BlobName: 'test-blob.txt',
+                })
+            ),
+            contentType: 'application/json',
+            source: 'test-source',
+            version: '1.0',
+        };
+
+        const data: RpcTypedData = { modelBindingData };
+
+        const result = fromRpcTypedData(data);
+
+        // Verify the factory was called with the correct data
+        expect(capturedModelBindingData).to.equal(modelBindingData);
+
+        // Verify the result is what the factory returned
+        expect(result).to.equal(mockBlobClient);
+    });
+
+    it('should handle undefined content in modelBindingData', () => {
+        // Override mock to throw if called with incorrect data
+        AzureStorageBlobClientFactory.buildClientFromModelBindingData = () => {
+            throw new Error('Should not be called with undefined content');
+        };
+
+        const modelBindingData: ModelBindingData = {
+            // content is undefined
+            contentType: 'application/json',
+        };
+
+        const data: RpcTypedData = { modelBindingData };
+
+        // This should not throw because the isDefined check should prevent the factory from being called
+        const result = fromRpcTypedData(data);
+        expect(result).to.be.undefined;
     });
 });

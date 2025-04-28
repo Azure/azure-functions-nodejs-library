@@ -11,7 +11,7 @@ export class ManagedIdentitySystemStrategy implements StorageBlobServiceClientSt
      */
     constructor(private accountUrl: string) {}
 
-    createStroageBlobServiceClient(options?: StoragePipelineOptions): BlobServiceClient {
+    createStorageBlobServiceClient(options?: StoragePipelineOptions): BlobServiceClient {
         const credential = new DefaultAzureCredential();
         return new BlobServiceClient(this.accountUrl, credential, options);
     }

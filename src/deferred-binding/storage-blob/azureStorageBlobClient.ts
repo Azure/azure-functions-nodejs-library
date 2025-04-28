@@ -21,7 +21,7 @@ export class AzureStorageBlobClient {
         blobName?: string,
         options?: StoragePipelineOptions
     ) {
-        const storageBlobServiceClient = strategy.createStroageBlobServiceClient(options);
+        const storageBlobServiceClient = strategy.createStorageBlobServiceClient(options);
         // Initialize container and blob clients if names are provided
         if (containerName) {
             this.containerClient = storageBlobServiceClient.getContainerClient(containerName);

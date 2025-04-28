@@ -13,7 +13,7 @@ export class ConnectionStringStrategy implements StorageBlobServiceClientStrateg
      */
     constructor(private connectionString: string) {}
 
-    createStroageBlobServiceClient(options?: StoragePipelineOptions): BlobServiceClient {
+    createStorageBlobServiceClient(options?: StoragePipelineOptions): BlobServiceClient {
         return BlobServiceClient.fromConnectionString(this.connectionString, options);
     }
 }
