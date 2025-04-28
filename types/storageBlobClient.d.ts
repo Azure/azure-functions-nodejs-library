@@ -11,12 +11,12 @@ export type StorageBlobClient = StorageBlobClientOptions;
 
 export interface StorageBlobClientOptions {
     /**
-     * Blob client to be used by this queue input or output. This is the client that will be used to perform operations on the blob storage.
+     * Blob client to be used by this blob input or output. This is the client that will be used to perform operations on the blob storage.
      */
     blobClient: BlobClient;
 
     /**
-     * Container client to be used by this queue input or output. This is the client that will be used to perform operations on the container storage.
+     * Container client to be used by this blob input or output. This is the client that will be used to perform operations on the container storage.
      */
     conatinerClient: ContainerClient;
 }

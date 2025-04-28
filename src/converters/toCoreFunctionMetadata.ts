@@ -1,12 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import {
-    ExponentialBackoffRetryOptions,
-    FixedDelayRetryOptions,
-    GenericFunctionOptions,
-    SupportedDeferredBindingTypes,
-} from '@azure/functions';
+import { ExponentialBackoffRetryOptions, FixedDelayRetryOptions, GenericFunctionOptions } from '@azure/functions';
 import * as coreTypes from '@azure/functions-core';
 import { returnBindingKey } from '../constants';
 import { AzFuncSystemError } from '../errors';
@@ -24,7 +19,7 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
         ...trigger,
         direction: 'in',
         type: isTrigger(trigger.type) ? trigger.type : trigger.type + 'Trigger',
-        properties: addDeferredBindingsFlag(options.trigger.type, options.trigger.deferredBindingType),
+        properties: addDeferredBindingsFlag(options.trigger?.deferredBinding),
     };
     bindingNames.push(trigger.name);
 
@@ -33,7 +28,7 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
             bindings[input.name] = {
                 ...input,
                 direction: 'in',
-                //properties: addDeferredBindingsFlag(input.type),
+                properties: addDeferredBindingsFlag(input?.deferredBinding),
             };
             bindingNames.push(input.name);
         }
@@ -84,25 +79,11 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
     return { name, bindings, retryOptions };
 }
 
-function addDeferredBindingsFlag(
-    triggerType: string,
-    deferredBindingType?: SupportedDeferredBindingTypes | unknown
-): { [key: string]: string } {
+function addDeferredBindingsFlag(deferredBindingType?: boolean | unknown): { [key: string]: string } {
     //Ensure that trigger type that is passed is valid and supported, to avoid customer misconfiguration.
-    console.log('Adding deferred binding flag: ', deferredBindingType);
-    //TODO there is inherent issue with converting the enum to string, look for fix in the when other SDK biniding will be supported.
-    const deferredBindingTypesSet = new Set<string>([
-        'blobTrigger',
-        //TODO: enum memeber conversion is running into error, issue is with the typescript.
-        //SupportedDeferredBindingTypes.BLOBTRIGGER,
-    ]);
-
-    if (
-        deferredBindingType !== undefined &&
-        deferredBindingType === triggerType &&
-        deferredBindingTypesSet.has(triggerType)
-    ) {
-        console.log('Adding deferred binding flag to trigger type:', triggerType);
+    console.log('Deferred binding flag value is: ', deferredBindingType);
+    if (deferredBindingType !== undefined && deferredBindingType === true) {
+        console.log('Adding deferred binding propertyu to trigger type:', deferredBindingType);
         return { supportsDeferredBinding: 'true' };
     }
 
