@@ -23,7 +23,7 @@ export * from './serviceBus';
 export * from './setup';
 export * from './sql';
 export * from './storage';
-export * from './storageBlobClient';
+export * from './storageBlobClientFactoryResolver';
 export * from './table';
 export * from './timer';
 export * as trigger from './trigger';

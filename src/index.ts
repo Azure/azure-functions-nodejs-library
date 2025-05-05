@@ -14,6 +14,7 @@ export { HttpResponse } from './http/HttpResponse';
 export * as input from './input';
 export { InvocationContext } from './InvocationContext';
 export * as output from './output';
+export * from './storageBlobClientFactoryResolver';
 export * as trigger from './trigger';
 export { Disposable } from './utils/Disposable';
 

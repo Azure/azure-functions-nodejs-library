@@ -17,7 +17,7 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
         ...trigger,
         direction: 'in',
         type: isTrigger(trigger.type) ? trigger.type : trigger.type + 'Trigger',
-        properties: addDeferredBindingsFlag(options.trigger?.deferredBinding),
+        properties: addSdkBindingsFlag(options.trigger?.sdkBinding),
     };
     bindingNames.push(trigger.name);
 
@@ -26,7 +26,7 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
             bindings[input.name] = {
                 ...input,
                 direction: 'in',
-                properties: addDeferredBindingsFlag(input?.deferredBinding),
+                properties: addSdkBindingsFlag(input?.sdkBinding),
             };
             bindingNames.push(input.name);
         }
@@ -77,9 +77,9 @@ export function toCoreFunctionMetadata(name: string, options: GenericFunctionOpt
     return { name, bindings, retryOptions };
 }
 
-function addDeferredBindingsFlag(deferredBindingType?: boolean | unknown): { [key: string]: string } {
+function addSdkBindingsFlag(sdkBindingType?: boolean | unknown): { [key: string]: string } {
     //Ensure that trigger type that is passed is valid and supported.
-    if (deferredBindingType !== undefined && deferredBindingType === true) {
+    if (sdkBindingType !== undefined && sdkBindingType === true) {
         return { supportsDeferredBinding: 'true' };
     }
 

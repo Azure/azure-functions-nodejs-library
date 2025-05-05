@@ -161,17 +161,17 @@ describe('toCoreFunctionMetadata', () => {
     });
 });
 
-describe('toCoreFunctionMetadata deferred binding tests', () => {
+describe('toCoreFunctionMetadata sdk binding tests', () => {
     const handler = () => {}; // Mock handler function
 
-    it('should set supportsDeferredBinding to true for blob trigger when deferredBinding is true', () => {
+    it('should set supportsDeferredBinding to true for blob trigger when sdkBinding is true', () => {
         const result = toCoreFunctionMetadata('blobFunction', {
             handler,
             trigger: {
                 ...trigger.storageBlob({
                     path: 'samples-workitems/{name}',
                     connection: 'AzureWebJobsStorage',
-                    deferredBinding: true,
+                    sdkBinding: true,
                 }),
             },
             return: output.http({}),
@@ -180,12 +180,12 @@ describe('toCoreFunctionMetadata deferred binding tests', () => {
         expect(result).to.deep.include({
             name: 'blobFunction',
             bindings: {
-                blobTriggerb6f7d01f70: {
+                blobTrigger97e7289e53: {
                     path: 'samples-workitems/{name}',
                     connection: 'AzureWebJobsStorage',
-                    deferredBinding: true,
+                    sdkBinding: true,
                     type: 'blobTrigger',
-                    name: 'blobTriggerb6f7d01f70',
+                    name: 'blobTrigger97e7289e53',
                     direction: 'in',
                     properties: {
                         supportsDeferredBinding: 'true',
@@ -197,14 +197,14 @@ describe('toCoreFunctionMetadata deferred binding tests', () => {
         });
     });
 
-    it('should set supportsDeferredBinding to false for blob trigger when deferredBinding is false', () => {
+    it('should set supportsDeferredBinding to false for blob trigger when sdkBinding is false', () => {
         const result = toCoreFunctionMetadata('blobFunction', {
             handler,
             trigger: {
                 ...trigger.storageBlob({
                     path: 'samples-workitems/{name}',
                     connection: 'AzureWebJobsStorage',
-                    deferredBinding: false,
+                    sdkBinding: false,
                 }),
             },
             return: output.http({}),
@@ -213,12 +213,12 @@ describe('toCoreFunctionMetadata deferred binding tests', () => {
         expect(result).to.deep.include({
             name: 'blobFunction',
             bindings: {
-                blobTriggerac6f6ca39f: {
+                blobTrigger81b6e1578f: {
                     path: 'samples-workitems/{name}',
                     connection: 'AzureWebJobsStorage',
-                    deferredBinding: false,
+                    sdkBinding: false,
                     type: 'blobTrigger',
-                    name: 'blobTriggerac6f6ca39f',
+                    name: 'blobTrigger81b6e1578f',
                     direction: 'in',
                     properties: {
                         supportsDeferredBinding: 'false',
@@ -230,7 +230,7 @@ describe('toCoreFunctionMetadata deferred binding tests', () => {
         });
     });
 
-    it('should set supportsDeferredBinding to false for blob trigger when deferredBinding is undefined', () => {
+    it('should set supportsDeferredBinding to false for blob trigger when sdkBinding is undefined', () => {
         const result = toCoreFunctionMetadata('blobFunction', {
             handler,
             trigger: trigger.storageBlob({
@@ -259,7 +259,7 @@ describe('toCoreFunctionMetadata deferred binding tests', () => {
         });
     });
 
-    it('should handle deferred binding for extra inputs', () => {
+    it('should handle sdk binding for extra inputs', () => {
         const result = toCoreFunctionMetadata('funcName', {
             handler,
             trigger: trigger.http({}),
@@ -268,7 +268,7 @@ describe('toCoreFunctionMetadata deferred binding tests', () => {
                     ...trigger.storageBlob({
                         path: 'samples-workitems/{name}',
                         connection: 'AzureWebJobsStorage',
-                        deferredBinding: true,
+                        sdkBinding: true,
                     }),
                 },
             ],
@@ -285,12 +285,12 @@ describe('toCoreFunctionMetadata deferred binding tests', () => {
                     direction: 'in',
                     properties: { supportsDeferredBinding: 'false' },
                 },
-                blobTriggerb6f7d01f70: {
+                blobTrigger97e7289e53: {
                     path: 'samples-workitems/{name}',
                     connection: 'AzureWebJobsStorage',
-                    deferredBinding: true,
+                    sdkBinding: true,
                     type: 'blobTrigger',
-                    name: 'blobTriggerb6f7d01f70',
+                    name: 'blobTrigger97e7289e53',
                     direction: 'in',
                     properties: { supportsDeferredBinding: 'true' },
                 },

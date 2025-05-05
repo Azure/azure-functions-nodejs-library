@@ -2,8 +2,10 @@
 // Licensed under the MIT License.
 
 import { RpcTypedData } from '@azure/functions-core';
-import { AzureStorageBlobClientFactory } from '../deferred-binding/storage-blob/azureStorageBlobClientFactory';
+import { StorageBlobClientOptions } from '../../types';
 import { HttpRequest } from '../http/HttpRequest';
+import { isModelBindingData, parseConnectionDetails } from '../sdk-binding/connectionDetails';
+import { StorageBlobClientFactoryResolver } from '../storageBlobClientFactoryResolver';
 import { isDefined } from '../utils/nonNull';
 
 export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown {
@@ -32,8 +34,19 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
     } else if (data.collectionSint64 && isDefined(data.collectionSint64.sint64)) {
         return data.collectionSint64.sint64;
     } else if (data.modelBindingData && isDefined(data.modelBindingData.content)) {
-        return AzureStorageBlobClientFactory.buildClientFromModelBindingData(data.modelBindingData);
-        //return data.modelBindingData;
+        if (isModelBindingData(data.modelBindingData)) {
+            const blobConnectionDetails = parseConnectionDetails(data.modelBindingData.content);
+
+            const storageBlobClientOptions: StorageBlobClientOptions = {
+                connection: blobConnectionDetails.Connection,
+                containerName: blobConnectionDetails.ContainerName,
+                blobName: blobConnectionDetails.BlobName,
+            };
+            const storageBlobClientFactoryResolver = StorageBlobClientFactoryResolver.getInstance();
+            return storageBlobClientFactoryResolver.createClient(storageBlobClientOptions);
+        }
+        //TODO determine if we need to throw error.
+        return data.modelBindingData;
     } else {
         return undefined;
     }

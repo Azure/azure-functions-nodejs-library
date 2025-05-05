@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { expect } from 'chai';
-import { isModelBindingData, parseConnectionDetails } from '../../src/deferred-binding/connectionDetails';
+import { isModelBindingData, parseConnectionDetails } from '../../src/sdk-binding/connectionDetails';
 
 describe('connectionDetails', () => {
     describe('parseConnectionDetails', () => {
@@ -86,6 +86,7 @@ describe('connectionDetails', () => {
 
         it('should handle objects with string properties correctly', () => {
             const validStringProps = {
+                content: Buffer.from('test'),
                 contentType: 'application/json',
                 source: 'test-source',
                 version: '1.0',
@@ -104,22 +105,17 @@ describe('connectionDetails', () => {
             expect(isModelBindingData(invalidStringProps)).to.be.false;
         });
 
-        // BUG: The current implementation returns false when content IS a Buffer
-        it('should flag BUG: returns false when content IS a Buffer (incorrect behavior)', () => {
+        //The current implementation returns false when content IS a Buffer
+        it('returns false when content IS a Buffer', () => {
             const modelBindingWithBuffer = {
                 content: Buffer.from('test'),
                 contentType: 'text/plain',
             };
-
-            // This is incorrect behavior in the implementation
-            expect(isModelBindingData(modelBindingWithBuffer)).to.be.false;
-
-            // What should happen instead:
-            // expect(isModelBindingData(modelBindingWithBuffer)).to.be.true;
+            expect(isModelBindingData(modelBindingWithBuffer)).to.be.true;
         });
 
         it('should handle empty objects', () => {
-            expect(isModelBindingData({})).to.be.true; // This is potentially incorrect behavior
+            expect(isModelBindingData({})).to.be.false; // This is potentially incorrect behavior
         });
     });
 

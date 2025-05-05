@@ -66,10 +66,10 @@ export function isModelBindingData(obj: unknown): obj is ModelBindingData {
 
     // Check content property if it exists
     if (
-        'content' in candidate &&
-        candidate.content !== null &&
-        candidate.content !== undefined &&
-        candidate.content instanceof Buffer
+        !('content' in candidate) ||
+        candidate.content === null ||
+        candidate.content === undefined ||
+        !(candidate.content instanceof Buffer)
     ) {
         return false;
     }
