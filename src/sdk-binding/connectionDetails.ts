@@ -9,9 +9,6 @@ export type BlobConnectionDetails = {
     BlobName: string;
 };
 
-// Define the `ServiceBusConnectionInfo` type that extends `ConnectionInfo`
-//TODO Define other connectionInfo example ServiceBusConnectionDetails
-
 /**
  * Type Guard to check if an object is of type BlobConnectionInfo
  */
@@ -35,7 +32,7 @@ function isBlobConnectionDetails(obj: unknown): obj is BlobConnectionDetails {
 /**
  * Function to parse JSON and determine its type
  * @param jsonBuffer Bufer that holds the JSON string to parse
- * @returns Either `BlobConnectionDetails` or `ServiceBusConnectionDetails`
+ * @returns `BlobConnectionDetails`
  */
 export function parseConnectionDetails(jsonBuffer: Buffer | null | undefined): BlobConnectionDetails {
     if (jsonBuffer === null || jsonBuffer === undefined) {
