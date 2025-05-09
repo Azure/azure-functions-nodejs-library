@@ -35,7 +35,6 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
     } else if (data.modelBindingData && isDefined(data.modelBindingData.content)) {
         if (isModelBindingData(data.modelBindingData)) {
             const blobConnectionDetails = parseConnectionDetails(data.modelBindingData.content);
-            console.log('Blob connection details:', blobConnectionDetails);
             const storageBlobClientOptions: StorageBlobClientOptions = {
                 connection: blobConnectionDetails.Connection,
                 containerName: blobConnectionDetails.ContainerName,
