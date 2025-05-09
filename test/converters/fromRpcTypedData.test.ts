@@ -9,8 +9,8 @@ import { fromRpcTypedData } from '../../src/converters/fromRpcTypedData';
 import Long = require('long');
 import { ModelBindingData, RpcTypedData } from '@azure/functions-core';
 import sinon = require('sinon');
+import * as storageBlobClientFactoryResolverModule from '@azure/functions-extensions-base';
 import * as connectionDetailsModule from '../../src/sdk-binding/connectionDetails';
-import * as storageBlobClientFactoryResolverModule from '../../src/storageBlobClientFactoryResolver';
 
 describe('fromRpcTypedData', () => {
     it('null', () => {

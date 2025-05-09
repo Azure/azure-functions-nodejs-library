@@ -443,7 +443,7 @@ declare module '@azure/functions-core' {
         modelBindingData?: ModelBindingData | null;
     }
 
-    interface ModelBindingData {
+    export interface ModelBindingData {
         content?: Buffer | null;
         contentType?: string | null;
         source?: string | null;

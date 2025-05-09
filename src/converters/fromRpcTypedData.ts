@@ -2,10 +2,9 @@
 // Licensed under the MIT License.
 
 import { RpcTypedData } from '@azure/functions-core';
-import { StorageBlobClientOptions } from '../../types';
+import { StorageBlobClientFactoryResolver, StorageBlobClientOptions } from '@azure/functions-extensions-base';
 import { HttpRequest } from '../http/HttpRequest';
 import { isModelBindingData, parseConnectionDetails } from '../sdk-binding/connectionDetails';
-import { StorageBlobClientFactoryResolver } from '../storageBlobClientFactoryResolver';
 import { isDefined } from '../utils/nonNull';
 
 export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown {
@@ -36,7 +35,7 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
     } else if (data.modelBindingData && isDefined(data.modelBindingData.content)) {
         if (isModelBindingData(data.modelBindingData)) {
             const blobConnectionDetails = parseConnectionDetails(data.modelBindingData.content);
-
+            console.log('Blob connection details:', blobConnectionDetails);
             const storageBlobClientOptions: StorageBlobClientOptions = {
                 connection: blobConnectionDetails.Connection,
                 containerName: blobConnectionDetails.ContainerName,
