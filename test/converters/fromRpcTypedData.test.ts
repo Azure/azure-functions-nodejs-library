@@ -9,8 +9,7 @@ import { fromRpcTypedData } from '../../src/converters/fromRpcTypedData';
 import Long = require('long');
 import { RpcTypedData } from '@azure/functions-core';
 import sinon = require('sinon');
-import * as extensionBase from '@azure/functions-extensions-base';
-import * as connectionDetailsModule from '../../src/sdk-binding/connectionDetails';
+import { ResourceFactoryResolver } from '@azure/functions-extensions-base';
 
 describe('fromRpcTypedData', () => {
     it('null', () => {
@@ -115,57 +114,97 @@ describe('fromRpcTypedData', () => {
     });
 });
 
-describe('fromRpcTypedData - modelBindingData handling', () => {
+describe('fromRpcTypedData - modelBindingData path', () => {
+    // Use SinonSandbox for automatic cleanup of stubs
     let sandbox: sinon.SinonSandbox;
-    let isModelBindingDataStub: sinon.SinonStub;
-    let resourceFactoryResolverStub: sinon.SinonStubbedInstance<extensionBase.ResourceFactoryResolver>;
+
+    // Store original ResourceFactoryResolver.getInstance to restore after tests
+    let originalGetInstance: typeof ResourceFactoryResolver.getInstance;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
-
-        // Stub the isModelBindingData function
-        isModelBindingDataStub = sandbox.stub(connectionDetailsModule, 'isModelBindingData');
-
-        // Create a mock ResourceFactoryResolver
-        resourceFactoryResolverStub = {
-            createClient: sandbox.stub(),
-            getInstance: sandbox.stub(),
-        } as unknown as sinon.SinonStubbedInstance<extensionBase.ResourceFactoryResolver>;
-
-        // Ensure getInstance returns our stub
-        sandbox.stub(extensionBase.ResourceFactoryResolver, 'getInstance').returns(resourceFactoryResolverStub);
+        // Store original method
+        originalGetInstance = ResourceFactoryResolver.getInstance;
     });
 
     afterEach(() => {
+        // Restore all stubs and original methods
         sandbox.restore();
+        ResourceFactoryResolver.getInstance = originalGetInstance;
     });
 
-    it('should return client when modelBindingData is valid', () => {
+    it('should successfully create a client when modelBindingData is valid', () => {
         // Arrange
-        const mockClient = { name: 'mockClient' };
-        resourceFactoryResolverStub.createClient.returns(mockClient);
-        isModelBindingDataStub.returns(true);
+        const mockClient = {
+            name: 'testClient',
+            download: () => Promise.resolve({ readableStreamBody: Buffer.from('test') }),
+        };
 
+        // Create mock ResourceFactoryResolver
+        const mockResolver = {
+            createClient: sinon.stub().returns(mockClient),
+        };
+
+        // Replace ResourceFactoryResolver.getInstance with our mock
+        ResourceFactoryResolver.getInstance = sinon.stub().returns(mockResolver);
+
+        // Create test data
         const modelBindingData = {
             content: Buffer.from('test-content'),
             source: 'blob',
             contentType: 'application/octet-stream',
         };
 
-        const data: RpcTypedData = { modelBindingData };
+        const data: RpcTypedData = {
+            modelBindingData: modelBindingData,
+        };
 
         // Act
         const result = fromRpcTypedData(data);
 
         // Assert
-        expect(isModelBindingDataStub.calledWith(modelBindingData)).to.be.true;
-        expect(resourceFactoryResolverStub.createClient.calledWith('blob', modelBindingData)).to.be.true;
+        sinon.assert.calledOnce(ResourceFactoryResolver.getInstance as sinon.SinonStub);
+        sinon.assert.calledWith(mockResolver.createClient, 'blob', modelBindingData);
         expect(result).to.equal(mockClient);
     });
 
-    it('should throw error when isModelBindingData returns false', () => {
+    it('should handle modelBindingData with undefined source', () => {
         // Arrange
-        isModelBindingDataStub.returns(false);
+        const mockClient = { name: 'testClient' };
+
+        const mockResolver = {
+            createClient: sinon.stub().returns(mockClient),
+        };
+
+        ResourceFactoryResolver.getInstance = sinon.stub().returns(mockResolver);
+
+        const modelBindingData = {
+            content: Buffer.from('test-content'),
+            // No source specified
+            contentType: 'application/octet-stream',
+        };
+
+        const data: RpcTypedData = {
+            modelBindingData: modelBindingData,
+        };
+
+        // Act
+        const result = fromRpcTypedData(data);
+
+        // Assert
+        expect(mockResolver.createClient.calledWith(undefined, modelBindingData)).to.be.true;
+        expect(result).to.equal(mockClient);
+    });
+
+    it('should throw enhanced error when ResourceFactoryResolver.createClient throws', () => {
+        // Arrange
+        const originalError = new Error('Factory not registered');
+
+        const mockResolver = {
+            createClient: sinon.stub().throws(originalError),
+        };
+
+        ResourceFactoryResolver.getInstance = sinon.stub().returns(mockResolver);
 
         const modelBindingData = {
             content: Buffer.from('test-content'),
@@ -173,39 +212,22 @@ describe('fromRpcTypedData - modelBindingData handling', () => {
             contentType: 'application/octet-stream',
         };
 
-        const data: RpcTypedData = { modelBindingData };
+        const data: RpcTypedData = {
+            modelBindingData: modelBindingData,
+        };
 
         // Act & Assert
         expect(() => fromRpcTypedData(data)).to.throw(
-            'Enable to create client. Please regiester the extensions library with your function app.'
+            'Unable to create client. Please register the extensions library with your function app. ' +
+                'Error: Factory not registered'
         );
-        expect(resourceFactoryResolverStub.createClient.called).to.be.false;
     });
 
-    it('should return undefined when modelBindingData is present but content is undefined', () => {
+    it('should throw enhanced error when ResourceFactoryResolver.getInstance throws', () => {
         // Arrange
-        const modelBindingData = {
-            // content is undefined
-            source: 'blob',
-            contentType: 'application/octet-stream',
-        };
+        const originalError = new Error('Resolver not initialized');
 
-        const data: RpcTypedData = { modelBindingData };
-
-        // Act
-        const result = fromRpcTypedData(data);
-
-        // Assert
-        expect(result).to.be.undefined;
-        expect(isModelBindingDataStub.called).to.be.false;
-        expect(resourceFactoryResolverStub.createClient.called).to.be.false;
-    });
-
-    it('should propagate errors from ResourceFactoryResolver.createClient', () => {
-        // Arrange
-        isModelBindingDataStub.returns(true);
-        const testError = new Error('Resource factory error');
-        resourceFactoryResolverStub.createClient.throws(testError);
+        ResourceFactoryResolver.getInstance = sinon.stub().throws(originalError);
 
         const modelBindingData = {
             content: Buffer.from('test-content'),
@@ -213,43 +235,39 @@ describe('fromRpcTypedData - modelBindingData handling', () => {
             contentType: 'application/octet-stream',
         };
 
-        const data: RpcTypedData = { modelBindingData };
+        const data: RpcTypedData = {
+            modelBindingData: modelBindingData,
+        };
 
         // Act & Assert
-        expect(() => fromRpcTypedData(data)).to.throw('Resource factory error');
+        expect(() => fromRpcTypedData(data)).to.throw(
+            'Unable to create client. Please register the extensions library with your function app. ' +
+                'Error: Resolver not initialized'
+        );
     });
 
-    it('should handle missing source in modelBindingData', () => {
+    it('should handle non-Error exceptions by converting to string', () => {
         // Arrange
-        isModelBindingDataStub.returns(true);
+        const mockResolver = {
+            createClient: sinon.stub().throws('String exception'), // Non-Error exception
+        };
+
+        ResourceFactoryResolver.getInstance = sinon.stub().returns(mockResolver);
 
         const modelBindingData = {
             content: Buffer.from('test-content'),
-            // source is missing
+            source: 'blob',
             contentType: 'application/octet-stream',
         };
 
-        const data: RpcTypedData = { modelBindingData };
-
-        // Act
-        fromRpcTypedData(data);
-
-        // Assert
-        // Verify createClient was called with undefined source
-        expect(resourceFactoryResolverStub.createClient.calledWith(undefined, modelBindingData)).to.be.true;
-    });
-
-    it('should handle null modelBindingData', () => {
-        // Arrange
         const data: RpcTypedData = {
-            modelBindingData: null as any,
+            modelBindingData: modelBindingData,
         };
 
-        // Act
-        const result = fromRpcTypedData(data);
-
-        // Assert
-        expect(result).to.be.undefined;
-        expect(isModelBindingDataStub.called).to.be.false;
+        // Act & Assert
+        expect(() => fromRpcTypedData(data)).to.throw(
+            'Unable to create client. Please register the extensions library with your function app. ' +
+                'Error: Sinon-provided String exception'
+        );
     });
 });
