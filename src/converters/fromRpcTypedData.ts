@@ -2,9 +2,9 @@
 // Licensed under the MIT License.
 
 import { RpcTypedData } from '@azure/functions-core';
-import { StorageBlobClientFactoryResolver, StorageBlobClientOptions } from '@azure/functions-extensions-base';
+import { ResourceFactoryResolver } from '@azure/functions-extensions-base';
 import { HttpRequest } from '../http/HttpRequest';
-import { isModelBindingData, parseConnectionDetails } from '../sdk-binding/connectionDetails';
+import { isModelBindingData } from '../sdk-binding/connectionDetails';
 import { isDefined } from '../utils/nonNull';
 
 export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown {
@@ -34,19 +34,12 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
         return data.collectionSint64.sint64;
     } else if (data.modelBindingData && isDefined(data.modelBindingData.content)) {
         if (isModelBindingData(data.modelBindingData)) {
-            const blobConnectionDetails = parseConnectionDetails(data.modelBindingData.content);
-            const storageBlobClientOptions: StorageBlobClientOptions = {
-                connection: blobConnectionDetails.Connection,
-                containerName: blobConnectionDetails.ContainerName,
-                blobName: blobConnectionDetails.BlobName,
-            };
-            const storageBlobClientFactoryResolver = StorageBlobClientFactoryResolver.getInstance();
-            return storageBlobClientFactoryResolver.createClient(storageBlobClientOptions);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            const resourceFactoryResolver: ResourceFactoryResolver = ResourceFactoryResolver.getInstance();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            return resourceFactoryResolver.createClient(data.modelBindingData.source, data.modelBindingData);
         }
-        //TODO determine if we need to throw error.
-        return data.modelBindingData;
-    } else {
-        return undefined;
+        throw new Error('Enable to create client. Please regiester the extensions library with your function app.');
     }
 }
 

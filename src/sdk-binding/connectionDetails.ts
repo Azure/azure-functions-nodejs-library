@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { ModelBindingData } from '@azure/functions-core';
+import { ModelBindingData } from '@azure/functions-extensions-base';
 
 export type BlobConnectionDetails = {
     Connection: string;

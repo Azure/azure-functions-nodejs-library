@@ -7,9 +7,9 @@ import { fromString } from 'long';
 import { HttpRequest } from '../../src';
 import { fromRpcTypedData } from '../../src/converters/fromRpcTypedData';
 import Long = require('long');
-import { ModelBindingData, RpcTypedData } from '@azure/functions-core';
+import { RpcTypedData } from '@azure/functions-core';
 import sinon = require('sinon');
-import * as storageBlobClientFactoryResolverModule from '@azure/functions-extensions-base';
+import * as extensionBase from '@azure/functions-extensions-base';
 import * as connectionDetailsModule from '../../src/sdk-binding/connectionDetails';
 
 describe('fromRpcTypedData', () => {
@@ -115,210 +115,141 @@ describe('fromRpcTypedData', () => {
     });
 });
 
-describe('fromRpcTypedData - modelBindingData path', () => {
+describe('fromRpcTypedData - modelBindingData handling', () => {
     let sandbox: sinon.SinonSandbox;
     let isModelBindingDataStub: sinon.SinonStub;
-    let parseConnectionDetailsStub: sinon.SinonStub;
-    let createClientStub: sinon.SinonStub;
-    let mockFactoryResolver: any;
+    let resourceFactoryResolverStub: sinon.SinonStubbedInstance<extensionBase.ResourceFactoryResolver>;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
 
-        // Mock isModelBindingData
+        // Stub the isModelBindingData function
         isModelBindingDataStub = sandbox.stub(connectionDetailsModule, 'isModelBindingData');
 
-        // Mock parseConnectionDetails
-        parseConnectionDetailsStub = sandbox.stub(connectionDetailsModule, 'parseConnectionDetails');
-
-        // Create a mock resolver with a stub createClient method
-        mockFactoryResolver = {
+        // Create a mock ResourceFactoryResolver
+        resourceFactoryResolverStub = {
             createClient: sandbox.stub(),
-        };
+            getInstance: sandbox.stub(),
+        } as unknown as sinon.SinonStubbedInstance<extensionBase.ResourceFactoryResolver>;
 
-        // Mock the getInstance method to return our mock resolver
-        sandbox
-            .stub(storageBlobClientFactoryResolverModule.StorageBlobClientFactoryResolver, 'getInstance')
-            .returns(mockFactoryResolver);
-
-        // Store reference to createClient stub for ease of use
-        createClientStub = mockFactoryResolver.createClient;
+        // Ensure getInstance returns our stub
+        sandbox.stub(extensionBase.ResourceFactoryResolver, 'getInstance').returns(resourceFactoryResolverStub);
     });
 
     afterEach(() => {
         sandbox.restore();
     });
 
-    it('should create a blob client when provided with valid model binding data', () => {
+    it('should return client when modelBindingData is valid', () => {
         // Arrange
-        const modelBindingData: ModelBindingData = {
-            content: Buffer.from(
-                JSON.stringify({
-                    Connection: 'test-connection',
-                    ContainerName: 'test-container',
-                    BlobName: 'test-blob.txt',
-                })
-            ),
-            contentType: 'application/json',
-        };
-
-        const rpcTypedData: RpcTypedData = { modelBindingData };
-
+        const mockClient = { name: 'mockClient' };
+        resourceFactoryResolverStub.createClient.returns(mockClient);
         isModelBindingDataStub.returns(true);
-        parseConnectionDetailsStub.returns({
-            Connection: 'test-connection',
-            ContainerName: 'test-container',
-            BlobName: 'test-blob.txt',
-        });
 
-        const mockBlobClient = {
-            name: 'mockBlobClient',
-            download: () => {},
+        const modelBindingData = {
+            content: Buffer.from('test-content'),
+            source: 'blob',
+            contentType: 'application/octet-stream',
         };
-        createClientStub.returns(mockBlobClient);
+
+        const data: RpcTypedData = { modelBindingData };
 
         // Act
-        const result = fromRpcTypedData(rpcTypedData);
+        const result = fromRpcTypedData(data);
 
         // Assert
-        expect(isModelBindingDataStub.calledOnce).to.be.true;
         expect(isModelBindingDataStub.calledWith(modelBindingData)).to.be.true;
-
-        expect(parseConnectionDetailsStub.calledOnce).to.be.true;
-        expect(parseConnectionDetailsStub.calledWith(modelBindingData.content)).to.be.true;
-
-        expect(createClientStub.calledOnce).to.be.true;
-        expect(createClientStub.firstCall.args[0]).to.deep.equal({
-            connection: 'test-connection',
-            containerName: 'test-container',
-            blobName: 'test-blob.txt',
-        });
-
-        expect(result).to.equal(mockBlobClient);
+        expect(resourceFactoryResolverStub.createClient.calledWith('blob', modelBindingData)).to.be.true;
+        expect(result).to.equal(mockClient);
     });
 
-    it('should handle when isModelBindingData returns false', () => {
+    it('should throw error when isModelBindingData returns false', () => {
         // Arrange
-        const modelBindingData: ModelBindingData = {
-            content: Buffer.from('invalid-content'),
-            contentType: 'text/plain',
-        };
-
-        const rpcTypedData: RpcTypedData = { modelBindingData };
-
         isModelBindingDataStub.returns(false);
 
-        // Act
-        const result = fromRpcTypedData(rpcTypedData);
-
-        // Assert
-        expect(isModelBindingDataStub.calledOnce).to.be.true;
-        expect(parseConnectionDetailsStub.called).to.be.false;
-        expect(createClientStub.called).to.be.false;
-
-        // Should return the modelBindingData as-is
-        expect(result).to.equal(modelBindingData);
-    });
-
-    it('should propagate errors from parseConnectionDetails', () => {
-        // Arrange
-        const modelBindingData: ModelBindingData = {
-            content: Buffer.from('invalid-json'),
-            contentType: 'application/json',
+        const modelBindingData = {
+            content: Buffer.from('test-content'),
+            source: 'blob',
+            contentType: 'application/octet-stream',
         };
 
-        const rpcTypedData: RpcTypedData = { modelBindingData };
-
-        isModelBindingDataStub.returns(true);
-        parseConnectionDetailsStub.throws(new Error('Invalid JSON format'));
+        const data: RpcTypedData = { modelBindingData };
 
         // Act & Assert
-        expect(() => fromRpcTypedData(rpcTypedData)).to.throw('Invalid JSON format');
-        expect(createClientStub.called).to.be.false;
+        expect(() => fromRpcTypedData(data)).to.throw(
+            'Enable to create client. Please regiester the extensions library with your function app.'
+        );
+        expect(resourceFactoryResolverStub.createClient.called).to.be.false;
     });
 
-    it('should propagate errors from createClient', () => {
+    it('should return undefined when modelBindingData is present but content is undefined', () => {
         // Arrange
-        const modelBindingData: ModelBindingData = {
-            content: Buffer.from(
-                JSON.stringify({
-                    Connection: 'test-connection',
-                    ContainerName: 'test-container',
-                    BlobName: 'test-blob.txt',
-                })
-            ),
-            contentType: 'application/json',
+        const modelBindingData = {
+            // content is undefined
+            source: 'blob',
+            contentType: 'application/octet-stream',
         };
 
-        const rpcTypedData: RpcTypedData = { modelBindingData };
-
-        isModelBindingDataStub.returns(true);
-        parseConnectionDetailsStub.returns({
-            Connection: 'test-connection',
-            ContainerName: 'test-container',
-            BlobName: 'test-blob.txt',
-        });
-
-        createClientStub.throws(new Error('Factory not registered'));
-
-        // Act & Assert
-        expect(() => fromRpcTypedData(rpcTypedData)).to.throw('Factory not registered');
-    });
-
-    it('should handle undefined modelBindingData content', () => {
-        // Arrange
-        const modelBindingData: ModelBindingData = {
-            // Missing content
-            contentType: 'application/json',
-        };
-
-        const rpcTypedData: RpcTypedData = { modelBindingData };
+        const data: RpcTypedData = { modelBindingData };
 
         // Act
-        const result = fromRpcTypedData(rpcTypedData);
+        const result = fromRpcTypedData(data);
 
         // Assert
-        expect(isModelBindingDataStub.called).to.be.false;
-        expect(parseConnectionDetailsStub.called).to.be.false;
-        expect(createClientStub.called).to.be.false;
-
         expect(result).to.be.undefined;
+        expect(isModelBindingDataStub.called).to.be.false;
+        expect(resourceFactoryResolverStub.createClient.called).to.be.false;
     });
 
-    it('should handle special characters in blob names', () => {
+    it('should propagate errors from ResourceFactoryResolver.createClient', () => {
         // Arrange
-        const blobName = 'special/char+blob#name.txt';
-        const modelBindingData: ModelBindingData = {
-            content: Buffer.from(
-                JSON.stringify({
-                    Connection: 'test-connection',
-                    ContainerName: 'test-container',
-                    BlobName: blobName,
-                })
-            ),
-            contentType: 'application/json',
-        };
-
-        const rpcTypedData: RpcTypedData = { modelBindingData };
-
         isModelBindingDataStub.returns(true);
-        parseConnectionDetailsStub.returns({
-            Connection: 'test-connection',
-            ContainerName: 'test-container',
-            BlobName: blobName,
-        });
+        const testError = new Error('Resource factory error');
+        resourceFactoryResolverStub.createClient.throws(testError);
 
-        const mockBlobClient = {
-            name: blobName,
-            download: () => {},
+        const modelBindingData = {
+            content: Buffer.from('test-content'),
+            source: 'blob',
+            contentType: 'application/octet-stream',
         };
-        createClientStub.returns(mockBlobClient);
+
+        const data: RpcTypedData = { modelBindingData };
+
+        // Act & Assert
+        expect(() => fromRpcTypedData(data)).to.throw('Resource factory error');
+    });
+
+    it('should handle missing source in modelBindingData', () => {
+        // Arrange
+        isModelBindingDataStub.returns(true);
+
+        const modelBindingData = {
+            content: Buffer.from('test-content'),
+            // source is missing
+            contentType: 'application/octet-stream',
+        };
+
+        const data: RpcTypedData = { modelBindingData };
 
         // Act
-        const result = fromRpcTypedData(rpcTypedData);
+        fromRpcTypedData(data);
 
         // Assert
-        expect(createClientStub.firstCall.args[0].blobName).to.equal(blobName);
-        expect(result).to.equal(mockBlobClient);
+        // Verify createClient was called with undefined source
+        expect(resourceFactoryResolverStub.createClient.calledWith(undefined, modelBindingData)).to.be.true;
+    });
+
+    it('should handle null modelBindingData', () => {
+        // Arrange
+        const data: RpcTypedData = {
+            modelBindingData: null as any,
+        };
+
+        // Act
+        const result = fromRpcTypedData(data);
+
+        // Assert
+        expect(result).to.be.undefined;
+        expect(isModelBindingDataStub.called).to.be.false;
     });
 });
