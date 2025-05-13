@@ -3,8 +3,10 @@
 
 import 'mocha';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
 import { output, trigger } from '../../src';
-import { toCoreFunctionMetadata } from '../../src/converters/toCoreFunctionMetadata';
+import { addSdkBindingsFlag, toCoreFunctionMetadata } from '../../src/converters/toCoreFunctionMetadata';
+import * as workerLogModule from '../../src/utils/workerSystemLog';
 import { InvocationContext } from '../../types';
 
 describe('toCoreFunctionMetadata', () => {
@@ -332,5 +334,200 @@ describe('toCoreFunctionMetadata error handling', () => {
         });
 
         expect(result.bindings['blobInput']?.type).to.equal('blob');
+    });
+});
+
+describe('addSdkBindingsFlag - logging tests', () => {
+    let workerSystemLogStub: sinon.SinonStub;
+
+    beforeEach(() => {
+        // Create a stub for workerSystemLog to capture calls and prevent actual logging
+        workerSystemLogStub = sinon.stub(workerLogModule, 'workerSystemLog');
+    });
+
+    afterEach(() => {
+        // Restore the original function after each test
+        sinon.restore();
+    });
+
+    describe('when sdkBindingType is true', () => {
+        it('should return supportsDeferredBinding:true and log with complete parameters', () => {
+            // Arrange
+            const sdkBindingType = true;
+            const functionName = 'testFunction';
+            const triggerType = 'http';
+            const bindingName = 'req';
+            const isBinding = false;
+
+            // Act
+            const result = addSdkBindingsFlag(sdkBindingType, functionName, triggerType, bindingName, isBinding);
+
+            // Assert
+            // 1. Verify return value
+            expect(result).to.deep.equal({ supportsDeferredBinding: 'true' });
+
+            // 2. Verify log was called
+            expect(workerSystemLogStub.calledOnce).to.be.true;
+            expect(workerSystemLogStub.firstCall.args[0]).to.equal('information');
+
+            // 3. Verify log content
+            const logArg = JSON.parse(workerSystemLogStub.firstCall.args[1]);
+            expect(logArg).to.deep.include({
+                operation: 'EnableDeferredBinding',
+                properties: {
+                    functionName: 'testFunction',
+                    entityType: 'trigger',
+                    triggerType: 'http',
+                    bindingOrTriggerName: 'req',
+                    supportsDeferredBinding: true,
+                },
+            });
+            expect(logArg.message).to.equal("Enabled Deferred Binding of type 'http' for function 'testFunction'");
+        });
+
+        it('should handle binding types correctly', () => {
+            // Arrange
+            const sdkBindingType = true;
+            const functionName = 'testFunction';
+            const triggerType = 'blob';
+            const bindingName = 'blobInput';
+            const isBinding = true;
+
+            // Act
+            const result = addSdkBindingsFlag(sdkBindingType, functionName, triggerType, bindingName, isBinding);
+
+            // Assert
+            expect(result).to.deep.equal({ supportsDeferredBinding: 'true' });
+
+            // Verify log contains binding instead of trigger
+            const logArg = JSON.parse(workerSystemLogStub.firstCall.args[1]);
+            expect(logArg.properties.entityType).to.equal('binding');
+            expect(logArg.message).to.not.include('trigger');
+        });
+
+        it('should use default values for undefined parameters', () => {
+            // Arrange
+            const sdkBindingType = true;
+            // All other parameters undefined
+
+            // Act
+            const result = addSdkBindingsFlag(sdkBindingType);
+
+            // Assert
+            expect(result).to.deep.equal({ supportsDeferredBinding: 'true' });
+
+            // Verify log contains 'unknown' placeholders
+            const logArg = JSON.parse(workerSystemLogStub.firstCall.args[1]);
+            expect(logArg.properties.functionName).to.equal('unknown');
+            expect(logArg.properties.triggerType).to.equal('unknown');
+            expect(logArg.properties.bindingOrTriggerName).to.equal('unknown');
+            expect(logArg.properties.entityType).to.equal('trigger'); // Default is trigger
+            expect(logArg.message).to.equal("Enabled Deferred Binding of type 'unknown' for function 'unknown'");
+        });
+
+        it('should handle mixed undefined parameters correctly', () => {
+            // Arrange
+            const sdkBindingType = true;
+            const functionName = 'testFunction';
+            // Other parameters undefined
+
+            // Act
+            const result = addSdkBindingsFlag(sdkBindingType, functionName);
+
+            // Assert
+            expect(result).to.deep.equal({ supportsDeferredBinding: 'true' });
+
+            // Verify log contains the provided function name but other 'unknown' placeholders
+            const logArg = JSON.parse(workerSystemLogStub.firstCall.args[1]);
+            expect(logArg.properties.functionName).to.equal('testFunction');
+            expect(logArg.properties.triggerType).to.equal('unknown');
+            expect(logArg.message).to.equal("Enabled Deferred Binding of type 'unknown' for function 'testFunction'");
+        });
+    });
+
+    describe('when sdkBindingType is not true', () => {
+        it('should return supportsDeferredBinding:false when sdkBindingType is false', () => {
+            // Arrange
+            const sdkBindingType = false;
+            const functionName = 'testFunction';
+
+            // Act
+            const result = addSdkBindingsFlag(sdkBindingType, functionName);
+
+            // Assert
+            expect(result).to.deep.equal({ supportsDeferredBinding: 'false' });
+
+            // Verify no logging occurred
+            expect(workerSystemLogStub.called).to.be.false;
+        });
+
+        it('should return supportsDeferredBinding:false when sdkBindingType is undefined', () => {
+            // Act
+            const result = addSdkBindingsFlag();
+
+            // Assert
+            expect(result).to.deep.equal({ supportsDeferredBinding: 'false' });
+
+            // Verify no logging occurred
+            expect(workerSystemLogStub.called).to.be.false;
+        });
+
+        it('should return supportsDeferredBinding:false for any non-true sdkBindingType', () => {
+            // Test with various non-true values
+            const nonTrueValues = [null, 0, '', 'true', {}, [], NaN];
+
+            // Test each value
+            for (const testValue of nonTrueValues) {
+                // Act
+                const result = addSdkBindingsFlag(testValue);
+
+                // Assert
+                expect(result).to.deep.equal({ supportsDeferredBinding: 'false' });
+                expect(workerSystemLogStub.called).to.be.false;
+
+                // Reset the stub for the next iteration
+                workerSystemLogStub.reset();
+            }
+        });
+    });
+
+    describe('log structure validation', () => {
+        it('should produce correctly formatted JSON in logs', () => {
+            // Arrange
+            const sdkBindingType = true;
+            const functionName = 'testFunction';
+            const triggerType = 'http';
+            const bindingName = 'req';
+            const isBinding = false;
+
+            // Act
+            addSdkBindingsFlag(sdkBindingType, functionName, triggerType, bindingName, isBinding);
+
+            // Assert
+            expect(workerSystemLogStub.calledOnce).to.be.true;
+
+            // Get the logged JSON string and parse it to verify it's valid JSON
+            const logString = workerSystemLogStub.firstCall.args[1];
+
+            // This should not throw if the JSON is valid
+            const logObject = JSON.parse(logString);
+
+            // Verify required fields
+            expect(logObject).to.have.property('operation');
+            expect(logObject).to.have.property('properties');
+            expect(logObject).to.have.property('message');
+
+            // Verify properties structure
+            expect(logObject.properties).to.have.property('functionName');
+            expect(logObject.properties).to.have.property('entityType');
+            expect(logObject.properties).to.have.property('triggerType');
+            expect(logObject.properties).to.have.property('bindingOrTriggerName');
+            expect(logObject.properties).to.have.property('supportsDeferredBinding');
+
+            // Verify data types
+            expect(typeof logObject.operation).to.equal('string');
+            expect(typeof logObject.message).to.equal('string');
+            expect(typeof logObject.properties.supportsDeferredBinding).to.equal('boolean');
+        });
     });
 });
