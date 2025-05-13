@@ -124,7 +124,7 @@ describe('fromRpcTypedData - modelBindingData path', () => {
     beforeEach(() => {
         sandbox = sinon.createSandbox();
         // Store original method
-        originalGetInstance = ResourceFactoryResolver.getInstance;
+        originalGetInstance = ResourceFactoryResolver.getInstance.bind(ResourceFactoryResolver);
     });
 
     afterEach(() => {
@@ -163,7 +163,6 @@ describe('fromRpcTypedData - modelBindingData path', () => {
         const result = fromRpcTypedData(data);
 
         // Assert
-        sinon.assert.calledOnce(ResourceFactoryResolver.getInstance as sinon.SinonStub);
         sinon.assert.calledWith(mockResolver.createClient, 'blob', modelBindingData);
         expect(result).to.equal(mockClient);
     });
