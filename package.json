@@ -41,10 +41,10 @@
         "watch": "webpack --watch --mode development"
     },
     "dependencies": {
+        "@azure/functions-extensions-base": "^0.1.0-preview",
         "cookie": "^0.7.0",
         "long": "^4.0.0",
-        "undici": "^5.13.0",
-        "@azure/functions-extensions-base": "0.1.0-preview"
+        "undici": "^5.13.0"
     },
     "devDependencies": {
         "@types/chai": "^4.2.22",
