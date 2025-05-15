@@ -1,6 +1,5 @@
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
-const { ModuleFederationPlugin } = require('webpack').container;
 
 module.exports = (_env, argv) => {
     const isDevMode = argv.mode === 'development';
@@ -38,12 +37,6 @@ module.exports = (_env, argv) => {
             new ESLintPlugin({
                 files: ['src/**/*.ts', 'test/**/*.ts'],
                 fix: isDevMode,
-            }),
-            new ModuleFederationPlugin({
-                name: '@azure/functions',
-                shared: {
-                    '@azure/functions-extensions-base': { singleton: true, eager: true },
-                },
             }),
         ],
     };
