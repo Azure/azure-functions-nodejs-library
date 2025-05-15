@@ -113,7 +113,6 @@ export function addSdkBindingsFlag(
             }'`,
         };
         // Log both the structured data
-        console.log(JSON.stringify(logData));
         workerSystemLog('information', JSON.stringify(logData));
         return { supportsDeferredBinding: 'true' };
     }
