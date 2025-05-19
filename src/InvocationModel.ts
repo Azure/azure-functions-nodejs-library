@@ -82,11 +82,9 @@ export class InvocationModel implements coreTypes.InvocationModel {
                 } else {
                     input = fromRpcTypedData(binding.data);
                 }
-
                 if (isTimerTrigger(bindingType)) {
                     input = toCamelCaseValue(input);
                 }
-
                 if (isTrigger(bindingType)) {
                     inputs.push(input);
                 } else {
