@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import { RpcTypedData } from '@azure/functions-core';
-import { ResourceFactoryResolver } from '@azure/functions-extensions-base';
 import { HttpRequest } from '../http/HttpRequest';
 import { isDefined } from '../utils/nonNull';
 
@@ -31,18 +30,8 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
         return data.collectionDouble.double;
     } else if (data.collectionSint64 && isDefined(data.collectionSint64.sint64)) {
         return data.collectionSint64.sint64;
-    } else if (data.modelBindingData && isDefined(data.modelBindingData.content)) {
-        try {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            const resourceFactoryResolver: ResourceFactoryResolver = ResourceFactoryResolver.getInstance();
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            return resourceFactoryResolver.createClient(data.modelBindingData.source, data.modelBindingData);
-        } catch (exception) {
-            throw new Error(
-                'Unable to create client. Please register the extensions library with your function app. ' +
-                    `Error: ${exception instanceof Error ? exception.message : String(exception)}`
-            );
-        }
+    } else {
+        return undefined;
     }
 }
 

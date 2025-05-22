@@ -391,17 +391,11 @@ declare module '@azure/functions-core' {
         direction?: RpcBindingDirection | null;
 
         dataType?: RpcBindingDataType | null;
-
-        properties?: RpcBindingProperties | null;
     }
 
     type RpcBindingDirection = 'in' | 'out' | 'inout';
 
     type RpcBindingDataType = 'undefined' | 'string' | 'binary' | 'stream';
-
-    interface RpcBindingProperties {
-        supportsDeferredBinding?: 'true' | 'false' | null;
-    }
 
     interface RpcRetryOptions {
         maxRetryCount?: number | null;
@@ -439,15 +433,6 @@ declare module '@azure/functions-core' {
         collectionDouble?: RpcCollectionDouble | null;
 
         collectionSint64?: RpcCollectionSInt64 | null;
-
-        modelBindingData?: ModelBindingData | null;
-    }
-
-    export interface ModelBindingData {
-        content?: Buffer | null;
-        contentType?: string | null;
-        source?: string | null;
-        version?: string | null;
     }
 
     interface RpcCollectionSInt64 {
