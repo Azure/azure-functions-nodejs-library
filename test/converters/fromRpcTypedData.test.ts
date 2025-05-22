@@ -217,8 +217,7 @@ describe('fromRpcTypedData - modelBindingData path', () => {
 
         // Act & Assert
         expect(() => fromRpcTypedData(data)).to.throw(
-            'Unable to create client. Please register the extensions library with your function app. ' +
-                'Error: Factory not registered'
+            'Please register the extensions library with your function app. ' + 'Error: Factory not registered'
         );
     });
 
@@ -240,8 +239,7 @@ describe('fromRpcTypedData - modelBindingData path', () => {
 
         // Act & Assert
         expect(() => fromRpcTypedData(data)).to.throw(
-            'Unable to create client. Please register the extensions library with your function app. ' +
-                'Error: Resolver not initialized'
+            'Please register the extensions library with your function app. ' + 'Error: Resolver not initialized'
         );
     });
 
