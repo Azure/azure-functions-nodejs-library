@@ -29,6 +29,11 @@ export interface StorageBlobOptions {
      * An app setting (or environment variable) with the storage connection string to be used by this blob input or output
      */
     connection: string;
+
+    /**
+     * Whether to use sdk binding for this blob operation.
+     * */
+    sdkBinding?: boolean;
 }
 
 export interface StorageQueueOptions {

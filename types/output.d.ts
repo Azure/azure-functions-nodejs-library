@@ -7,6 +7,7 @@ import { EventHubOutput, EventHubOutputOptions } from './eventHub';
 import { GenericOutputOptions } from './generic';
 import { HttpOutput, HttpOutputOptions } from './http';
 import { FunctionOutput } from './index';
+import { MySqlOutput, MySqlOutputOptions } from './mySql';
 import {
     ServiceBusQueueOutput,
     ServiceBusQueueOutputOptions,
@@ -16,7 +17,6 @@ import {
 import { SqlOutput, SqlOutputOptions } from './sql';
 import { StorageBlobOutput, StorageBlobOutputOptions, StorageQueueOutput, StorageQueueOutputOptions } from './storage';
 import { TableOutput, TableOutputOptions } from './table';
-import { MySqlOutput, MySqlOutputOptions } from './mySql';
 import { WebPubSubOutput, WebPubSubOutputOptions } from './webpubsub';
 
 /**
