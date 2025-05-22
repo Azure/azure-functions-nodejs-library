@@ -39,7 +39,7 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
             return resourceFactoryResolver.createClient(data.modelBindingData.source, data.modelBindingData);
         } catch (exception) {
             throw new Error(
-                'Unable to create client. Please register the extensions library with your function app. ' +
+                'Please register the extensions library with your function app. ' +
                     `Error: ${exception instanceof Error ? exception.message : String(exception)}`
             );
         }

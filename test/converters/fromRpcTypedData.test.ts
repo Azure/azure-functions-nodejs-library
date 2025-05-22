@@ -265,8 +265,7 @@ describe('fromRpcTypedData - modelBindingData path', () => {
 
         // Act & Assert
         expect(() => fromRpcTypedData(data)).to.throw(
-            'Unable to create client. Please register the extensions library with your function app. ' +
-                'Error: Sinon-provided String exception'
+            'Please register the extensions library with your function app. ' + 'Error: Sinon-provided String exception'
         );
     });
 });
