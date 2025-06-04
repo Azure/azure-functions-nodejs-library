@@ -63,6 +63,7 @@ export class HttpResponse implements types.HttpResponse {
     }
 
     async formData(): Promise<FormData> {
+        // eslint-disable-next-line deprecation/deprecation
         return this.#uRes.formData();
     }
 
