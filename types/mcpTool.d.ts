@@ -90,13 +90,18 @@ export interface McpToolProperty {
     propertyName: string;
 
     /**
-     * The value of the property.
+     * The type of the property.
      */
-    propertyValue: string;
+    propertyType: string;
 
     /**
      * A description of the property.
      * This provides additional context about the purpose or usage of the property.
      */
     description: string;
+
+    /**
+     * Indicates whether the property is required.
+     */
+    required?: boolean;
 }

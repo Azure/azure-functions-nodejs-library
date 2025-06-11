@@ -38,7 +38,9 @@ export function converToMcpToolTriggerOptionsToRpc(
                 toolProperties: JSON.stringify(mcpToolTriggerOptions.toolProperties),
             };
         } else {
-            throw new Error('Invalid toolProperties: Array contains invalid McpToolProperty objects.');
+            throw new Error(
+                'Invalid toolProperties: Array contains invalid McpToolProperty, please validate the parameters.'
+            );
         }
     }
 
@@ -86,11 +88,6 @@ export function converToMcpToolTriggerOptionsToRpc(
                 propertyType,
                 description,
             };
-        });
-
-        console.log('result', {
-            ...baseResult,
-            toolProperties: JSON.stringify(result),
         });
 
         return {
@@ -143,10 +140,10 @@ function isMcpToolProperty(property: unknown): property is McpToolProperty {
         typeof property === 'object' &&
         property !== null &&
         'propertyName' in property &&
-        'propertyValue' in property &&
+        'propertyType' in property &&
         'description' in property &&
         typeof (property as McpToolProperty).propertyName === 'string' &&
-        typeof (property as McpToolProperty).propertyValue === 'string' &&
+        typeof (property as McpToolProperty).propertyType === 'string' &&
         typeof (property as McpToolProperty).description === 'string'
     );
 }
