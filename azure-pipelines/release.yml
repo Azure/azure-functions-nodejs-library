@@ -44,22 +44,8 @@ extends:
                   - job: Release
                     steps:
                         - download: officialBuild
-                        - task: NodeTool@0
-                          displayName: 'Install Node.js'
-                          inputs:
-                              versionSpec: 18.x
-                        - script: npm ci
-                          displayName: 'npm ci'
-                        - script: 'npm run validateRelease -- --publishTag ${{ parameters.NpmPublishTag }} --dropPath "$(Pipeline.Workspace)/officialBuild/drop"'
-                          displayName: 'validate release'
-                        - script: mv *.tgz package.tgz
-                          displayName: 'Rename tgz file' # because the publish command below requires an exact path
-                          workingDirectory: '$(Pipeline.Workspace)/officialBuild/drop'
-                        - task: Npm@1
-                          displayName: 'npm publish'
-                          inputs:
-                              command: custom
-                              workingDir: '$(Pipeline.Workspace)/officialBuild/drop'
-                              verbose: true
-                              customCommand: 'publish package.tgz --tag ${{ parameters.NpmPublishTag }} --dry-run ${{ lower(parameters.NpmPublishDryRun) }}'
-                              customEndpoint: nodejs-library-npm
+                        - template: /azure-pipelines/templates/npm-publish-steps.yml@self
+                          parameters:
+                            tgzPath: '$(Pipeline.Workspace)/officialBuild/drop'
+                            NpmPublishTag: ${{ parameters.NpmPublishTag }}
+                            NpmPublishDryRun: ${{ parameters.NpmPublishDryRun }}

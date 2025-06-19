@@ -1,0 +1,86 @@
+parameters:
+    - name: NpmPublishTag
+      displayName: 'Tag'
+      type: string
+      default: 'preview'
+    - name: NpmPublishDryRun
+      displayName: 'Dry Run'
+      type: boolean
+      default: true
+
+trigger: none
+pr: none
+
+resources:
+    repositories:
+        - repository: 1es
+          type: git
+          name: 1ESPipelineTemplates/1ESPipelineTemplates
+          ref: refs/tags/release
+
+extends:
+    template: v1/1ES.Official.PipelineTemplate.yml@1es
+    parameters:
+        sdl:
+            sourceAnalysisPool:
+                name: 1es-pool-azfunc
+                image: 1es-windows-2022
+                os: windows
+            codeql:
+                runSourceLanguagesInSourceAnalysis: true
+        pool:
+          name: 1es-pool-azfunc
+          image: 1es-windows-2022
+          os: windows
+
+        stages:
+            - stage: Build
+              jobs:
+              - template: /azure-pipelines/templates/build.yml@self
+                parameters:
+                    # Version to be published is specified in branch
+                    IsPrerelease: false
+            # - job: Create GitHub Tag & Release Note
+            - stage: Release
+              dependsOn: Build
+              jobs:
+                - job: Release
+                  steps:
+                  - task: DownloadPipelineArtifact@2
+                    inputs:
+                      artifact: drop
+                      path: $(Pipeline.Workspace)/drop
+                    displayName: 'Download artifact'
+                  - template: /azure-pipelines/templates/npm-publish-steps.yml@self
+                    parameters:
+                      tgzPath: '$(Pipeline.Workspace)/drop'
+                      NpmPublishTag: ${{ parameters.NpmPublishTag }}
+                      NpmPublishDryRun: ${{ parameters.NpmPublishDryRun }}
+            - stage: GitHubTagAndRelease
+              dependsOn: Release
+              jobs:
+              - job: GitHubTagAndRelease
+                steps:
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    artifact: drop
+                    path: $(Pipeline.Workspace)/drop
+                  displayName: 'Download drop artifact'
+                - powershell: |
+                    $files = Get-ChildItem "$(Pipeline.Workspace)\drop" -Filter "azure-functions-*.tgz"
+                    if ($files.Count -ne 1) {
+                        Write-Error "Expected one .tgz file, found $($files.Count)"
+                        exit 1
+                    }
+                    $file = $files[0].Name
+                    if ($file -match 'azure-functions-(.+)\.tgz') {
+                        $version = $Matches[1]
+                        Write-Host "Parsed version: $version"
+                        Write-Host "##vso[task.setvariable variable=version]$version"
+                    } else {
+                        Write-Error "Filename did not match expected pattern"
+                        exit 1
+                    }
+                  displayName: 'Extract version from .tgz filename'
+                - template: /azure-pipelines/templates/github-release.yml@self
+

@@ -1,0 +1,47 @@
+  steps:
+    - powershell: |
+        $githubToken = "$(GithubPat)"
+        $newLibraryVersion = "$(version)"
+        Write-Host "Debug: Version from pipeline variable is '$newLibraryVersion'"
+        
+        # Create GitHub credential
+        git config --global user.name "AzureFunctionsNodeJS"
+        git config --global user.email "azfunc@microsoft.com"
+    
+        # Clone Repository
+        git clone https://$githubToken@github.com/Azure/azure-functions-nodejs-library
+        Write-Host "Cloned azure-functions-nodejs-library into local"
+        Set-Location "azure-functions-nodejs-library"
+        git checkout "origin/release/$newLibraryVersion"
+    
+        # Create release tag X.Y.Z
+        Write-Host "Creating release tag $newLibraryVersion"
+        git tag -a "$newLibraryVersion" -m "$newLibraryVersion"
+    
+        # Push tag to remote
+        git push origin $newLibraryVersion
+
+      displayName: 'Create and push release tag x.y.z'
+    - powershell: |
+        $githubUser = "$(GithubUser)"
+        $githubToken = "$(GithubPat)"
+        $newLibraryVersion = "$(version)"
+        
+        # Create GitHub credential
+        $credential = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes("${githubUser}:${githubToken}"))
+    
+        # Create Release Note
+        Write-Host "Creating release note in GitHub"
+        $body = (@{tag_name="$newLibraryVersion";name="Release $newLibraryVersion";body="- Fill in Release Note Here";draft=$true} | ConvertTo-Json -Compress)
+        $response = Invoke-WebRequest -Headers @{"Cache-Control"="no-cache";"Content-Type"="application/json";"Authorization"="Basic $credential"} -Method Post -Body "$body" -Uri "https://api.github.com/repos/Azure/azure-functions-nodejs-library/releases"
+    
+        # Return Value
+        if ($response.StatusCode -ne 201) {
+            Write-Host "Failed to create release note in GitHub"
+            exit -1
+        }
+    
+        $draftUrl = $response | ConvertFrom-Json | Select -expand url
+        Write-Host "Release draft created in $draftUrl"
+
+      displayName: 'Create GitHub release draft'
