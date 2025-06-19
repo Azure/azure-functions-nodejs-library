@@ -40,7 +40,6 @@ extends:
                 parameters:
                     # Version to be published is specified in branch
                     IsPrerelease: false
-            # - job: Create GitHub Tag & Release Note
             - stage: Release
               dependsOn: Build
               jobs:

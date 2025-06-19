@@ -1,6 +1,6 @@
 {
     "name": "@azure/functions",
-    "version": "4.7.3-alpha.0",
+    "version": "4.7.3",
     "description": "Microsoft Azure Functions NodeJS Framework",
     "keywords": [
         "azure",
