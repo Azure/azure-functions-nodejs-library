@@ -15,6 +15,7 @@ import { fromRpcTypedData } from '../converters/fromRpcTypedData';
 import { AzFuncSystemError } from '../errors';
 import { isDefined, nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
+import { parseFormData } from './formDataParser';
 
 interface InternalHttpRequestInit extends RpcHttpData {
     undiciRequest?: uRequest;
@@ -96,8 +97,7 @@ export class HttpRequest implements types.HttpRequest {
     }
 
     async formData(): Promise<FormData> {
-        // eslint-disable-next-line deprecation/deprecation
-        return this.#uReq.formData();
+        return parseFormData(this.#uReq.body, this.#uReq.headers);
     }
 
     async json(): Promise<unknown> {

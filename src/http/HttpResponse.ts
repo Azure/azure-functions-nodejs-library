@@ -7,6 +7,7 @@ import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
 import { FormData, Headers, Response as uResponse, ResponseInit as uResponseInit } from 'undici';
 import { isDefined } from '../utils/nonNull';
+import { parseFormData } from './formDataParser';
 
 interface InternalHttpResponseInit extends HttpResponseInit {
     undiciResponse?: uResponse;
@@ -63,8 +64,7 @@ export class HttpResponse implements types.HttpResponse {
     }
 
     async formData(): Promise<FormData> {
-        // eslint-disable-next-line deprecation/deprecation
-        return this.#uRes.formData();
+        return parseFormData(this.#uRes.body, this.#uRes.headers);
     }
 
     async json(): Promise<unknown> {
