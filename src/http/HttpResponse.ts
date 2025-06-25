@@ -6,7 +6,6 @@ import { HttpResponseInit } from '@azure/functions';
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
 import { FormData, Headers, Response as uResponse, ResponseInit as uResponseInit } from 'undici';
-import { isDefined } from '../utils/nonNull';
 
 interface InternalHttpResponseInit extends HttpResponseInit {
     undiciResponse?: uResponse;
@@ -27,7 +26,7 @@ export class HttpResponse implements types.HttpResponse {
             this.#uRes = init.undiciResponse;
         } else {
             const uResInit: uResponseInit = { status: init.status, headers: init.headers };
-            if (isDefined(init.jsonBody)) {
+            if (init.jsonBody !== undefined) {
                 this.#uRes = uResponse.json(init.jsonBody, uResInit);
             } else {
                 this.#uRes = new uResponse(init.body, uResInit);
