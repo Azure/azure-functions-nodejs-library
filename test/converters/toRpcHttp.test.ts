@@ -54,6 +54,11 @@ describe('toRpcHttp', () => {
         );
     });
 
+    it('response class json null', async () => {
+        const result = await toRpcHttp('invocId', new HttpResponse({ jsonBody: null }));
+        expect(result).to.deep.equal(getExpectedRpcHttp('null', jsonHeaders));
+    });
+
     it('undefined', async () => {
         const result = await toRpcHttp('invocId', {});
         expect(result).to.deep.equal(getExpectedRpcHttp('', {}));
