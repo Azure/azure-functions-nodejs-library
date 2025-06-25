@@ -59,6 +59,16 @@ describe('toRpcHttp', () => {
         expect(result).to.deep.equal(getExpectedRpcHttp('null', jsonHeaders));
     });
 
+    it('response class json boolean false', async () => {
+        const result = await toRpcHttp('invocId', new HttpResponse({ jsonBody: false }));
+        expect(result).to.deep.equal(getExpectedRpcHttp('false', jsonHeaders));
+    });
+
+    it('response class json number zero', async () => {
+        const result = await toRpcHttp('invocId', new HttpResponse({ jsonBody: 0 }));
+        expect(result).to.deep.equal(getExpectedRpcHttp('0', jsonHeaders));
+    });
+
     it('undefined', async () => {
         const result = await toRpcHttp('invocId', {});
         expect(result).to.deep.equal(getExpectedRpcHttp('', {}));
