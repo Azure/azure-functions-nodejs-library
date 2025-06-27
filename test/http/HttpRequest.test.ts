@@ -5,6 +5,7 @@ import 'mocha';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
+import { File } from 'undici';
 import { HttpRequest } from '../../src/http/HttpRequest';
 
 chai.use(chaiAsPromised);
@@ -134,7 +135,7 @@ value2
             const contentTypes = ['application/octet-stream', 'application/json', 'text/plain', 'invalid'];
             for (const contentType of contentTypes) {
                 const req = createFormRequest('', contentType);
-                await expect(req.formData()).to.eventually.be.rejectedWith(/Content-Type was not one of /i);
+                await expect(req.formData()).to.eventually.be.rejectedWith(/Could not parse content as FormData/i);
             }
         });
     });
