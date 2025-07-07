@@ -13,7 +13,7 @@ import {
     HttpTrigger,
     HttpTriggerOptions,
     MySqlTrigger,
-    MySqlTriggerOptions,	
+    MySqlTriggerOptions,
     ServiceBusQueueTrigger,
     ServiceBusQueueTriggerOptions,
     ServiceBusTopicTrigger,

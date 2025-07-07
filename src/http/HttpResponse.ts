@@ -5,32 +5,39 @@ import * as types from '@azure/functions';
 import { HttpResponseInit } from '@azure/functions';
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
-import { FormData, Headers, Response as uResponse, ResponseInit as uResponseInit } from 'undici';
 import { isDefined } from '../utils/nonNull';
 
 interface InternalHttpResponseInit extends HttpResponseInit {
-    undiciResponse?: uResponse;
+    response?: Response;
 }
 
 export class HttpResponse implements types.HttpResponse {
     readonly cookies: types.Cookie[];
     readonly enableContentNegotiation: boolean;
 
-    #uRes: uResponse;
+    #res: Response;
     #init: InternalHttpResponseInit;
 
     constructor(init?: InternalHttpResponseInit) {
         init ??= {};
         this.#init = init;
 
-        if (init.undiciResponse) {
-            this.#uRes = init.undiciResponse;
+        if (init.response) {
+            this.#res = init.response;
         } else {
-            const uResInit: uResponseInit = { status: init.status, headers: init.headers };
+            const resInit: ResponseInit = { status: init.status, headers: init.headers };
             if (isDefined(init.jsonBody)) {
-                this.#uRes = uResponse.json(init.jsonBody, uResInit);
+                // Create JSON response manually for compatibility
+                const jsonHeaders = new Headers(resInit.headers);
+                if (!jsonHeaders.has('content-type')) {
+                    jsonHeaders.set('content-type', 'application/json');
+                }
+                this.#res = new Response(JSON.stringify(init.jsonBody), {
+                    ...resInit,
+                    headers: jsonHeaders,
+                });
             } else {
-                this.#uRes = new uResponse(init.body, uResInit);
+                this.#res = new Response(init.body, resInit);
             }
         }
 
@@ -39,44 +46,47 @@ export class HttpResponse implements types.HttpResponse {
     }
 
     get status(): number {
-        return this.#uRes.status;
+        return this.#res.status;
     }
 
     get headers(): Headers {
-        return this.#uRes.headers;
+        return this.#res.headers;
     }
 
-    get body(): ReadableStream<any> | null {
-        return this.#uRes.body;
+    get body(): ReadableStream<Uint8Array> | null {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return this.#res.body as any; // Type compatibility between global and Node.js ReadableStream
     }
 
     get bodyUsed(): boolean {
-        return this.#uRes.bodyUsed;
+        return this.#res.bodyUsed;
     }
 
     async arrayBuffer(): Promise<ArrayBuffer> {
-        return this.#uRes.arrayBuffer();
+        return this.#res.arrayBuffer();
     }
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     async blob(): Promise<Blob> {
-        return this.#uRes.blob();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return this.#res.blob() as any; // Type compatibility with Node.js Blob
     }
 
     async formData(): Promise<FormData> {
-        return this.#uRes.formData();
+        return this.#res.formData();
     }
 
     async json(): Promise<unknown> {
-        return this.#uRes.json();
+        return this.#res.json();
     }
 
     async text(): Promise<string> {
-        return this.#uRes.text();
+        return this.#res.text();
     }
 
     clone(): HttpResponse {
         const newInit = structuredClone(this.#init);
-        newInit.undiciResponse = this.#uRes.clone();
+        newInit.response = this.#res.clone();
         return new HttpResponse(newInit);
     }
 }
