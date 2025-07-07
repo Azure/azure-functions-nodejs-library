@@ -1,6 +1,6 @@
 {
     "name": "@azure/functions",
-    "version": "4.7.3",
+    "version": "4.7.2",
     "description": "Microsoft Azure Functions NodeJS Framework",
     "keywords": [
         "azure",
@@ -43,7 +43,7 @@
     "dependencies": {
         "cookie": "^0.7.0",
         "long": "^4.0.0",
-        "undici": "^7.10.0"
+        "undici": "^5.29.0"
     },
     "devDependencies": {
         "@types/chai": "^4.2.22",
