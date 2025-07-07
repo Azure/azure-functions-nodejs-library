@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import { HttpRequestUser } from '@azure/functions';
-import { Headers } from 'undici';
 import { nonNullValue } from '../utils/nonNull';
 
 /* grandfathered in. Should fix when possible */

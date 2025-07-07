@@ -8,7 +8,6 @@ import { Blob } from 'buffer';
 import { IncomingMessage } from 'http';
 import * as stream from 'stream';
 import { ReadableStream } from 'stream/web';
-import { FormData, Headers, HeadersInit, Request as uRequest } from 'undici';
 import { URLSearchParams } from 'url';
 import { fromNullableMapping } from '../converters/fromRpcNullable';
 import { fromRpcTypedData } from '../converters/fromRpcTypedData';
@@ -17,7 +16,7 @@ import { isDefined, nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
 interface InternalHttpRequestInit extends RpcHttpData {
-    undiciRequest?: uRequest;
+    request?: Request;
 }
 
 export class HttpRequest implements types.HttpRequest {
@@ -25,14 +24,14 @@ export class HttpRequest implements types.HttpRequest {
     readonly params: HttpRequestParams;
 
     #cachedUser?: HttpRequestUser | null;
-    #uReq: uRequest;
+    #req: Request;
     #init: InternalHttpRequestInit;
 
     constructor(init: InternalHttpRequestInit) {
         this.#init = init;
 
-        let uReq = init.undiciRequest;
-        if (!uReq) {
+        let req = init.request;
+        if (!req) {
             const url = nonNullProp(init, 'url');
 
             let body: Buffer | string | undefined;
@@ -42,33 +41,33 @@ export class HttpRequest implements types.HttpRequest {
                 body = init.body.string;
             }
 
-            uReq = new uRequest(url, {
+            req = new Request(url, {
                 body,
                 method: nonNullProp(init, 'method'),
                 headers: fromNullableMapping(init.nullableHeaders, init.headers),
             });
         }
-        this.#uReq = uReq;
+        this.#req = req;
 
         if (init.nullableQuery || init.query) {
             this.query = new URLSearchParams(fromNullableMapping(init.nullableQuery, init.query));
         } else {
-            this.query = new URL(this.#uReq.url).searchParams;
+            this.query = new URL(this.#req.url).searchParams;
         }
 
         this.params = fromNullableMapping(init.nullableParams, init.params);
     }
 
     get url(): string {
-        return this.#uReq.url;
+        return this.#req.url;
     }
 
     get method(): string {
-        return this.#uReq.method;
+        return this.#req.method;
     }
 
     get headers(): Headers {
-        return this.#uReq.headers;
+        return this.#req.headers;
     }
 
     get user(): HttpRequestUser | null {
@@ -79,37 +78,40 @@ export class HttpRequest implements types.HttpRequest {
         return this.#cachedUser;
     }
 
-    get body(): ReadableStream<any> | null {
-        return this.#uReq.body;
+    get body(): ReadableStream<Uint8Array> | null {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return this.#req.body as any; // Type compatibility between global and Node.js ReadableStream
     }
 
     get bodyUsed(): boolean {
-        return this.#uReq.bodyUsed;
+        return this.#req.bodyUsed;
     }
 
     async arrayBuffer(): Promise<ArrayBuffer> {
-        return this.#uReq.arrayBuffer();
+        return this.#req.arrayBuffer();
     }
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     async blob(): Promise<Blob> {
-        return this.#uReq.blob();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return this.#req.blob() as any; // Type compatibility with Node.js Blob
     }
 
     async formData(): Promise<FormData> {
-        return this.#uReq.formData();
+        return this.#req.formData();
     }
 
     async json(): Promise<unknown> {
-        return this.#uReq.json();
+        return this.#req.json();
     }
 
     async text(): Promise<string> {
-        return this.#uReq.text();
+        return this.#req.text();
     }
 
     clone(): HttpRequest {
         const newInit = structuredClone(this.#init);
-        newInit.undiciRequest = this.#uReq.clone();
+        newInit.request = this.#req.clone();
         return new HttpRequest(newInit);
     }
 }
@@ -144,12 +146,14 @@ export function createStreamRequest(
         headers = <HeadersInit>headersData;
     }
 
-    const uReq = new uRequest(url, {
-        body,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const req = new Request(url, {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        body: body as any, // Node.js Readable stream compatibility
         duplex: 'half',
         method: nonNullProp(proxyReq, 'method'),
         headers,
-    });
+    } as any); // Global Request constructor compatibility
 
     const params: Record<string, string> = {};
     for (const [key, rpcValue] of Object.entries(rpcParams)) {
@@ -159,7 +163,7 @@ export function createStreamRequest(
     }
 
     return new HttpRequest({
-        undiciRequest: uReq,
+        request: req,
         params,
     });
 }
