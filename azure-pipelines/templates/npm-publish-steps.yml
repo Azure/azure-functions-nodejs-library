@@ -1,0 +1,30 @@
+parameters:
+  tgzPath: ''
+  NpmPublishTag: ''
+  NpmPublishDryRun: false
+
+steps:
+  - task: NodeTool@0
+    displayName: 'Install Node.js'
+    inputs:
+      versionSpec: 18.x
+
+  - script: npm ci
+    displayName: 'npm ci'
+
+  - script: 'npm run validateRelease -- --publishTag ${{ parameters.NpmPublishTag }} --dropPath "${{ parameters.tgzPath }}"'
+    displayName: 'Validate release'
+    name: validateReleaseStep
+
+  - script: mv *.tgz package.tgz
+    displayName: 'Rename tgz file'
+    workingDirectory: '${{ parameters.tgzPath }}'
+
+  - task: Npm@1
+    displayName: 'npm publish'
+    inputs:
+      command: custom
+      workingDir: '${{ parameters.tgzPath }}'
+      verbose: true
+      customCommand: 'publish package.tgz --tag ${{ parameters.NpmPublishTag }} --dry-run ${{ lower(parameters.NpmPublishDryRun) }}'
+      customEndpoint: nodejs-library-npm
