@@ -1,6 +1,6 @@
 {
     "name": "@azure/functions",
-    "version": "4.7.2",
+    "version": "5.0.0",
     "description": "Microsoft Azure Functions NodeJS Framework",
     "keywords": [
         "azure",
@@ -28,7 +28,7 @@
         "README.md"
     ],
     "engines": {
-        "node": ">=18.0"
+        "node": ">=20.0"
     },
     "scripts": {
         "build": "webpack --mode development",
