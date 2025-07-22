@@ -42,13 +42,17 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
                     `Error: ${exception instanceof Error ? exception.message : String(exception)}`
             );
         }
-    } else if (data.collectionModelBindingData && isDefined(data.collectionModelBindingData.modelBindingData)) {
+    } else if (
+        data.collectionModelBindingData &&
+        isDefined(data.collectionModelBindingData.modelBindingData) &&
+        data.collectionModelBindingData.modelBindingData.length > 0
+    ) {
         try {
             const resourceFactoryResolver: ResourceFactoryResolver = ResourceFactoryResolver.getInstance();
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             return resourceFactoryResolver.createClient(
-                data?.collectionModelBindingData?.modelBindingData[0]?.source,
-                data?.collectionModelBindingData?.modelBindingData
+                data.collectionModelBindingData.modelBindingData[0]?.source,
+                data.collectionModelBindingData.modelBindingData
             );
         } catch (exception) {
             throw new Error(
