@@ -433,6 +433,21 @@ declare module '@azure/functions-core' {
         collectionDouble?: RpcCollectionDouble | null;
 
         collectionSint64?: RpcCollectionSInt64 | null;
+
+        modelBindingData?: ModelBindingData | null;
+
+        collectionModelBindingData?: CollectionModelBindingData | null;
+    }
+
+    export interface CollectionModelBindingData {
+        modelBindingData?: ModelBindingData[] | null;
+    }
+
+    export interface ModelBindingData {
+        content?: Buffer | null;
+        contentType?: string | null;
+        source?: string | null;
+        version?: string | null;
     }
 
     interface RpcCollectionSInt64 {

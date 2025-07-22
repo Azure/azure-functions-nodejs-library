@@ -30,8 +30,35 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
         return data.collectionDouble.double;
     } else if (data.collectionSint64 && isDefined(data.collectionSint64.sint64)) {
         return data.collectionSint64.sint64;
-    } else {
-        return undefined;
+    } else if (data.modelBindingData && isDefined(data.modelBindingData.content)) {
+        try {
+            const resourceFactoryResolver: ResourceFactoryResolver = ResourceFactoryResolver.getInstance();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            return resourceFactoryResolver.createClient(data.modelBindingData.source, data.modelBindingData);
+        } catch (exception) {
+            throw new Error(
+                'Unable to create client. Please register the extensions library with your function app. ' +
+                    `Error: ${exception instanceof Error ? exception.message : String(exception)}`
+            );
+        }
+    } else if (
+        data.collectionModelBindingData &&
+        isDefined(data.collectionModelBindingData.modelBindingData) &&
+        data.collectionModelBindingData.modelBindingData.length > 0
+    ) {
+        try {
+            const resourceFactoryResolver: ResourceFactoryResolver = ResourceFactoryResolver.getInstance();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            return resourceFactoryResolver.createClient(
+                data.collectionModelBindingData.modelBindingData[0]?.source,
+                data.collectionModelBindingData.modelBindingData
+            );
+        } catch (exception) {
+            throw new Error(
+                'Unable to create client. Please register the extensions library with your function app. ' +
+                    `Error: ${exception instanceof Error ? exception.message : String(exception)}`
+            );
+        }
     }
 }
 
