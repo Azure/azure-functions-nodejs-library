@@ -270,3 +270,164 @@ describe('fromRpcTypedData - modelBindingData path', () => {
         );
     });
 });
+describe('fromRpcTypedData - collectionModelBindingData path', () => {
+    let sandbox: sinon.SinonSandbox;
+    let originalGetInstance: typeof ResourceFactoryResolver.getInstance;
+
+    beforeEach(() => {
+        sandbox = sinon.createSandbox();
+        originalGetInstance = ResourceFactoryResolver.getInstance.bind(ResourceFactoryResolver);
+    });
+
+    afterEach(() => {
+        sandbox.restore();
+        ResourceFactoryResolver.getInstance = originalGetInstance;
+    });
+
+    it('should successfully create a client when collectionModelBindingData is valid', () => {
+        const mockClient = { name: 'testCollectionClient' };
+        const mockResolver = {
+            createClient: sinon.stub().returns(mockClient),
+        };
+        ResourceFactoryResolver.getInstance = sinon.stub().returns(mockResolver);
+
+        const collectionModelBindingData = {
+            modelBindingData: [
+                {
+                    content: Buffer.from('test-content-1'),
+                    source: 'blob',
+                    contentType: 'application/octet-stream',
+                },
+                {
+                    content: Buffer.from('test-content-2'),
+                    source: 'blob',
+                    contentType: 'application/octet-stream',
+                },
+            ],
+        };
+
+        const data: RpcTypedData = {
+            collectionModelBindingData,
+        };
+
+        const result = fromRpcTypedData(data);
+
+        sinon.assert.calledWith(mockResolver.createClient, 'blob', collectionModelBindingData.modelBindingData);
+        expect(result).to.equal(mockClient);
+    });
+
+    it('should handle collectionModelBindingData with undefined source', () => {
+        const mockClient = { name: 'testCollectionClient' };
+        const mockResolver = {
+            createClient: sinon.stub().returns(mockClient),
+        };
+        ResourceFactoryResolver.getInstance = sinon.stub().returns(mockResolver);
+
+        const collectionModelBindingData = {
+            modelBindingData: [
+                {
+                    content: Buffer.from('test-content-1'),
+                    // source is undefined
+                    contentType: 'application/octet-stream',
+                },
+            ],
+        };
+
+        const data: RpcTypedData = {
+            collectionModelBindingData,
+        };
+
+        const result = fromRpcTypedData(data);
+
+        expect(mockResolver.createClient.calledWith(undefined, collectionModelBindingData.modelBindingData)).to.be.true;
+        expect(result).to.equal(mockClient);
+    });
+
+    it('should throw enhanced error when ResourceFactoryResolver.createClient throws for collectionModelBindingData', () => {
+        const originalError = new Error('Collection factory not registered');
+        const mockResolver = {
+            createClient: sinon.stub().throws(originalError),
+        };
+        ResourceFactoryResolver.getInstance = sinon.stub().returns(mockResolver);
+
+        const collectionModelBindingData = {
+            modelBindingData: [
+                {
+                    content: Buffer.from('test-content-1'),
+                    source: 'blob',
+                    contentType: 'application/octet-stream',
+                },
+            ],
+        };
+
+        const data: RpcTypedData = {
+            collectionModelBindingData,
+        };
+
+        expect(() => fromRpcTypedData(data)).to.throw(
+            'Unable to create client. Please register the extensions library with your function app. ' +
+                'Error: Collection factory not registered'
+        );
+    });
+
+    it('should throw enhanced error when ResourceFactoryResolver.getInstance throws for collectionModelBindingData', () => {
+        const originalError = new Error('Collection resolver not initialized');
+        ResourceFactoryResolver.getInstance = sinon.stub().throws(originalError);
+
+        const collectionModelBindingData = {
+            modelBindingData: [
+                {
+                    content: Buffer.from('test-content-1'),
+                    source: 'blob',
+                    contentType: 'application/octet-stream',
+                },
+            ],
+        };
+
+        const data: RpcTypedData = {
+            collectionModelBindingData,
+        };
+
+        expect(() => fromRpcTypedData(data)).to.throw(
+            'Unable to create client. Please register the extensions library with your function app. ' +
+                'Error: Collection resolver not initialized'
+        );
+    });
+
+    it('should handle non-Error exceptions by converting to string for collectionModelBindingData', () => {
+        const mockResolver = {
+            createClient: sinon.stub().throws('String exception for collection'), // Non-Error exception
+        };
+        ResourceFactoryResolver.getInstance = sinon.stub().returns(mockResolver);
+
+        const collectionModelBindingData = {
+            modelBindingData: [
+                {
+                    content: Buffer.from('test-content-1'),
+                    source: 'blob',
+                    contentType: 'application/octet-stream',
+                },
+            ],
+        };
+
+        const data: RpcTypedData = {
+            collectionModelBindingData,
+        };
+
+        expect(() => fromRpcTypedData(data)).to.throw(
+            'Unable to create client. Please register the extensions library with your function app. ' +
+                'Error: Sinon-provided String exception for collection'
+        );
+    });
+});
+
+describe('fromRpcTypedData - fallback/undefined cases', () => {
+    it('should return undefined for unknown data shape', () => {
+        const data: RpcTypedData = { foo: 'bar' } as any;
+        expect(fromRpcTypedData(data)).to.be.undefined;
+    });
+
+    it('should return undefined for empty object', () => {
+        expect(fromRpcTypedData({} as RpcTypedData)).to.be.undefined;
+    });
+});

@@ -29,9 +29,21 @@ export interface ServiceBusQueueTriggerOptions {
     isSessionsEnabled?: boolean;
 
     /**
+     * Gets or sets a value indicating whether the trigger should automatically complete the message after successful processing.
+     * If not explicitly set, the behavior will be based on the autoCompleteMessages configuration in host.json.
+     * For more information, <see cref="https://aka.ms/AAp8dm9"/>"
+     */
+    autoCompleteMessages?: boolean;
+
+    /**
      * Set to `many` in order to enable batching. If omitted or set to `one`, a single message is passed to the function.
      */
     cardinality?: 'many' | 'one';
+
+    /**
+     * Whether to use sdk binding for this blob operation.
+     * */
+    sdkBinding?: boolean;
 }
 export type ServiceBusQueueTrigger = FunctionTrigger & ServiceBusQueueTriggerOptions;
 
