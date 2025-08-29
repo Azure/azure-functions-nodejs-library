@@ -131,10 +131,19 @@ value2
         });
 
         it('Unsupported content type', async () => {
-            const contentTypes = ['application/octet-stream', 'application/json', 'text/plain', 'invalid'];
-            for (const contentType of contentTypes) {
-                const req = createFormRequest('', contentType);
-                await expect(req.formData()).to.eventually.be.rejectedWith(/Content-Type was not one of/i);
+            if (process.version.startsWith('v18.')) {
+                console.log('Here');
+                const contentTypes = ['application/octet-stream', 'application/json', 'text/plain', 'invalid'];
+                for (const contentType of contentTypes) {
+                    const req = createFormRequest('', contentType);
+                    await expect(req.formData()).to.eventually.be.rejectedWith(/Request.formData: Could not/i);
+                }
+            } else {
+                const contentTypes = ['application/octet-stream', 'application/json', 'text/plain', 'invalid'];
+                for (const contentType of contentTypes) {
+                    const req = createFormRequest('', contentType);
+                    await expect(req.formData()).to.eventually.be.rejectedWith(/Content-Type was not one of/i);
+                }
             }
         });
     });
