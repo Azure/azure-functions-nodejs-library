@@ -4,7 +4,7 @@
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type ServiceBusQueueHandler = (messages: unknown, context: InvocationContext) => FunctionResult;
+export type ServiceBusQueueHandler = (messages: unknown | any, context: InvocationContext) => FunctionResult;
 
 export interface ServiceBusQueueFunctionOptions extends ServiceBusQueueTriggerOptions, Partial<FunctionOptions> {
     handler: ServiceBusQueueHandler;
