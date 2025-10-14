@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { RpcTypedData } from '@azure/functions-core';
+import { ResourceFactoryResolver } from '@azure/functions-extensions-base';
 import { HttpRequest } from '../http/HttpRequest';
 import { isDefined } from '../utils/nonNull';
 

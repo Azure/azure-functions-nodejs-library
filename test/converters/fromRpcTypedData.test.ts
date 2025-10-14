@@ -7,6 +7,9 @@ import { fromString } from 'long';
 import { HttpRequest } from '../../src';
 import { fromRpcTypedData } from '../../src/converters/fromRpcTypedData';
 import Long = require('long');
+import { ResourceFactoryResolver } from '@azure/functions-extensions-base';
+import sinon = require('sinon');
+import { RpcTypedData } from '@azure/functions-core';
 
 describe('fromRpcTypedData', () => {
     it('null', () => {
