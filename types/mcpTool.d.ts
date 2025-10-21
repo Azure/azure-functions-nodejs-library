@@ -103,5 +103,5 @@ export interface McpToolProperty {
     /**
      * Indicates whether the property is required.
      */
-    required?: boolean;
+    isRequired?: boolean;
 }
