@@ -391,6 +391,12 @@ declare module '@azure/functions-core' {
         direction?: RpcBindingDirection | null;
 
         dataType?: RpcBindingDataType | null;
+
+        properties?: RpcBindingProperties | null;
+    }
+
+    interface RpcBindingProperties {
+        supportsDeferredBinding?: 'true' | 'false' | null;
     }
 
     type RpcBindingDirection = 'in' | 'out' | 'inout';
