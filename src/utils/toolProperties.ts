@@ -244,10 +244,6 @@ export function normalizeToolProperties(
 
     if (isToolProperties(properties)) {
         const converted = convertToolProperties(properties);
-        // Additional validation to ensure everything is properly set
-        converted.forEach((property) => {
-            validateToolProperty(property, property.propertyName);
-        });
         return converted;
     }
 

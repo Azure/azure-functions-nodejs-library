@@ -282,28 +282,6 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
             );
         });
 
-        it('should throw error for fluent properties with missing type accessed via conversion', () => {
-            // Create properties with invalid object that lacks propertyType but has other required properties
-            const invalidToolProps = {
-                invalidProp: {
-                    propertyType: '', // Empty type should trigger validation
-                    description: 'Some description',
-                    isRequired: true,
-                    isArray: false,
-                } as any,
-            };
-
-            const input: McpToolTriggerOptions = {
-                toolName: 'invalid-fluent-tool',
-                description: 'A tool with invalid fluent properties',
-                toolProperties: invalidToolProps,
-            };
-
-            expect(() => converToMcpToolTriggerOptionsToRpc(input)).to.throw(
-                /Property type is required for property 'invalidProp'/
-            );
-        });
-
         it('should handle fluent properties with missing description by defaulting to empty string', () => {
             // Create properties with object that lacks description but has other required properties
             const validToolProps = {

@@ -49,6 +49,6 @@ export function converToMcpToolTriggerOptionsToRpc(
 
     // Handle cases where toolProperties is not an array
     throw new Error(
-        `Invalid toolProperties for tool '${mcpToolTriggerOptions.toolName}': Expected an array of McpToolProperty or ToolProps objects.`
+        `Invalid toolProperties for tool '${mcpToolTriggerOptions.toolName}': Expected an array of McpToolProperty or ToolProps objects or ToolProps need a type defined.`
     );
 }
