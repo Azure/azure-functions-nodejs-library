@@ -48,9 +48,9 @@ export interface McpToolTriggerOptions {
 
     /**
      * Additional properties or metadata for the tool.
-     * This is a dictionary of key-value pairs that can be used to configure the trigger.
+     * Can be provided as an array (legacy format) or as a toolProp object format.
      */
-    toolProperties?: any | McpToolProperty[];
+    toolProperties?: McpToolProperty[] | ToolProps | any;
 }
 
 /**
@@ -98,10 +98,25 @@ export interface McpToolProperty {
      * A description of the property.
      * This provides additional context about the purpose or usage of the property.
      */
-    description: string;
+    description?: string;
 
     /**
      * Indicates whether the property is required.
      */
     isRequired?: boolean;
+
+    /**
+     * Indicates whether the property is an array type.
+     */
+    isArray?: boolean;
 }
+
+/**
+ * Represents a tool property definition (same as McpToolProperty but without propertyName)
+ */
+export type ToolProperty = Omit<McpToolProperty, 'propertyName'>;
+
+/**
+ * Tool properties format - an object mapping property names to their definitions
+ */
+export type ToolProps = Record<string, ToolProperty>;
