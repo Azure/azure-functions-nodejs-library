@@ -30,6 +30,9 @@ export * as trigger from './trigger';
 export * from './warmup';
 export * from './webpubsub';
 
+// Export toolProp for fluent tool properties API
+export { arg } from '../src/utils/toolProperties';
+
 /**
  * Void if no `return` output is registered
  * Otherwise, the registered `return` output
