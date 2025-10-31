@@ -4,7 +4,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import { converToMcpToolTriggerOptionsToRpc } from '../../src/converters/toMcpToolTriggerOptionsToRpc';
-import { toolProperty } from '../../src/utils/toolProperties';
+import { arg } from '../../src/utils/toolProperties';
 import { McpToolProperty, McpToolTriggerOptions, ToolProps } from '../../types/mcpTool';
 
 describe('converToMcpToolTriggerOptionsToRpc', () => {
@@ -90,8 +90,8 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
     describe('toolProps object format', () => {
         it('should handle toolProps object format', () => {
             const toolProperties: ToolProps = {
-                name: toolProperty.string().describe('The name of the item'),
-                age: toolProperty.number().describe('The age of the person').optional(),
+                name: arg.string().describe('The name of the item'),
+                age: arg.number().describe('The age of the person').optional(),
             };
 
             const input: McpToolTriggerOptions = {
@@ -116,11 +116,11 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
 
         it('should handle all supported property types', () => {
             const toolProperties: ToolProps = {
-                stringProp: toolProperty.string().describe('A string property'),
-                numberProp: toolProperty.number().describe('A number property').optional(),
-                booleanProp: toolProperty.boolean().describe('A boolean property'),
-                objectProp: toolProperty.object().describe('An object property').optional(),
-                doubleProp: toolProperty.double().describe('A double property'),
+                stringProp: arg.string().describe('A string property'),
+                numberProp: arg.number().describe('A number property').optional(),
+                booleanProp: arg.boolean().describe('A boolean property'),
+                objectProp: arg.object().describe('An object property').optional(),
+                integerProp: arg.integer().describe('An integer property'),
             };
 
             const input: McpToolTriggerOptions = {
@@ -140,8 +140,8 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
 
         it('should handle array properties correctly', () => {
             const toolProperties: ToolProps = {
-                stringArray: toolProperty.string().describe('A string array').asArray().optional(),
-                numberArray: toolProperty.number().describe('A number array').asArray(),
+                stringArray: arg.string().describe('A string array').asArray().optional(),
+                numberArray: arg.number().describe('A number array').asArray(),
             };
 
             const input: McpToolTriggerOptions = {
@@ -312,7 +312,7 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
     describe('JSON serialization', () => {
         it('should produce valid JSON in toolProperties', () => {
             const toolProperties: ToolProps = {
-                test: toolProperty.string().describe('Test property'),
+                test: arg.string().describe('Test property'),
             };
 
             const input: McpToolTriggerOptions = {
@@ -352,9 +352,7 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
     describe('edge cases', () => {
         it('should handle properties with special characters', () => {
             const toolProperties: ToolProps = {
-                'special-field_with$symbols': toolProperty
-                    .string()
-                    .describe('A property with special characters in name'),
+                'special-field_with$symbols': arg.string().describe('A property with special characters in name'),
             };
 
             const input: McpToolTriggerOptions = {
@@ -374,7 +372,7 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
 
         it('should handle properties with non-empty descriptions', () => {
             const toolProperties: ToolProps = {
-                validDesc: toolProperty.string().describe('A valid description'),
+                validDesc: arg.string().describe('A valid description'),
             };
 
             const input: McpToolTriggerOptions = {
@@ -393,7 +391,7 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
         });
         it('should handle whitespace in names and descriptions', () => {
             const toolProperties: ToolProps = {
-                '  spaced name  ': toolProperty.string().describe('  spaced description  ').optional(),
+                '  spaced name  ': arg.string().describe('  spaced description  ').optional(),
             };
 
             const input: McpToolTriggerOptions = {

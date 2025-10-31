@@ -3,16 +3,11 @@
 
 import 'mocha';
 import { expect } from 'chai';
-import {
-    convertToolProperties,
-    normalizeToolProperties,
-    toolProperty,
-    ToolPropertyBuilder,
-} from '../src/utils/toolProperties';
+import { arg, convertToolProperties, normalizeToolProperties, ToolPropertyBuilder } from '../src/utils/toolProperties';
 
 describe('isArray property support', () => {
     it('asArray() method sets isArray to true', () => {
-        const stringArrayProp = toolProperty.string().asArray().describe('String array');
+        const stringArrayProp = arg.string().asArray().describe('String array');
         expect(stringArrayProp.isArray).to.equal(true);
         expect(stringArrayProp.propertyType).to.equal('string');
         expect(stringArrayProp.description).to.equal('String array');
@@ -20,7 +15,7 @@ describe('isArray property support', () => {
     });
 
     it('regular properties have isArray set to false', () => {
-        const regularProp = toolProperty.string().describe('Regular string').optional();
+        const regularProp = arg.string().describe('Regular string').optional();
         expect(regularProp.isArray).to.equal(false);
         expect(regularProp.propertyType).to.equal('string');
         expect(regularProp.description).to.equal('Regular string');
@@ -29,9 +24,9 @@ describe('isArray property support', () => {
 
     it('convertToolProperties preserves isArray property', () => {
         const toolProps = {
-            stringArray: toolProperty.string().asArray().describe('String array'),
-            numberArray: toolProperty.number().asArray().describe('Number array').optional(),
-            regularProp: toolProperty.boolean().describe('Regular boolean'),
+            stringArray: arg.string().asArray().describe('String array'),
+            numberArray: arg.number().asArray().describe('Number array').optional(),
+            regularProp: arg.boolean().describe('Regular boolean'),
         };
 
         const converted = convertToolProperties(toolProps);
@@ -79,24 +74,24 @@ describe('isArray property support', () => {
     });
 
     it('all property types support asArray()', () => {
-        const stringArray = toolProperty.string().asArray().describe('String array');
-        const numberArray = toolProperty.number().asArray().describe('Number array');
-        const booleanArray = toolProperty.boolean().asArray().describe('Boolean array');
-        const objectArray = toolProperty.object().asArray().describe('Object array');
-        const longArray = toolProperty.long().asArray().describe('Long array');
+        const stringArray = arg.string().asArray().describe('String array');
+        const numberArray = arg.number().asArray().describe('Number array');
+        const booleanArray = arg.boolean().asArray().describe('Boolean array');
+        const objectArray = arg.object().asArray().describe('Object array');
+        const integerArray = arg.integer().asArray().describe('Integer array');
 
         expect(stringArray.isArray).to.equal(true);
         expect(numberArray.isArray).to.equal(true);
         expect(booleanArray.isArray).to.equal(true);
         expect(objectArray.isArray).to.equal(true);
-        expect(longArray.isArray).to.equal(true);
+        expect(integerArray.isArray).to.equal(true);
     });
 
     it('supports seamless property access after desc()', () => {
         // Test the specific pattern from user's example - this should work seamlessly
         const toolProperties = {
-            name: toolProperty.string().describe('Required property to identify the caller.').optional(),
-            arrayT: toolProperty.string().asArray().describe('An array of strings property.'),
+            name: arg.string().describe('Required property to identify the caller.').optional(),
+            arrayT: arg.string().asArray().describe('An array of strings property.'),
         };
 
         expect(toolProperties.name).to.have.property('propertyType', 'string');
@@ -117,7 +112,7 @@ describe('isArray property support', () => {
         }).to.throw('Property type must be specified');
 
         // Missing description should default to empty string when description getter is accessed
-        const builder = toolProperty.string();
+        const builder = arg.string();
         expect(builder.description).to.equal(''); // Should default to empty string
     });
 });

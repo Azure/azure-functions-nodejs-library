@@ -69,16 +69,16 @@ export class ToolPropertyBuilder implements McpToolProperty {
     /**
      * Set the property type to long
      */
-    long(): ToolPropertyBuilder {
-        this.property.propertyType = 'long';
+    integer(): ToolPropertyBuilder {
+        this.property.propertyType = 'integer';
         return this;
     }
 
     /**
-     * Set the property type to double
+     * Set the property type to long
      */
-    double(): ToolPropertyBuilder {
-        this.property.propertyType = 'double';
+    datetime(): ToolPropertyBuilder {
+        this.property.propertyType = 'string';
         return this;
     }
 
@@ -132,23 +132,30 @@ export class ToolPropertyBuilder implements McpToolProperty {
  * @example
  * ```typescript
  * const toolProperties = {
- *   snippetName: toolProp
+ *   snippetName: arg
  *     .string()
  *     .describe("Some Description"),
  *
- *   optionalField: toolProp
+ *   optionalField: arg
  *     .number()
  *     .describe("Optional number field")
  *     .optional(),
  * };
  * ```
  */
-export const toolProperty = {
+export const arg = {
     /**
      * Start building a string property
      */
     string(): ToolPropertyBuilder {
         return new ToolPropertyBuilder().string();
+    },
+
+    /**
+     * Start building a number property
+     */
+    integer(): ToolPropertyBuilder {
+        return new ToolPropertyBuilder().integer();
     },
 
     /**
@@ -166,24 +173,17 @@ export const toolProperty = {
     },
 
     /**
+     * Start building a datetime property
+     */
+    datetime(): ToolPropertyBuilder {
+        return new ToolPropertyBuilder().datetime();
+    },
+
+    /**
      * Start building an object property
      */
     object(): ToolPropertyBuilder {
         return new ToolPropertyBuilder().object();
-    },
-
-    /**
-     * Start building a long property
-     */
-    long(): ToolPropertyBuilder {
-        return new ToolPropertyBuilder().long();
-    },
-
-    /**
-     * Start building a double property
-     */
-    double(): ToolPropertyBuilder {
-        return new ToolPropertyBuilder().double();
     },
 };
 
