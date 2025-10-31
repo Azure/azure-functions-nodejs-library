@@ -48,9 +48,9 @@ export interface McpToolTriggerOptions {
 
     /**
      * Additional properties or metadata for the tool.
-     * Can be provided as an array (legacy format) or as a toolProp object format.
+     * Can be provided as an array or as a Args object format.
      */
-    toolProperties?: McpToolProperty[] | ToolProps | any;
+    toolProperties?: McpToolProperty[] | Args;
 }
 
 /**
@@ -114,9 +114,9 @@ export interface McpToolProperty {
 /**
  * Represents a tool property definition (same as McpToolProperty but without propertyName)
  */
-export type ToolProperty = Omit<McpToolProperty, 'propertyName'>;
+export type Arg = Omit<McpToolProperty, 'propertyName'>;
 
 /**
  * Tool properties format - an object mapping property names to their definitions
  */
-export type ToolProps = Record<string, ToolProperty>;
+export type Args = Record<string, Arg>;

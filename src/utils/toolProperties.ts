@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { McpToolProperty, ToolProps } from '../../types/mcpTool';
+import { Args, McpToolProperty } from '../../types/mcpTool';
 
 /**
  * Fluent API builder for creating MCP Tool properties
@@ -192,8 +192,8 @@ export const arg = {
  * @param toolProps - Object with property names as keys and ToolProperty as values
  * @returns Array of McpToolProperty objects with propertyName set correctly
  */
-export function convertToolProperties(toolProps: ToolProps): McpToolProperty[] {
-    return Object.entries(toolProps).map(([propertyName, property]) => ({
+export function convertToolProperties(args: Args): McpToolProperty[] {
+    return Object.entries(args).map(([propertyName, property]) => ({
         propertyName,
         propertyType: property.propertyType,
         description: property.description || '', // Default to empty string if not provided
@@ -205,7 +205,7 @@ export function convertToolProperties(toolProps: ToolProps): McpToolProperty[] {
 /**
  * Type guard to check if properties are in toolProp format
  */
-export function isToolProperties(properties: unknown): properties is ToolProps {
+export function isToolProperties(properties: unknown): properties is Args {
     return (
         typeof properties === 'object' &&
         properties !== null &&
@@ -243,7 +243,7 @@ function validateToolProperty(property: McpToolProperty, propertyName?: string):
  * Supports both legacy array format and new toolProp object format
  */
 export function normalizeToolProperties(
-    properties: McpToolProperty[] | ToolProps | undefined
+    properties: McpToolProperty[] | Args | undefined
 ): McpToolProperty[] | undefined {
     if (!properties) {
         return undefined;
