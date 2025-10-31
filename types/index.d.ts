@@ -31,7 +31,7 @@ export * from './warmup';
 export * from './webpubsub';
 
 // Export toolProp for fluent tool properties API
-export { toolProp } from '../src/utils/toolProperties';
+export { toolProperty } from '../src/utils/toolProperties';
 
 /**
  * Void if no `return` output is registered

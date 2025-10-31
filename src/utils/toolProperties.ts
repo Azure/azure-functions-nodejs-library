@@ -75,10 +75,18 @@ export class ToolPropertyBuilder implements McpToolProperty {
     }
 
     /**
+     * Set the property type to double
+     */
+    double(): ToolPropertyBuilder {
+        this.property.propertyType = 'double';
+        return this;
+    }
+
+    /**
      * Set the description for the property
      * @param description - Description of the property's purpose
      */
-    desc(description: string): ToolPropertyBuilder {
+    describe(description: string): ToolPropertyBuilder {
         this.property.description = description;
         return this;
     }
@@ -126,16 +134,16 @@ export class ToolPropertyBuilder implements McpToolProperty {
  * const toolProperties = {
  *   snippetName: toolProp
  *     .string()
- *     .desc("Some Description"),
+ *     .describe("Some Description"),
  *
  *   optionalField: toolProp
  *     .number()
- *     .desc("Optional number field")
+ *     .describe("Optional number field")
  *     .optional(),
  * };
  * ```
  */
-export const toolProp = {
+export const toolProperty = {
     /**
      * Start building a string property
      */
@@ -169,6 +177,13 @@ export const toolProp = {
      */
     long(): ToolPropertyBuilder {
         return new ToolPropertyBuilder().long();
+    },
+
+    /**
+     * Start building a double property
+     */
+    double(): ToolPropertyBuilder {
+        return new ToolPropertyBuilder().double();
     },
 };
 

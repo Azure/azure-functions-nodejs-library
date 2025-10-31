@@ -16,7 +16,7 @@ export { InvocationContext } from './InvocationContext';
 export * as output from './output';
 export * as trigger from './trigger';
 export { Disposable } from './utils/Disposable';
-export { toolProp } from './utils/toolProperties';
+export { toolProperty } from './utils/toolProperties';
 
 export enum SqlChangeOperation {
     Insert = 0,
