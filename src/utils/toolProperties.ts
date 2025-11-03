@@ -43,6 +43,22 @@ export class ToolPropertyBuilder implements McpToolProperty {
     }
 
     /**
+     * Set the property type to double
+     */
+    double(): ToolPropertyBuilder {
+        this.property.propertyType = 'number';
+        return this;
+    }
+
+    /**
+     * Set the property type to long
+     */
+    long(): ToolPropertyBuilder {
+        this.property.propertyType = 'number';
+        return this;
+    }
+
+    /**
      * Set the property type to number
      */
     number(): ToolPropertyBuilder {
@@ -163,6 +179,20 @@ export const arg = {
      */
     number(): ToolPropertyBuilder {
         return new ToolPropertyBuilder().number();
+    },
+
+    /**
+     * Start building a long property
+     */
+    long(): ToolPropertyBuilder {
+        return new ToolPropertyBuilder().long();
+    },
+
+    /**
+     * Start building a double property
+     */
+    double(): ToolPropertyBuilder {
+        return new ToolPropertyBuilder().double();
     },
 
     /**

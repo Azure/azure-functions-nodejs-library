@@ -121,6 +121,8 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
                 booleanProp: arg.boolean().describe('A boolean property'),
                 objectProp: arg.object().describe('An object property').optional(),
                 integerProp: arg.integer().describe('An integer property'),
+                longProp: arg.long().describe('A long property'),
+                doubleProp: arg.double().describe('A double property').optional(),
             };
 
             const input: McpToolTriggerOptions = {
@@ -135,13 +137,26 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
             expect(() => JSON.parse(result.toolProperties || '')).to.not.throw();
 
             const parsedProperties = JSON.parse(result.toolProperties || '[]') as McpToolProperty[];
-            expect(parsedProperties).to.have.length(5);
+            expect(parsedProperties).to.have.length(7);
+
+            // Verify long and double properties are correctly converted
+            const longProp = parsedProperties.find((p) => p.propertyName === 'longProp');
+            expect(longProp?.propertyType).to.equal('number');
+            expect(longProp?.description).to.equal('A long property');
+            expect(longProp?.isRequired).to.equal(true);
+
+            const doubleProp = parsedProperties.find((p) => p.propertyName === 'doubleProp');
+            expect(doubleProp?.propertyType).to.equal('number');
+            expect(doubleProp?.description).to.equal('A double property');
+            expect(doubleProp?.isRequired).to.equal(false);
         });
 
         it('should handle array properties correctly', () => {
             const toolProperties: Args = {
                 stringArray: arg.string().describe('A string array').asArray().optional(),
                 numberArray: arg.number().describe('A number array').asArray(),
+                longArray: arg.long().describe('A long array').asArray(),
+                doubleArray: arg.double().describe('A double array').asArray().optional(),
             };
 
             const input: McpToolTriggerOptions = {
@@ -156,7 +171,71 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
             expect(() => JSON.parse(result.toolProperties || '')).to.not.throw();
 
             const parsedProperties = JSON.parse(result.toolProperties || '[]') as McpToolProperty[];
-            expect(parsedProperties).to.have.length(2);
+            expect(parsedProperties).to.have.length(4);
+
+            // Verify long and double array properties
+            const longArray = parsedProperties.find((p) => p.propertyName === 'longArray');
+            expect(longArray?.propertyType).to.equal('number');
+            expect(longArray?.isArray).to.equal(true);
+            expect(longArray?.isRequired).to.equal(true);
+
+            const doubleArray = parsedProperties.find((p) => p.propertyName === 'doubleArray');
+            expect(doubleArray?.propertyType).to.equal('number');
+            expect(doubleArray?.isArray).to.equal(true);
+            expect(doubleArray?.isRequired).to.equal(false);
+        });
+
+        it('should handle long and double property types specifically', () => {
+            const toolProperties: Args = {
+                longValue: arg.long().describe('A long integer value'),
+                doubleValue: arg.double().describe('A double precision value').optional(),
+                longArrayValue: arg.long().asArray().describe('Array of long values'),
+                doubleArrayValue: arg.double().asArray().describe('Array of double values').optional(),
+            };
+
+            const input: McpToolTriggerOptions = {
+                toolName: 'long-double-tool',
+                description: 'A tool testing long and double types',
+                toolProperties: toolProperties,
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.toolProperties).to.be.a('string');
+            expect(() => JSON.parse(result.toolProperties || '')).to.not.throw();
+
+            const parsedProperties = JSON.parse(result.toolProperties || '[]') as McpToolProperty[];
+            expect(parsedProperties).to.have.length(4);
+
+            // Test individual long property
+            const longProp = parsedProperties.find((p) => p.propertyName === 'longValue');
+            expect(longProp).to.not.be.undefined;
+            expect(longProp?.propertyType).to.equal('number');
+            expect(longProp?.description).to.equal('A long integer value');
+            expect(longProp?.isRequired).to.equal(true);
+            expect(longProp?.isArray).to.equal(false);
+
+            // Test individual double property
+            const doubleProp = parsedProperties.find((p) => p.propertyName === 'doubleValue');
+            expect(doubleProp).to.not.be.undefined;
+            expect(doubleProp?.propertyType).to.equal('number');
+            expect(doubleProp?.description).to.equal('A double precision value');
+            expect(doubleProp?.isRequired).to.equal(false);
+            expect(doubleProp?.isArray).to.equal(false);
+
+            // Test long array property
+            const longArrayProp = parsedProperties.find((p) => p.propertyName === 'longArrayValue');
+            expect(longArrayProp).to.not.be.undefined;
+            expect(longArrayProp?.propertyType).to.equal('number');
+            expect(longArrayProp?.isArray).to.equal(true);
+            expect(longArrayProp?.isRequired).to.equal(true);
+
+            // Test double array property
+            const doubleArrayProp = parsedProperties.find((p) => p.propertyName === 'doubleArrayValue');
+            expect(doubleArrayProp).to.not.be.undefined;
+            expect(doubleArrayProp?.propertyType).to.equal('number');
+            expect(doubleArrayProp?.isArray).to.equal(true);
+            expect(doubleArrayProp?.isRequired).to.equal(false);
         });
     });
 
