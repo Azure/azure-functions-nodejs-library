@@ -79,12 +79,16 @@ describe('isArray property support', () => {
         const booleanArray = arg.boolean().asArray().describe('Boolean array');
         const objectArray = arg.object().asArray().describe('Object array');
         const integerArray = arg.integer().asArray().describe('Integer array');
+        const longArray = arg.long().asArray().describe('Long array');
+        const doubleArray = arg.double().asArray().describe('Double array');
 
         expect(stringArray.isArray).to.equal(true);
         expect(numberArray.isArray).to.equal(true);
         expect(booleanArray.isArray).to.equal(true);
         expect(objectArray.isArray).to.equal(true);
         expect(integerArray.isArray).to.equal(true);
+        expect(longArray.isArray).to.equal(true);
+        expect(doubleArray.isArray).to.equal(true);
     });
 
     it('supports seamless property access after desc()', () => {
@@ -114,5 +118,60 @@ describe('isArray property support', () => {
         // Missing description should default to empty string when description getter is accessed
         const builder = arg.string();
         expect(builder.description).to.equal(''); // Should default to empty string
+    });
+
+    it('long and double property types work correctly', () => {
+        const longProp = arg.long().describe('A long number property');
+        const doubleProp = arg.double().describe('A double precision property').optional();
+
+        // Test long property
+        expect(longProp.propertyType).to.equal('number');
+        expect(longProp.description).to.equal('A long number property');
+        expect(longProp.isRequired).to.equal(true);
+        expect(longProp.isArray).to.equal(false);
+
+        // Test double property
+        expect(doubleProp.propertyType).to.equal('number');
+        expect(doubleProp.description).to.equal('A double precision property');
+        expect(doubleProp.isRequired).to.equal(false);
+        expect(doubleProp.isArray).to.equal(false);
+    });
+
+    it('long and double properties work with convertToolProperties', () => {
+        const toolProps = {
+            longValue: arg.long().describe('Long integer value'),
+            doubleValue: arg.double().describe('Double precision value').optional(),
+            longArray: arg.long().asArray().describe('Array of long values'),
+            doubleArray: arg.double().asArray().describe('Array of double values').optional(),
+        };
+
+        const converted = convertToolProperties(toolProps);
+
+        expect(converted).to.have.lengthOf(4);
+
+        // Test long property
+        const longProp = converted.find((p) => p.propertyName === 'longValue');
+        expect(longProp?.propertyType).to.equal('number');
+        expect(longProp?.description).to.equal('Long integer value');
+        expect(longProp?.isRequired).to.equal(true);
+        expect(longProp?.isArray).to.equal(false);
+
+        // Test double property
+        const doubleProp = converted.find((p) => p.propertyName === 'doubleValue');
+        expect(doubleProp?.propertyType).to.equal('number');
+        expect(doubleProp?.description).to.equal('Double precision value');
+        expect(doubleProp?.isRequired).to.equal(false);
+        expect(doubleProp?.isArray).to.equal(false);
+
+        // Test long array
+        const longArrayProp = converted.find((p) => p.propertyName === 'longArray');
+        expect(longArrayProp?.propertyType).to.equal('number');
+        expect(longArrayProp?.isArray).to.equal(true);
+
+        // Test double array
+        const doubleArrayProp = converted.find((p) => p.propertyName === 'doubleArray');
+        expect(doubleArrayProp?.propertyType).to.equal('number');
+        expect(doubleArrayProp?.isArray).to.equal(true);
+        expect(doubleArrayProp?.isRequired).to.equal(false);
     });
 });
