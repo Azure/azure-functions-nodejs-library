@@ -5,7 +5,8 @@ import 'mocha';
 import { expect } from 'chai';
 import { converToMcpToolTriggerOptionsToRpc } from '../../src/converters/toMcpToolTriggerOptionsToRpc';
 import { arg } from '../../src/utils/toolProperties';
-import { Args, McpToolProperty, McpToolTriggerOptions } from '../../types/mcpTool';
+import type { Args } from '../../types/mcpTool';
+import { McpToolProperty, McpToolTriggerOptions } from '../../types/mcpTool';
 
 describe('converToMcpToolTriggerOptionsToRpc', () => {
     describe('basic conversion', () => {
