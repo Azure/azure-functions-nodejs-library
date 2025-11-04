@@ -1,7 +1,8 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { Args, McpToolProperty } from '../../types/mcpTool';
+import type { Args } from '../../types/mcpTool';
+import { McpToolProperty } from '../../types/mcpTool';
 
 /**
  * Fluent API builder for creating MCP Tool properties
