@@ -23,6 +23,7 @@ import { toRpcTypedData } from './converters/toRpcTypedData';
 import { AzFuncSystemError } from './errors';
 import { waitForProxyRequest } from './http/httpProxy';
 import { createStreamRequest } from './http/HttpRequest';
+import { HttpResponse } from './http/HttpResponse';
 import { InvocationContext } from './InvocationContext';
 import { enableHttpStream } from './setup';
 import { isHttpTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
@@ -105,7 +106,33 @@ export class InvocationModel implements coreTypes.InvocationModel {
     ): Promise<unknown> {
         try {
             return await Promise.resolve(handler(...inputs, context));
+        } catch (error) {
+            // Log the error for debugging purposes
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.#systemLog('error', `Function threw an error: ${errorMessage}`);
+
+            // For HTTP triggers with streaming enabled, convert errors to HTTP responses
+            if (isHttpTrigger(this.#triggerType) && enableHttpStream) {
+                const statusCode = this.#getErrorStatusCode(error);
+                const responseBody = {
+                    error: errorMessage,
+                    timestamp: new Date().toISOString(),
+                    invocationId: context.invocationId,
+                };
+
+                return new HttpResponse({
+                    status: statusCode,
+                    jsonBody: responseBody,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            }
+
+            // For non-HTTP triggers or when streaming is disabled, re-throw the original error
+            throw error;
         } finally {
+            // Mark invocation as done regardless of success or failure
             this.#isDone = true;
         }
     }
@@ -172,5 +199,44 @@ export class InvocationModel implements coreTypes.InvocationModel {
             this.#systemLog('warning', badAsyncMsg);
         }
         this.#log(level, 'user', ...args);
+    }
+
+    /**
+     * Maps different types of errors to appropriate HTTP status codes
+     * @param error The error to analyze
+     * @returns HTTP status code
+     */
+    #getErrorStatusCode(error: unknown): number {
+        const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+
+        // Check for specific error patterns and map to appropriate status codes
+        if (errorMessage.includes('unauthorized') || errorMessage.includes('auth')) {
+            return 401;
+        }
+        if (errorMessage.includes('forbidden') || errorMessage.includes('access denied')) {
+            return 403;
+        }
+        if (errorMessage.includes('not found') || errorMessage.includes('404')) {
+            return 404;
+        }
+        if (
+            errorMessage.includes('bad request') ||
+            errorMessage.includes('invalid') ||
+            errorMessage.includes('validation')
+        ) {
+            return 400;
+        }
+        if (errorMessage.includes('timeout') || errorMessage.includes('timed out')) {
+            return 408;
+        }
+        if (errorMessage.includes('conflict')) {
+            return 409;
+        }
+        if (errorMessage.includes('too many requests') || errorMessage.includes('rate limit')) {
+            return 429;
+        }
+
+        // Default to 500 Internal Server Error for unrecognized errors
+        return 500;
     }
 }
