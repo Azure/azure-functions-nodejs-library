@@ -174,4 +174,53 @@ describe('isArray property support', () => {
         expect(doubleArrayProp?.isArray).to.equal(true);
         expect(doubleArrayProp?.isRequired).to.equal(false);
     });
+
+    it('convertToolProperties defaults undefined isRequired to true and isArray to false', () => {
+        // Create a mock Args object with undefined optional properties
+        const toolProps = {
+            prop1: {
+                propertyName: '',
+                propertyType: 'string',
+                description: 'Test property 1',
+                isRequired: undefined,
+                isArray: undefined,
+            },
+            prop2: {
+                propertyName: '',
+                propertyType: 'number',
+                description: 'Test property 2',
+                isRequired: false,
+                isArray: true,
+            },
+            prop3: {
+                propertyName: '',
+                propertyType: 'boolean',
+                description: 'Test property 3',
+                isRequired: true,
+                isArray: false,
+            },
+        };
+
+        const converted = convertToolProperties(toolProps as any);
+
+        expect(converted).to.have.lengthOf(3);
+
+        // prop1 with undefined should default to required=true, array=false
+        const prop1 = converted.find((p) => p.propertyName === 'prop1');
+        expect(prop1?.isRequired).to.equal(true);
+        expect(prop1?.isArray).to.equal(false);
+        expect(prop1?.propertyType).to.equal('string');
+
+        // prop2 with explicit false/true should be preserved
+        const prop2 = converted.find((p) => p.propertyName === 'prop2');
+        expect(prop2?.isRequired).to.equal(false);
+        expect(prop2?.isArray).to.equal(true);
+        expect(prop2?.propertyType).to.equal('number');
+
+        // prop3 with explicit true/false should be preserved
+        const prop3 = converted.find((p) => p.propertyName === 'prop3');
+        expect(prop3?.isRequired).to.equal(true);
+        expect(prop3?.isArray).to.equal(false);
+        expect(prop3?.propertyType).to.equal('boolean');
+    });
 });
