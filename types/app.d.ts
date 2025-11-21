@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import { CosmosDBFunctionOptions } from './cosmosDB';
-import { EventGridFunctionOptions } from './eventGrid';
+import { EventGridEvent, EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
 import { GenericFunctionOptions } from './generic';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
@@ -112,49 +112,49 @@ export function timer(name: string, options: TimerFunctionOptions): void;
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function storageBlob(name: string, options: StorageBlobFunctionOptions): void;
+export function storageBlob<T = unknown>(name: string, options: StorageBlobFunctionOptions<T>): void;
 
 /**
  * Registers a function in your app that will be triggered whenever an item is added to a storage queue
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function storageQueue(name: string, options: StorageQueueFunctionOptions): void;
+export function storageQueue<T = unknown>(name: string, options: StorageQueueFunctionOptions<T>): void;
 
 /**
  * Registers a function in your app that will be triggered whenever a message is added to a service bus queue
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function serviceBusQueue(name: string, options: ServiceBusQueueFunctionOptions): void;
+export function serviceBusQueue<T = unknown>(name: string, options: ServiceBusQueueFunctionOptions<T>): void;
 
 /**
  * Registers a function in your app that will be triggered whenever a message is added to a service bus topic
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function serviceBusTopic(name: string, options: ServiceBusTopicFunctionOptions): void;
+export function serviceBusTopic<T = unknown>(name: string, options: ServiceBusTopicFunctionOptions<T>): void;
 
 /**
  * Registers a function in your app that will be triggered whenever a message is added to an event hub
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function eventHub(name: string, options: EventHubFunctionOptions): void;
+export function eventHub<T = unknown>(name: string, options: EventHubFunctionOptions<T>): void;
 
 /**
  * Registers a function in your app that will be triggered whenever an event is sent by an event grid source
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function eventGrid(name: string, options: EventGridFunctionOptions): void;
+export function eventGrid<T = EventGridEvent>(name: string, options: EventGridFunctionOptions<T>): void;
 
 /**
  * Registers a Cosmos DB function in your app that will be triggered whenever inserts and updates occur (not deletions)
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void;
+export function cosmosDB<T = unknown>(name: string, options: CosmosDBFunctionOptions<T>): void;
 
 /**
  * Registers a function in your app that will be triggered when an instance is added to scale a running function app.
@@ -173,14 +173,14 @@ export function warmup(name: string, options: WarmupFunctionOptions): void;
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function sql(name: string, options: SqlFunctionOptions): void;
+export function sql<T = unknown>(name: string, options: SqlFunctionOptions<T>): void;
 
 /**
  * Registers a MySql function in your app that will be triggered when a row is created or updated
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function mySql(name: string, options: MySqlFunctionOptions): void;
+export function mySql<T = unknown>(name: string, options: MySqlFunctionOptions<T>): void;
 
 /**
  * Registers a generic function in your app that will be triggered based on the type specified in `options.trigger.type`
@@ -195,8 +195,13 @@ export function generic(name: string, options: GenericFunctionOptions): void;
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
-export function webPubSub(name: string, options: WebPubSubFunctionOptions): void;
+export function webPubSub<T = unknown>(name: string, options: WebPubSubFunctionOptions<T>): void;
 
-export function mcpTool(name: string, options: McpToolFunctionOptions): void;
+/**
+ * Registers an MCP Tool function in your app
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the inputs, outputs, and handler for this function
+ */
+export function mcpTool<T = unknown>(name: string, options: McpToolFunctionOptions<T>): void;
 
 export * as hook from './hooks/registerHook';

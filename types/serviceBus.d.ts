@@ -4,10 +4,12 @@
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type ServiceBusQueueHandler = (messages: unknown | any, context: InvocationContext) => FunctionResult;
+export type ServiceBusQueueHandler<T = unknown> = (messages: T, context: InvocationContext) => FunctionResult;
 
-export interface ServiceBusQueueFunctionOptions extends ServiceBusQueueTriggerOptions, Partial<FunctionOptions> {
-    handler: ServiceBusQueueHandler;
+export interface ServiceBusQueueFunctionOptions<T = unknown>
+    extends ServiceBusQueueTriggerOptions,
+        Partial<FunctionOptions> {
+    handler: ServiceBusQueueHandler<T>;
 
     trigger?: ServiceBusQueueTrigger;
 }
@@ -60,10 +62,12 @@ export interface ServiceBusQueueOutputOptions {
 }
 export type ServiceBusQueueOutput = FunctionOutput & ServiceBusQueueOutputOptions;
 
-export type ServiceBusTopicHandler = (message: unknown, context: InvocationContext) => FunctionResult;
+export type ServiceBusTopicHandler<T = unknown> = (message: T, context: InvocationContext) => FunctionResult;
 
-export interface ServiceBusTopicFunctionOptions extends ServiceBusTopicTriggerOptions, Partial<FunctionOptions> {
-    handler: ServiceBusTopicHandler;
+export interface ServiceBusTopicFunctionOptions<T = unknown>
+    extends ServiceBusTopicTriggerOptions,
+        Partial<FunctionOptions> {
+    handler: ServiceBusTopicHandler<T>;
 
     trigger?: ServiceBusTopicTrigger;
 }

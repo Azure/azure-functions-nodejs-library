@@ -4,10 +4,10 @@
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger, RetryOptions } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type EventHubHandler = (messages: unknown, context: InvocationContext) => FunctionResult;
+export type EventHubHandler<T = unknown> = (messages: T, context: InvocationContext) => FunctionResult;
 
-export interface EventHubFunctionOptions extends EventHubTriggerOptions, Partial<FunctionOptions> {
-    handler: EventHubHandler;
+export interface EventHubFunctionOptions<T = unknown> extends EventHubTriggerOptions, Partial<FunctionOptions> {
+    handler: EventHubHandler<T>;
 
     trigger?: EventHubTrigger;
 

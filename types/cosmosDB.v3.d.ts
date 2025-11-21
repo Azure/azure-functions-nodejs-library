@@ -4,10 +4,10 @@
 import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger, RetryOptions } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type CosmosDBv3Handler = (documents: unknown[], context: InvocationContext) => FunctionResult;
+export type CosmosDBv3Handler<T = unknown> = (documents: T[], context: InvocationContext) => FunctionResult;
 
-export interface CosmosDBv3FunctionOptions extends CosmosDBv3TriggerOptions, Partial<FunctionOptions> {
-    handler: CosmosDBv3Handler;
+export interface CosmosDBv3FunctionOptions<T = unknown> extends CosmosDBv3TriggerOptions, Partial<FunctionOptions> {
+    handler: CosmosDBv3Handler<T>;
 
     trigger?: CosmosDBv3Trigger;
 
