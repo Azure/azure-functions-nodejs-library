@@ -5,32 +5,37 @@ import * as types from '@azure/functions';
 import { HttpResponseInit } from '@azure/functions';
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
-import { FormData, Headers, Response as uResponse, ResponseInit as uResponseInit } from 'undici';
 import { isDefined } from '../utils/nonNull';
 
 interface InternalHttpResponseInit extends HttpResponseInit {
-    undiciResponse?: uResponse;
+    nativeResponse?: Response;
 }
 
 export class HttpResponse implements types.HttpResponse {
     readonly cookies: types.Cookie[];
     readonly enableContentNegotiation: boolean;
 
-    #uRes: uResponse;
+    #nativeRes: Response;
     #init: InternalHttpResponseInit;
 
     constructor(init?: InternalHttpResponseInit) {
         init ??= {};
         this.#init = init;
 
-        if (init.undiciResponse) {
-            this.#uRes = init.undiciResponse;
+        if (init.nativeResponse) {
+            this.#nativeRes = init.nativeResponse;
         } else {
-            const uResInit: uResponseInit = { status: init.status, headers: init.headers };
+            const resInit: ResponseInit = { status: init.status, headers: init.headers };
             if (isDefined(init.jsonBody)) {
-                this.#uRes = uResponse.json(init.jsonBody, uResInit);
+                // Response.json is not available in all versions, so we create it manually
+                const jsonBody = JSON.stringify(init.jsonBody);
+                const jsonHeaders = new Headers(resInit.headers);
+                if (!jsonHeaders.has('content-type')) {
+                    jsonHeaders.set('content-type', 'application/json');
+                }
+                this.#nativeRes = new Response(jsonBody, { ...resInit, headers: jsonHeaders });
             } else {
-                this.#uRes = new uResponse(init.body, uResInit);
+                this.#nativeRes = new Response(init.body, resInit);
             }
         }
 
@@ -39,44 +44,44 @@ export class HttpResponse implements types.HttpResponse {
     }
 
     get status(): number {
-        return this.#uRes.status;
+        return this.#nativeRes.status;
     }
 
     get headers(): Headers {
-        return this.#uRes.headers;
+        return this.#nativeRes.headers;
     }
 
     get body(): ReadableStream<any> | null {
-        return this.#uRes.body;
+        return this.#nativeRes.body as ReadableStream<any> | null;
     }
 
     get bodyUsed(): boolean {
-        return this.#uRes.bodyUsed;
+        return this.#nativeRes.bodyUsed;
     }
 
     async arrayBuffer(): Promise<ArrayBuffer> {
-        return this.#uRes.arrayBuffer();
+        return this.#nativeRes.arrayBuffer();
     }
 
     async blob(): Promise<Blob> {
-        return this.#uRes.blob();
+        return this.#nativeRes.blob() as Promise<Blob>;
     }
 
     async formData(): Promise<FormData> {
-        return this.#uRes.formData();
+        return this.#nativeRes.formData();
     }
 
     async json(): Promise<unknown> {
-        return this.#uRes.json();
+        return this.#nativeRes.json();
     }
 
     async text(): Promise<string> {
-        return this.#uRes.text();
+        return this.#nativeRes.text();
     }
 
     clone(): HttpResponse {
         const newInit = structuredClone(this.#init);
-        newInit.undiciResponse = this.#uRes.clone();
+        newInit.nativeResponse = this.#nativeRes.clone();
         return new HttpResponse(newInit);
     }
 }
