@@ -227,8 +227,8 @@ export function convertToolProperties(args: Args): McpToolProperty[] {
         propertyName,
         propertyType: property.propertyType,
         description: property.description || '', // Default to empty string if not provided
-        isRequired: property.isRequired,
-        isArray: property.isArray,
+        isRequired: property.isRequired ?? true, // Default to true (required by default)
+        isArray: property.isArray ?? false, // Default to false
     }));
 }
 
