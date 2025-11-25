@@ -135,7 +135,9 @@ value2
             for (const contentType of contentTypes) {
                 const req = createFormRequest('', contentType);
                 // Native fetch API has different error message than undici
-                await expect(req.formData()).to.eventually.be.rejectedWith(/Content-Type.*not.*one of|Could not parse content as FormData/i);
+                await expect(req.formData()).to.eventually.be.rejectedWith(
+                    /Content-Type.*not.*one of|Could not parse content as FormData/i
+                );
             }
         });
     });
