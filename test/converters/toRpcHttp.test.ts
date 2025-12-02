@@ -5,7 +5,6 @@ import 'mocha';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import { Headers } from 'undici';
 import { toRpcHttp } from '../../src/converters/toRpcHttp';
 import { HttpResponse } from '../../src/http/HttpResponse';
 
