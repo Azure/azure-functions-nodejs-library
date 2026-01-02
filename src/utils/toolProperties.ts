@@ -2,12 +2,13 @@
 // Licensed under the MIT License.
 
 import type { Args, McpToolProperty } from '../../types/mcpTool';
+import type { IToolPropertyBuilder } from '../../types/toolPropertyBuilder';
 
 /**
  * Fluent API builder for creating MCP Tool properties
- * Also implements McpToolProperty interface to work seamlessly in object contexts
+ * Implements the IToolPropertyBuilder interface to ensure type consistency
  */
-export class ToolPropertyBuilder implements McpToolProperty {
+export class ToolPropertyBuilder implements IToolPropertyBuilder {
     private property: Partial<McpToolProperty> = {};
 
     // Implement McpToolProperty interface with getters
