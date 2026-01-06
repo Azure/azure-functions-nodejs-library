@@ -23,7 +23,7 @@ export declare class ToolPropertyBuilder implements IToolPropertyBuilder {
     integer(): IToolPropertyBuilder;
     datetime(): IToolPropertyBuilder;
     describe(description: string): IToolPropertyBuilder;
-    optional(): McpToolProperty;
+    optional(): IToolPropertyBuilder;
     asArray(): IToolPropertyBuilder;
 }
 

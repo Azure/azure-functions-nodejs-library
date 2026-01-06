@@ -62,7 +62,7 @@ export interface IToolPropertyBuilder extends Omit<Arg, never> {
     /**
      * Mark the property as optional
      */
-    optional(): Arg;
+    optional(): IToolPropertyBuilder;
 
     /**
      * Mark the property as an array type

@@ -111,9 +111,9 @@ export class ToolPropertyBuilder implements IToolPropertyBuilder {
     /**
      * Mark the property as optional
      */
-    optional(): McpToolProperty {
+    optional(): IToolPropertyBuilder {
         this.property.isRequired = false;
-        return this.buildInternal();
+        return this;
     }
 
     /**
@@ -122,24 +122,6 @@ export class ToolPropertyBuilder implements IToolPropertyBuilder {
     asArray(): ToolPropertyBuilder {
         this.property.isArray = true;
         return this;
-    }
-
-    /**
-     * Build the final McpToolProperty object
-     * @private
-     */
-    private buildInternal(): McpToolProperty {
-        if (!this.property.propertyType) {
-            throw new Error('Property type must be specified (use .string(), .number(), etc.)');
-        }
-
-        return {
-            propertyName: '', // Will be set by the consumer based on the key
-            propertyType: this.property.propertyType,
-            description: this.property.description || '', // Default to empty string if not provided
-            isRequired: this.property.isRequired ?? true, // Default to true (required by default)
-            isArray: this.property.isArray ?? false,
-        };
     }
 }
 
