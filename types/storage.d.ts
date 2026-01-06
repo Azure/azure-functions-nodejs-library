@@ -4,17 +4,17 @@
 import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type StorageBlobHandler = (blob: unknown, context: InvocationContext) => FunctionResult;
-export type StorageQueueHandler = (queueEntry: unknown, context: InvocationContext) => FunctionResult;
+export type StorageBlobHandler<T = unknown> = (blob: T, context: InvocationContext) => FunctionResult;
+export type StorageQueueHandler<T = unknown> = (queueEntry: T, context: InvocationContext) => FunctionResult;
 
-export interface StorageBlobFunctionOptions extends StorageBlobTriggerOptions, Partial<FunctionOptions> {
-    handler: StorageBlobHandler;
+export interface StorageBlobFunctionOptions<T = unknown> extends StorageBlobTriggerOptions, Partial<FunctionOptions> {
+    handler: StorageBlobHandler<T>;
 
     trigger?: StorageBlobTrigger;
 }
 
-export interface StorageQueueFunctionOptions extends StorageQueueTriggerOptions, Partial<FunctionOptions> {
-    handler: StorageQueueHandler;
+export interface StorageQueueFunctionOptions<T = unknown> extends StorageQueueTriggerOptions, Partial<FunctionOptions> {
+    handler: StorageQueueHandler<T>;
 
     trigger?: StorageQueueTrigger;
 }

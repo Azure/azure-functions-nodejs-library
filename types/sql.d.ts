@@ -4,10 +4,10 @@
 import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type SqlHandler = (changes: SqlChange[], context: InvocationContext) => FunctionResult;
+export type SqlHandler<T = unknown> = (changes: SqlChange<T>[], context: InvocationContext) => FunctionResult;
 
-export interface SqlFunctionOptions extends SqlTriggerOptions, Partial<FunctionOptions> {
-    handler: SqlHandler;
+export interface SqlFunctionOptions<T = unknown> extends SqlTriggerOptions, Partial<FunctionOptions> {
+    handler: SqlHandler<T>;
 
     trigger?: SqlTrigger;
 }
@@ -25,8 +25,8 @@ export interface SqlTriggerOptions {
 }
 export type SqlTrigger = FunctionTrigger & SqlTriggerOptions;
 
-export interface SqlChange {
-    Item: unknown;
+export interface SqlChange<T = unknown> {
+    Item: T;
     Operation: SqlChangeOperation;
 }
 

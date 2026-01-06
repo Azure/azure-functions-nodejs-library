@@ -4,10 +4,10 @@
 import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type MySqlHandler = (changes: MySqlChange[], context: InvocationContext) => FunctionResult;
+export type MySqlHandler<T = unknown> = (changes: MySqlChange<T>[], context: InvocationContext) => FunctionResult;
 
-export interface MySqlFunctionOptions extends MySqlTriggerOptions, Partial<FunctionOptions> {
-    handler: MySqlHandler;
+export interface MySqlFunctionOptions<T = unknown> extends MySqlTriggerOptions, Partial<FunctionOptions> {
+    handler: MySqlHandler<T>;
 
     trigger?: MySqlTrigger;
 }
@@ -25,8 +25,8 @@ export interface MySqlTriggerOptions {
 }
 export type MySqlTrigger = FunctionTrigger & MySqlTriggerOptions;
 
-export interface MySqlChange {
-    Item: unknown;
+export interface MySqlChange<T = unknown> {
+    Item: T;
     Operation: MySqlChangeOperation;
 }
 

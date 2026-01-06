@@ -22,9 +22,9 @@ import {
     CosmosDBv4TriggerOptions,
 } from './cosmosDB.v4';
 
-export type CosmosDBHandler = CosmosDBv3Handler | CosmosDBv4Handler;
+export type CosmosDBHandler<T = unknown> = CosmosDBv3Handler<T> | CosmosDBv4Handler<T>;
 
-export type CosmosDBFunctionOptions = CosmosDBv3FunctionOptions | CosmosDBv4FunctionOptions;
+export type CosmosDBFunctionOptions<T = unknown> = CosmosDBv3FunctionOptions<T> | CosmosDBv4FunctionOptions<T>;
 
 export type CosmosDBInputOptions = CosmosDBv3InputOptions | CosmosDBv4InputOptions;
 export type CosmosDBInput = CosmosDBv3Input | CosmosDBv4Input;

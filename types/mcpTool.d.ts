@@ -11,17 +11,17 @@ import { InvocationContext } from './InvocationContext';
  * @param context - The invocation context for the function.
  * @returns A result that can be a promise or a synchronous value.
  */
-export type McpToolTriggerHandler = (messages: unknown, context: InvocationContext) => FunctionResult;
+export type McpToolTriggerHandler<T = unknown> = (messages: T, context: InvocationContext) => FunctionResult;
 
 /**
  * Configuration options for an MCP Tool function.
  * This includes trigger-specific options and general function options.
  */
-export interface McpToolFunctionOptions extends McpToolTriggerOptions, Partial<FunctionOptions> {
+export interface McpToolFunctionOptions<T = unknown> extends McpToolTriggerOptions, Partial<FunctionOptions> {
     /**
      * The handler function to execute when the trigger is invoked.
      */
-    handler: McpToolTriggerHandler;
+    handler: McpToolTriggerHandler<T>;
 
     /**
      * The trigger configuration for the MCP Tool.

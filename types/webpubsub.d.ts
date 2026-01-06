@@ -4,10 +4,10 @@
 import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type WebPubSubHandler = (message: unknown, context: InvocationContext) => FunctionResult;
+export type WebPubSubHandler<T = unknown> = (message: T, context: InvocationContext) => FunctionResult;
 
-export interface WebPubSubFunctionOptions extends WebPubSubTriggerOptions, Partial<FunctionOptions> {
-    handler: WebPubSubHandler;
+export interface WebPubSubFunctionOptions<T = unknown> extends WebPubSubTriggerOptions, Partial<FunctionOptions> {
+    handler: WebPubSubHandler<T>;
 
     trigger?: WebPubSubTrigger;
 }
