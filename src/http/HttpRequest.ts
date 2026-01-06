@@ -8,7 +8,6 @@ import { Blob } from 'buffer';
 import { IncomingMessage } from 'http';
 import * as stream from 'stream';
 import { ReadableStream } from 'stream/web';
-import { FormData, Headers, HeadersInit, Request as uRequest } from 'undici';
 import { URLSearchParams } from 'url';
 import { fromNullableMapping } from '../converters/fromRpcNullable';
 import { fromRpcTypedData } from '../converters/fromRpcTypedData';
@@ -17,7 +16,7 @@ import { isDefined, nonNullProp } from '../utils/nonNull';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
 interface InternalHttpRequestInit extends RpcHttpData {
-    undiciRequest?: uRequest;
+    nativeRequest?: Request;
 }
 
 export class HttpRequest implements types.HttpRequest {
@@ -25,14 +24,14 @@ export class HttpRequest implements types.HttpRequest {
     readonly params: HttpRequestParams;
 
     #cachedUser?: HttpRequestUser | null;
-    #uReq: uRequest;
+    #nativeReq: Request;
     #init: InternalHttpRequestInit;
 
     constructor(init: InternalHttpRequestInit) {
         this.#init = init;
 
-        let uReq = init.undiciRequest;
-        if (!uReq) {
+        let nativeReq = init.nativeRequest;
+        if (!nativeReq) {
             const url = nonNullProp(init, 'url');
 
             let body: Buffer | string | undefined;
@@ -42,33 +41,33 @@ export class HttpRequest implements types.HttpRequest {
                 body = init.body.string;
             }
 
-            uReq = new uRequest(url, {
+            nativeReq = new Request(url, {
                 body,
                 method: nonNullProp(init, 'method'),
                 headers: fromNullableMapping(init.nullableHeaders, init.headers),
             });
         }
-        this.#uReq = uReq;
+        this.#nativeReq = nativeReq;
 
         if (init.nullableQuery || init.query) {
             this.query = new URLSearchParams(fromNullableMapping(init.nullableQuery, init.query));
         } else {
-            this.query = new URL(this.#uReq.url).searchParams;
+            this.query = new URL(this.#nativeReq.url).searchParams;
         }
 
         this.params = fromNullableMapping(init.nullableParams, init.params);
     }
 
     get url(): string {
-        return this.#uReq.url;
+        return this.#nativeReq.url;
     }
 
     get method(): string {
-        return this.#uReq.method;
+        return this.#nativeReq.method;
     }
 
     get headers(): Headers {
-        return this.#uReq.headers;
+        return this.#nativeReq.headers;
     }
 
     get user(): HttpRequestUser | null {
@@ -80,36 +79,36 @@ export class HttpRequest implements types.HttpRequest {
     }
 
     get body(): ReadableStream<any> | null {
-        return this.#uReq.body;
+        return this.#nativeReq.body as ReadableStream<any> | null;
     }
 
     get bodyUsed(): boolean {
-        return this.#uReq.bodyUsed;
+        return this.#nativeReq.bodyUsed;
     }
 
     async arrayBuffer(): Promise<ArrayBuffer> {
-        return this.#uReq.arrayBuffer();
+        return this.#nativeReq.arrayBuffer();
     }
 
     async blob(): Promise<Blob> {
-        return this.#uReq.blob();
+        return this.#nativeReq.blob() as Promise<Blob>;
     }
 
     async formData(): Promise<FormData> {
-        return this.#uReq.formData();
+        return this.#nativeReq.formData();
     }
 
     async json(): Promise<unknown> {
-        return this.#uReq.json();
+        return this.#nativeReq.json();
     }
 
     async text(): Promise<string> {
-        return this.#uReq.text();
+        return this.#nativeReq.text();
     }
 
     clone(): HttpRequest {
         const newInit = structuredClone(this.#init);
-        newInit.undiciRequest = this.#uReq.clone();
+        newInit.nativeRequest = this.#nativeReq.clone();
         return new HttpRequest(newInit);
     }
 }
@@ -144,8 +143,10 @@ export function createStreamRequest(
         headers = <HeadersInit>headersData;
     }
 
-    const uReq = new uRequest(url, {
-        body,
+    const nativeReq = new Request(url, {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        body: body as any,
+        // @ts-expect-error duplex is needed for streaming but not in all TypeScript versions
         duplex: 'half',
         method: nonNullProp(proxyReq, 'method'),
         headers,
@@ -159,7 +160,7 @@ export function createStreamRequest(
     }
 
     return new HttpRequest({
-        undiciRequest: uReq,
+        nativeRequest: nativeReq,
         params,
     });
 }

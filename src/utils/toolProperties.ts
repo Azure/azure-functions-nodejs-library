@@ -2,12 +2,13 @@
 // Licensed under the MIT License.
 
 import type { Args, McpToolProperty } from '../../types/mcpTool';
+import type { IToolPropertyBuilder } from '../../types/toolPropertyBuilder';
 
 /**
  * Fluent API builder for creating MCP Tool properties
- * Also implements McpToolProperty interface to work seamlessly in object contexts
+ * Implements the IToolPropertyBuilder interface to ensure type consistency
  */
-export class ToolPropertyBuilder implements McpToolProperty {
+export class ToolPropertyBuilder implements IToolPropertyBuilder {
     private property: Partial<McpToolProperty> = {};
 
     // Implement McpToolProperty interface with getters
@@ -110,9 +111,9 @@ export class ToolPropertyBuilder implements McpToolProperty {
     /**
      * Mark the property as optional
      */
-    optional(): McpToolProperty {
+    optional(): IToolPropertyBuilder {
         this.property.isRequired = false;
-        return this.buildInternal();
+        return this;
     }
 
     /**
@@ -121,24 +122,6 @@ export class ToolPropertyBuilder implements McpToolProperty {
     asArray(): ToolPropertyBuilder {
         this.property.isArray = true;
         return this;
-    }
-
-    /**
-     * Build the final McpToolProperty object
-     * @private
-     */
-    private buildInternal(): McpToolProperty {
-        if (!this.property.propertyType) {
-            throw new Error('Property type must be specified (use .string(), .number(), etc.)');
-        }
-
-        return {
-            propertyName: '', // Will be set by the consumer based on the key
-            propertyType: this.property.propertyType,
-            description: this.property.description || '', // Default to empty string if not provided
-            isRequired: this.property.isRequired ?? true, // Default to true (required by default)
-            isArray: this.property.isArray ?? false,
-        };
     }
 }
 
@@ -227,8 +210,8 @@ export function convertToolProperties(args: Args): McpToolProperty[] {
         propertyName,
         propertyType: property.propertyType,
         description: property.description || '', // Default to empty string if not provided
-        isRequired: property.isRequired,
-        isArray: property.isArray,
+        isRequired: property.isRequired ?? true, // Default to true (required by default)
+        isArray: property.isArray ?? false, // Default to false
     }));
 }
 

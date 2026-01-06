@@ -3,7 +3,6 @@
 
 import { Blob } from 'buffer';
 import { ReadableStream } from 'stream/web';
-import { BodyInit, FormData, Headers, HeadersInit } from 'undici';
 import { URLSearchParams } from 'url';
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
