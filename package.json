@@ -1,6 +1,6 @@
 {
     "name": "@azure/functions",
-    "version": "4.11.0",
+    "version": "4.11.1",
     "description": "Microsoft Azure Functions NodeJS Framework",
     "keywords": [
         "azure",
@@ -42,8 +42,7 @@
     },
     "dependencies": {
         "@azure/functions-extensions-base": "0.2.0",
-        "cookie": "^0.7.0",
-        "long": "^4.0.0"
+        "cookie": "^0.7.0"
     },
     "devDependencies": {
         "@types/chai": "^4.2.22",
@@ -71,6 +70,7 @@
         "fork-ts-checker-webpack-plugin": "^7.2.13",
         "fs-extra": "^10.0.1",
         "globby": "^11.0.0",
+        "long": "^4.0.0",
         "minimist": "^1.2.6",
         "mocha": "^11.1.0",
         "mocha-junit-reporter": "^2.0.2",
