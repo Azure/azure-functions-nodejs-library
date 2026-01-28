@@ -44,14 +44,14 @@ describe('HttpResponse', () => {
             expect(await res.text()).to.equal('Hello World');
         });
 
-        it('null body', async () => {
+        it('null body', () => {
             const res = new HttpResponse({
                 body: null,
             });
             expect(res.body).to.be.null;
         });
 
-        it('undefined body', async () => {
+        it('undefined body', () => {
             const res = new HttpResponse({
                 body: undefined,
             });
@@ -108,7 +108,7 @@ describe('HttpResponse', () => {
     });
 
     describe('HttpHeadersInit types', () => {
-        it('Record<string, string> headers', async () => {
+        it('Record<string, string> headers', () => {
             const res = new HttpResponse({
                 body: 'test',
                 headers: {
@@ -120,7 +120,7 @@ describe('HttpResponse', () => {
             expect(res.headers.get('X-Custom-Header')).to.equal('custom-value');
         });
 
-        it('Array of tuples headers', async () => {
+        it('Array of tuples headers', () => {
             const res = new HttpResponse({
                 body: 'test',
                 headers: [
@@ -132,7 +132,7 @@ describe('HttpResponse', () => {
             expect(res.headers.get('X-Request-Id')).to.equal('12345');
         });
 
-        it('Headers class', async () => {
+        it('Headers class', () => {
             const headers = new Headers();
             headers.set('Content-Type', 'text/html');
             headers.set('Cache-Control', 'no-cache');
@@ -145,7 +145,7 @@ describe('HttpResponse', () => {
             expect(res.headers.get('Cache-Control')).to.equal('no-cache');
         });
 
-        it('undefined headers', async () => {
+        it('undefined headers', () => {
             const res = new HttpResponse({
                 body: 'test',
                 headers: undefined,
@@ -153,7 +153,7 @@ describe('HttpResponse', () => {
             expect(res.headers).to.not.be.undefined;
         });
 
-        it('empty Record headers', async () => {
+        it('empty Record headers', () => {
             const res = new HttpResponse({
                 body: 'test',
                 headers: {},
@@ -161,7 +161,7 @@ describe('HttpResponse', () => {
             expect(res.headers).to.not.be.undefined;
         });
 
-        it('empty array headers', async () => {
+        it('empty array headers', () => {
             const res = new HttpResponse({
                 body: 'test',
                 headers: [],
