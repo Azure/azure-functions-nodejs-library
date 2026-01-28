@@ -7,6 +7,20 @@ import { URLSearchParams } from 'url';
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
 
+/**
+ * Represents the body types that can be used in an HTTP response.
+ * This is a local definition to avoid dependency on lib.dom.
+ * Compatible with Node.js native Fetch API body types.
+ */
+export type HttpResponseBodyInit = ReadableStream | Blob | ArrayBufferView | ArrayBuffer | string | null | undefined;
+
+/**
+ * Represents the headers types that can be used to initialize HTTP headers.
+ * This is a local definition to avoid dependency on lib.dom.
+ * Compatible with Node.js native Fetch API header types.
+ */
+export type HttpHeadersInit = Headers | Record<string, string> | [string, string][];
+
 export type HttpHandler = (
     request: HttpRequest,
     context: InvocationContext
@@ -203,7 +217,7 @@ export interface HttpResponseInit {
     /**
      * HTTP response body
      */
-    body?: BodyInit;
+    body?: HttpResponseBodyInit;
 
     /**
      * A JSON-serializable HTTP Response body.
@@ -220,7 +234,7 @@ export interface HttpResponseInit {
     /**
      * HTTP response headers
      */
-    headers?: HeadersInit;
+    headers?: HttpHeadersInit;
 
     /**
      * HTTP response cookies
