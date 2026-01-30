@@ -71,7 +71,7 @@ describe('HttpRequest', () => {
     });
 
     describe('clone', () => {
-        it('cloned request has independent headers', async () => {
+        it('cloned request has independent headers', () => {
             const req = new HttpRequest({
                 method: 'GET',
                 url: 'http://localhost:7071/api/test',

@@ -37,7 +37,7 @@ describe('HttpResponse', () => {
     });
 
     describe('clone', () => {
-        it('cloned response has independent headers', async () => {
+        it('cloned response has independent headers', () => {
             const res = new HttpResponse({
                 body: 'test',
                 headers: {
@@ -108,7 +108,9 @@ describe('HttpResponse', () => {
             const cloned = res.clone();
 
             expect(cloned.cookies).to.have.length(2);
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const cookie0 = cloned.cookies[0]!;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const cookie1 = cloned.cookies[1]!;
             expect(cookie0.name).to.equal('session');
             expect(cookie0.value).to.equal('abc123');
