@@ -137,10 +137,10 @@ export function createStreamRequest(
     // NOTE: We ignore query info because it has this bug: https://github.com/Azure/azure-functions-nodejs-library/issues/168
     const { Query: rpcQueryIgnored, Headers: rpcHeaders, ...rpcParams } = triggerMetadata;
 
-    let headers: HeadersInit | undefined;
+    let headers: types.HttpHeadersInit | undefined;
     const headersData = fromRpcTypedData(rpcHeaders);
     if (typeof headersData === 'object' && isDefined(headersData)) {
-        headers = <HeadersInit>headersData;
+        headers = <types.HttpHeadersInit>headersData;
     }
 
     const nativeReq = new Request(url, {

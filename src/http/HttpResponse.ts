@@ -35,7 +35,9 @@ export class HttpResponse implements types.HttpResponse {
                 }
                 this.#nativeRes = new Response(jsonBody, { ...resInit, headers: jsonHeaders });
             } else {
-                this.#nativeRes = new Response(init.body, resInit);
+                // Cast to BodyInit to satisfy the native Response constructor
+                // Our HttpResponseBodyInit type is compatible with what Node.js accepts
+                this.#nativeRes = new Response(init.body as BodyInit, resInit);
             }
         }
 
