@@ -209,5 +209,55 @@ describe('HttpResponse', () => {
             expect(res.headers.get('X-Blob-Size')).to.equal('9');
             expect(await res.text()).to.equal('test data');
         });
+
+        it('FormData body', async () => {
+            const formData = new FormData();
+            formData.append('field1', 'value1');
+            formData.append('field2', 'value2');
+
+            const res = new HttpResponse({
+                body: formData,
+            });
+
+            // FormData body should set multipart/form-data content-type
+            const contentType = res.headers.get('Content-Type');
+            expect(contentType).to.include('multipart/form-data');
+
+            // Verify we can get the FormData back
+            const responseFormData = await res.formData();
+            expect(responseFormData.get('field1')).to.equal('value1');
+            expect(responseFormData.get('field2')).to.equal('value2');
+        });
+
+        it('URLSearchParams body', async () => {
+            const params = new URLSearchParams();
+            params.append('key1', 'value1');
+            params.append('key2', 'value2');
+
+            const res = new HttpResponse({
+                body: params,
+            });
+
+            // URLSearchParams should set application/x-www-form-urlencoded content-type
+            const contentType = res.headers.get('Content-Type');
+            expect(contentType).to.equal('application/x-www-form-urlencoded;charset=UTF-8');
+
+            // Verify the body text
+            expect(await res.text()).to.equal('key1=value1&key2=value2');
+        });
+
+        it('Map as headers (converted to array)', () => {
+            const headersMap = new Map<string, string>([
+                ['Content-Type', 'application/json'],
+                ['X-Custom-Header', 'map-value'],
+            ]);
+
+            const res = new HttpResponse({
+                body: 'test',
+                headers: [...headersMap],
+            });
+            expect(res.headers.get('Content-Type')).to.equal('application/json');
+            expect(res.headers.get('X-Custom-Header')).to.equal('map-value');
+        });
     });
 });

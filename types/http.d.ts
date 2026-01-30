@@ -12,7 +12,16 @@ import { InvocationContext } from './InvocationContext';
  * This is a local definition to avoid dependency on lib.dom.
  * Compatible with Node.js native Fetch API body types.
  */
-export type HttpResponseBodyInit = ReadableStream | Blob | ArrayBufferView | ArrayBuffer | string | null | undefined;
+export type HttpResponseBodyInit =
+    | ReadableStream
+    | Blob
+    | ArrayBufferView
+    | ArrayBuffer
+    | FormData
+    | URLSearchParams
+    | string
+    | null
+    | undefined;
 
 /**
  * Represents the headers types that can be used to initialize HTTP headers.
