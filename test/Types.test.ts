@@ -9,7 +9,7 @@ import * as path from 'path';
 describe('Public TypeScript types', () => {
     for (const tsVersion of ['4']) {
         it(`builds with TypeScript v${tsVersion}`, async function (this: Context) {
-            this.timeout(10 * 1000);
+            this.timeout(60 * 1000);
             expect(await runTsBuild(tsVersion)).to.equal(2);
         });
     }

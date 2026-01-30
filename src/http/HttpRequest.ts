@@ -79,7 +79,7 @@ export class HttpRequest implements types.HttpRequest {
     }
 
     get body(): ReadableStream<any> | null {
-        return this.#nativeReq.body as ReadableStream<any> | null;
+        return this.#nativeReq.body;
     }
 
     get bodyUsed(): boolean {
@@ -91,10 +91,12 @@ export class HttpRequest implements types.HttpRequest {
     }
 
     async blob(): Promise<Blob> {
-        return this.#nativeReq.blob() as Promise<Blob>;
+        return this.#nativeReq.blob();
     }
 
+    // eslint-disable-next-line deprecation/deprecation
     async formData(): Promise<FormData> {
+        // eslint-disable-next-line deprecation/deprecation
         return this.#nativeReq.formData();
     }
 
@@ -146,7 +148,6 @@ export function createStreamRequest(
     const nativeReq = new Request(url, {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         body: body as any,
-        // @ts-expect-error duplex is needed for streaming but not in all TypeScript versions
         duplex: 'half',
         method: nonNullProp(proxyReq, 'method'),
         headers,

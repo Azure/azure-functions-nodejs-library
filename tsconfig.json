@@ -6,6 +6,7 @@
         "noUnusedLocals": true,
         "noUncheckedIndexedAccess": true,
         "outDir": "out",
+        "lib": ["ES2022"],
         "sourceMap": true,
         "baseUrl": "./",
         "paths": {

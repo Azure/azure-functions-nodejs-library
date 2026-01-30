@@ -35,9 +35,10 @@ export class HttpResponse implements types.HttpResponse {
                 }
                 this.#nativeRes = new Response(jsonBody, { ...resInit, headers: jsonHeaders });
             } else {
-                // Cast to BodyInit to satisfy the native Response constructor
+                // Cast to any to satisfy the native Response constructor
                 // Our HttpResponseBodyInit type is compatible with what Node.js accepts
-                this.#nativeRes = new Response(init.body as BodyInit, resInit);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                this.#nativeRes = new Response(init.body as any, resInit);
             }
         }
 
@@ -54,7 +55,7 @@ export class HttpResponse implements types.HttpResponse {
     }
 
     get body(): ReadableStream<any> | null {
-        return this.#nativeRes.body as ReadableStream<any> | null;
+        return this.#nativeRes.body;
     }
 
     get bodyUsed(): boolean {
@@ -66,10 +67,12 @@ export class HttpResponse implements types.HttpResponse {
     }
 
     async blob(): Promise<Blob> {
-        return this.#nativeRes.blob() as Promise<Blob>;
+        return this.#nativeRes.blob();
     }
 
+    // eslint-disable-next-line deprecation/deprecation
     async formData(): Promise<FormData> {
+        // eslint-disable-next-line deprecation/deprecation
         return this.#nativeRes.formData();
     }
 
