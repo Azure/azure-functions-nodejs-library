@@ -185,6 +185,23 @@ describe('HttpRequest', () => {
             expect(req.params).to.not.equal(cloned.params);
         });
 
+        it('clone with nativeRequest and params', async () => {
+            const nativeReq = new Request('http://localhost:7071/api/items/123', {
+                method: 'GET',
+            });
+            const req = new HttpRequest({
+                nativeRequest: nativeReq,
+                params: { id: '123' },
+            } as any);
+
+            const cloned = req.clone();
+
+            expect(cloned.params.id).to.equal('123');
+            expect(cloned.url).to.equal('http://localhost:7071/api/items/123');
+            expect(cloned.method).to.equal('GET');
+            expect(req.params).to.not.equal(cloned.params);
+        });
+
         it('clone with binary body preserves data correctly', async () => {
             // Create binary data with various byte values
             const binaryData = Buffer.from([0x00, 0x01, 0x02, 0xff, 0xfe, 0x80, 0x7f]);
