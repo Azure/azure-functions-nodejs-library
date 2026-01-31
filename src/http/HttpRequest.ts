@@ -109,7 +109,9 @@ export class HttpRequest implements types.HttpRequest {
     }
 
     clone(): HttpRequest {
-        const newInit = structuredClone(this.#init);
+        // Exclude nativeRequest from structuredClone since Request objects can't be cloned that way
+        const { nativeRequest: _nativeRequest, ...initWithoutNativeReq } = this.#init;
+        const newInit: InternalHttpRequestInit = structuredClone(initWithoutNativeReq);
         newInit.nativeRequest = this.#nativeReq.clone();
         return new HttpRequest(newInit);
     }
