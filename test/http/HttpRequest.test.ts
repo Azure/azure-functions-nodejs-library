@@ -185,7 +185,7 @@ describe('HttpRequest', () => {
             expect(req.params).to.not.equal(cloned.params);
         });
 
-        it('clone with nativeRequest and params', async () => {
+        it('clone with nativeRequest and params', () => {
             const nativeReq = new Request('http://localhost:7071/api/items/123', {
                 method: 'GET',
             });
