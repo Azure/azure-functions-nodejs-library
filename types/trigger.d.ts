@@ -7,6 +7,7 @@ import { EventHubTrigger, EventHubTriggerOptions } from './eventHub';
 import { GenericTriggerOptions } from './generic';
 import { HttpTrigger, HttpTriggerOptions } from './http';
 import { FunctionTrigger } from './index';
+import { McpResourceFunctionOptions, McpResourceTrigger } from './mcpResource';
 import { McpToolFunctionOptions, McpToolTrigger } from './mcpTool';
 import { MySqlTrigger, MySqlTriggerOptions } from './mySql';
 import {
@@ -95,6 +96,12 @@ export function webPubSub(options: WebPubSubTriggerOptions): WebPubSubTrigger;
  * [Link to docs and examples](//TODO Add link to docs and examples)
  */
 export function mcpTool(options: McpToolFunctionOptions): McpToolTrigger;
+
+/**
+ * Creates an MCP Resource trigger for defining resources that can be read by MCP clients.
+ * [Link to docs and examples](//TODO Add link to docs and examples)
+ */
+export function mcpResource(options: McpResourceFunctionOptions): McpResourceTrigger;
 
 /**
  * A generic option that can be used for any trigger type

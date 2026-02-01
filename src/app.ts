@@ -11,6 +11,7 @@ import {
     HttpHandler,
     HttpMethod,
     HttpMethodFunctionOptions,
+    McpResourceFunctionOptions,
     McpToolFunctionOptions,
     MySqlFunctionOptions,
     ServiceBusQueueFunctionOptions,
@@ -155,6 +156,17 @@ export function webPubSub(name: string, options: WebPubSubFunctionOptions): void
  */
 export function mcpTool(name: string, options: McpToolFunctionOptions): void {
     generic(name, convertToGenericOptions(options, trigger.mcpTool));
+}
+
+/**
+ * Registers an MCP Resource function in your app.
+ * This function is triggered when an MCP client reads the resource and allows you to define the resource content.
+ *
+ * @param name - The name of the function. This must be unique within your app and is primarily used for tracking purposes.
+ * @param options - Configuration options for the MCP Resource function, including the handler and trigger-specific settings.
+ */
+export function mcpResource(name: string, options: McpResourceFunctionOptions): void {
+    generic(name, convertToGenericOptions(options, trigger.mcpResource));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {
