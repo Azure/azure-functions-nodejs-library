@@ -12,6 +12,8 @@ import {
     GenericTriggerOptions,
     HttpTrigger,
     HttpTriggerOptions,
+    McpResourceTrigger,
+    McpResourceTriggerOptions,
     McpToolTrigger,
     McpToolTriggerOptions,
     MySqlTrigger,
@@ -34,6 +36,7 @@ import {
     WebPubSubTriggerOptions,
 } from '@azure/functions';
 import { addBindingName } from './addBindingName';
+import { convertToMcpResourceTriggerOptionsToRpc } from './converters/toMcpResourceTriggerOptionsToRpc';
 import { converToMcpToolTriggerOptionsToRpc } from './converters/toMcpToolTriggerOptionsToRpc';
 
 export function http(options: HttpTriggerOptions): HttpTrigger {
@@ -140,6 +143,21 @@ export function mcpTool(options: McpToolTriggerOptions): McpToolTrigger {
     return addTriggerBindingName({
         ...converToMcpToolTriggerOptionsToRpc(options),
         type: 'mcpToolTrigger',
+    });
+}
+
+/**
+ * Creates an MCP Resource trigger configuration.
+ * This function is used to define an MCP Resource trigger for an Azure Function.
+ * MCP Resources are read-only data sources that can be accessed by MCP clients.
+ *
+ * @param options - The configuration options for the MCP Resource trigger, including resource-specific metadata.
+ * @returns An MCP Resource trigger object with the specified configuration.
+ */
+export function mcpResource(options: McpResourceTriggerOptions): McpResourceTrigger {
+    return addTriggerBindingName({
+        ...convertToMcpResourceTriggerOptionsToRpc(options),
+        type: 'mcpResourceTrigger',
     });
 }
 

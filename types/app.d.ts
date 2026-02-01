@@ -6,6 +6,7 @@ import { EventGridEvent, EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
 import { GenericFunctionOptions } from './generic';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
+import { McpResourceFunctionOptions } from './mcpResource';
 import { McpToolFunctionOptions } from './mcpTool';
 import { MySqlFunctionOptions } from './mySql';
 import { ServiceBusQueueFunctionOptions, ServiceBusTopicFunctionOptions } from './serviceBus';
@@ -203,5 +204,12 @@ export function webPubSub<T = unknown>(name: string, options: WebPubSubFunctionO
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function mcpTool<T = unknown>(name: string, options: McpToolFunctionOptions<T>): void;
+
+/**
+ * Registers an MCP Resource function in your app that can be read by MCP clients.
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the inputs, outputs, and handler for this function
+ */
+export function mcpResource<T = unknown>(name: string, options: McpResourceFunctionOptions<T>): void;
 
 export * as hook from './hooks/registerHook';
