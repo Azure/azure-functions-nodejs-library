@@ -176,6 +176,152 @@ describe('convertToMcpResourceTriggerOptionsToRpc', () => {
         });
     });
 
+    describe('metadata validation', () => {
+        it('should throw error for invalid JSON in metadata', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: '{invalid json}',
+            };
+
+            expect(() => convertToMcpResourceTriggerOptionsToRpc(input)).to.throw(
+                'MCP Resource trigger "metadata" must be a valid JSON string.'
+            );
+        });
+
+        it('should throw error for malformed JSON with missing quotes', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: '{key: value}',
+            };
+
+            expect(() => convertToMcpResourceTriggerOptionsToRpc(input)).to.throw(
+                'MCP Resource trigger "metadata" must be a valid JSON string.'
+            );
+        });
+
+        it('should throw error for JSON with trailing comma', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: '{"key": "value",}',
+            };
+
+            expect(() => convertToMcpResourceTriggerOptionsToRpc(input)).to.throw(
+                'MCP Resource trigger "metadata" must be a valid JSON string.'
+            );
+        });
+
+        it('should throw error for plain text metadata', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: 'not a json string',
+            };
+
+            expect(() => convertToMcpResourceTriggerOptionsToRpc(input)).to.throw(
+                'MCP Resource trigger "metadata" must be a valid JSON string.'
+            );
+        });
+
+        it('should accept valid JSON object string', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: '{"key": "value"}',
+            };
+
+            const result = convertToMcpResourceTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('{"key": "value"}');
+        });
+
+        it('should accept valid JSON array string', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: '[1, 2, 3]',
+            };
+
+            const result = convertToMcpResourceTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('[1, 2, 3]');
+        });
+
+        it('should accept valid JSON primitive string', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: '"a simple string"',
+            };
+
+            const result = convertToMcpResourceTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('"a simple string"');
+        });
+
+        it('should accept valid JSON number string', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: '42',
+            };
+
+            const result = convertToMcpResourceTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('42');
+        });
+
+        it('should accept valid JSON boolean string', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: 'true',
+            };
+
+            const result = convertToMcpResourceTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('true');
+        });
+
+        it('should accept valid JSON null string', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: 'null',
+            };
+
+            const result = convertToMcpResourceTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('null');
+        });
+
+        it('should accept empty string for metadata without validation', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: '',
+            };
+
+            const result = convertToMcpResourceTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('');
+        });
+
+        it('should accept whitespace-only string for metadata without validation', () => {
+            const input: McpResourceTriggerOptions = {
+                uri: 'mcp://example.com/resource',
+                resourceName: 'My Resource',
+                metadata: '   ',
+            };
+
+            const result = convertToMcpResourceTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('   ');
+        });
+    });
+
     describe('size validation', () => {
         it('should accept size of 0', () => {
             const input: McpResourceTriggerOptions = {
