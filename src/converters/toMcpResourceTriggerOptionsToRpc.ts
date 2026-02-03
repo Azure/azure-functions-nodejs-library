@@ -49,6 +49,14 @@ export function convertToMcpResourceTriggerOptionsToRpc(
     }
 
     if (options.metadata !== undefined) {
+        // Validate that metadata is a valid JSON string
+        if (typeof options.metadata === 'string' && options.metadata.trim() !== '') {
+            try {
+                JSON.parse(options.metadata);
+            } catch (e) {
+                throw new Error('MCP Resource trigger "metadata" must be a valid JSON string.');
+            }
+        }
         result.metadata = options.metadata;
     }
 
