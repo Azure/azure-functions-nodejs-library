@@ -39,12 +39,27 @@ export function converToMcpToolTriggerOptionsToRpc(
         normalizedProperties = undefined;
     }
 
+    // Validate metadata if provided
+    if (mcpToolTriggerOptions.metadata !== undefined) {
+        if (typeof mcpToolTriggerOptions.metadata === 'string' && mcpToolTriggerOptions.metadata.trim() !== '') {
+            try {
+                JSON.parse(mcpToolTriggerOptions.metadata);
+            } catch (e) {
+                throw new Error('MCP Tool trigger "metadata" must be a valid JSON string.');
+            }
+        }
+    }
+
     // If we successfully normalized the properties, use them
     if (normalizedProperties !== undefined) {
-        return {
+        const result: McpToolTriggerOptionsToRpc = {
             ...baseResult,
             toolProperties: JSON.stringify(normalizedProperties),
         };
+        if (mcpToolTriggerOptions.metadata !== undefined) {
+            result.metadata = mcpToolTriggerOptions.metadata;
+        }
+        return result;
     }
 
     // Handle cases where toolProperties is not an array

@@ -51,6 +51,12 @@ export interface McpToolTriggerOptions {
      * Can be provided as an array or as a Args object format.
      */
     toolProperties?: McpToolProperty[] | Args;
+
+    /**
+     * JSON-serialized metadata object.
+     * Additional metadata about the tool in JSON format.
+     */
+    metadata?: string;
 }
 
 /**
@@ -75,6 +81,12 @@ export interface McpToolTriggerOptionsToRpc {
      * This is a dictionary of key-value pairs that can be used to configure the trigger.
      */
     toolProperties?: string;
+
+    /**
+     * JSON-serialized metadata object.
+     * Additional metadata about the tool in JSON format.
+     */
+    metadata?: string;
 }
 
 /**
