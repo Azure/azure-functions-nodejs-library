@@ -6,6 +6,7 @@ import { Blob } from 'buffer';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
+import { Readable } from 'stream';
 import { ReadableStream } from 'stream/web';
 import { HttpResponse } from '../../src/http/HttpResponse';
 
@@ -365,6 +366,39 @@ describe('HttpResponse', () => {
                 body: webStream,
             });
             expect(await res.text()).to.equal('Stream content');
+        });
+
+        it('Node.js Readable stream body', async () => {
+            // Create a Node.js Readable stream (common for HTTP streaming scenarios)
+            const readable = new Readable({
+                read() {
+                    this.push('Readable ');
+                    this.push('stream ');
+                    this.push('content');
+                    this.push(null); // Signal end of stream
+                },
+            });
+
+            const res = new HttpResponse({
+                body: readable,
+            });
+            expect(await res.text()).to.equal('Readable stream content');
+        });
+
+        it('Node.js Readable stream from async generator', async () => {
+            // Common pattern for HTTP streaming (e.g., AI chat responses)
+            async function* generateChunks() {
+                yield 'Hello ';
+                yield 'from ';
+                yield 'stream';
+            }
+
+            const readable = Readable.from(generateChunks());
+
+            const res = new HttpResponse({
+                body: readable,
+            });
+            expect(await res.text()).to.equal('Hello from stream');
         });
     });
 
