@@ -387,7 +387,7 @@ describe('HttpResponse', () => {
 
         it('Node.js Readable stream from async generator', async () => {
             // Common pattern for HTTP streaming (e.g., AI chat responses)
-            async function* generateChunks() {
+            function* generateChunks() {
                 yield 'Hello ';
                 yield 'from ';
                 yield 'stream';
