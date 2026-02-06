@@ -153,7 +153,7 @@ export function createStreamRequest(
         duplex: 'half',
         method: nonNullProp(proxyReq, 'method'),
         headers,
-    });
+    } as RequestInit);
 
     const params: Record<string, string> = {};
     for (const [key, rpcValue] of Object.entries(rpcParams)) {

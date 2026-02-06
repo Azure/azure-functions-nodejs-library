@@ -42,7 +42,8 @@
     },
     "dependencies": {
         "@azure/functions-extensions-base": "0.2.0",
-        "cookie": "^0.7.0"
+        "cookie": "^0.7.0",
+        "undici-types": "^7.20.0"
     },
     "devDependencies": {
         "@types/chai": "^4.2.22",

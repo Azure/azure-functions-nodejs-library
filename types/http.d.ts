@@ -4,6 +4,7 @@
 import { Blob } from 'buffer';
 import { Readable } from 'stream';
 import { ReadableStream } from 'stream/web';
+import { FormData, Headers } from 'undici-types';
 import { URLSearchParams } from 'url';
 import { FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger } from './index';
 import { InvocationContext } from './InvocationContext';
