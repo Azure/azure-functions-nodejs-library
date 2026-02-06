@@ -400,6 +400,57 @@ describe('HttpResponse', () => {
             });
             expect(await res.text()).to.equal('Hello from stream');
         });
+
+        it('AsyncIterable<Uint8Array> body', async () => {
+            // AsyncIterable is useful for streaming responses (e.g., AI chat responses)
+            const encoder = new TextEncoder();
+
+            async function* generateChunks(): AsyncIterable<Uint8Array> {
+                await Promise.resolve();
+                yield encoder.encode('Async ');
+                yield encoder.encode('iterable ');
+                yield encoder.encode('content');
+            }
+
+            const res = new HttpResponse({
+                body: generateChunks(),
+            });
+            expect(await res.text()).to.equal('Async iterable content');
+        });
+
+        it('AsyncIterable<Uint8Array> body with multiple chunks', async () => {
+            const encoder = new TextEncoder();
+            const chunks = ['chunk1', 'chunk2', 'chunk3'];
+
+            async function* generateChunks(): AsyncIterable<Uint8Array> {
+                await Promise.resolve();
+                for (const chunk of chunks) {
+                    yield encoder.encode(chunk);
+                }
+            }
+
+            const res = new HttpResponse({
+                body: generateChunks(),
+            });
+            expect(await res.text()).to.equal('chunk1chunk2chunk3');
+        });
+
+        it('AsyncIterable<Uint8Array> body with delayed chunks', async () => {
+            const encoder = new TextEncoder();
+
+            async function* generateDelayedChunks(): AsyncIterable<Uint8Array> {
+                yield encoder.encode('first');
+                await new Promise((resolve) => setTimeout(resolve, 10));
+                yield encoder.encode('second');
+                await new Promise((resolve) => setTimeout(resolve, 10));
+                yield encoder.encode('third');
+            }
+
+            const res = new HttpResponse({
+                body: generateDelayedChunks(),
+            });
+            expect(await res.text()).to.equal('firstsecondthird');
+        });
     });
 
     describe('HttpHeadersInit types', () => {
