@@ -406,6 +406,7 @@ describe('HttpResponse', () => {
             const encoder = new TextEncoder();
 
             async function* generateChunks(): AsyncIterable<Uint8Array> {
+                await Promise.resolve();
                 yield encoder.encode('Async ');
                 yield encoder.encode('iterable ');
                 yield encoder.encode('content');
@@ -422,6 +423,7 @@ describe('HttpResponse', () => {
             const chunks = ['chunk1', 'chunk2', 'chunk3'];
 
             async function* generateChunks(): AsyncIterable<Uint8Array> {
+                await Promise.resolve();
                 for (const chunk of chunks) {
                     yield encoder.encode(chunk);
                 }
