@@ -12,7 +12,7 @@ import { InvocationContext } from './InvocationContext';
  * Represents the body types that can be used in an HTTP response.
  * This is a local definition to avoid dependency on lib.dom.
  * Compatible with Node.js native Fetch API body types.
- * Includes Node.js Readable streams for HTTP streaming scenarios.
+ * Includes Node.js Readable streams and AsyncIterable for HTTP streaming scenarios.
  */
 export type HttpResponseBodyInit =
     | ReadableStream
@@ -20,6 +20,7 @@ export type HttpResponseBodyInit =
     | Blob
     | ArrayBufferView
     | ArrayBuffer
+    | AsyncIterable<Uint8Array>
     | FormData
     | URLSearchParams
     | string
