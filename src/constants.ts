@@ -1,6 +1,6 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-export const version = '4.12.0-preview.1';
+export const version = '4.12.0';
 
 export const returnBindingKey = '$return';
