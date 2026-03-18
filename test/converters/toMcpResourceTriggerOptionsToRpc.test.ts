@@ -398,7 +398,7 @@ describe('convertToMcpResourceTriggerOptionsToRpc', () => {
             expect(result.title).to.equal('');
             expect(result.description).to.equal('');
             expect(result.mimeType).to.equal('');
-            expect(result.metadata).to.equal('');
+            expect(result.metadata).to.be.undefined;
         });
 
         it('should handle complex metadata JSON', () => {
