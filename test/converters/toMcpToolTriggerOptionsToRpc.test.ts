@@ -621,7 +621,7 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
             expect(result.metadata).to.equal('null');
         });
 
-        it('should accept empty string for metadata without validation', () => {
+        it('should skip empty string metadata and not include in result', () => {
             const input: McpToolTriggerOptions = {
                 toolName: 'test-tool',
                 description: 'A test tool',
@@ -631,10 +631,10 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
 
             const result = converToMcpToolTriggerOptionsToRpc(input);
 
-            expect(result.metadata).to.equal('');
+            expect(result.metadata).to.be.undefined;
         });
 
-        it('should accept whitespace-only string for metadata without validation', () => {
+        it('should skip whitespace-only metadata and not include in result', () => {
             const input: McpToolTriggerOptions = {
                 toolName: 'test-tool',
                 description: 'A test tool',
@@ -644,7 +644,7 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
 
             const result = converToMcpToolTriggerOptionsToRpc(input);
 
-            expect(result.metadata).to.equal('   ');
+            expect(result.metadata).to.be.undefined;
         });
 
         it('should not include metadata in result when undefined', () => {

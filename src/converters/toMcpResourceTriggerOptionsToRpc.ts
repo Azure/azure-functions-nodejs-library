@@ -1,18 +1,16 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { McpResourceTriggerOptions, McpResourceTriggerOptionsToRpc } from '../../types';
+import { McpResourceTriggerOptions } from '../../types';
 
 /**
- * Converts an McpResourceTriggerOptions object to an McpResourceTriggerOptionsToRpc object.
+ * Validates and returns an McpResourceTriggerOptions object.
  *
- * @param options - The input options to be converted.
- * @returns The converted McpResourceTriggerOptionsToRpc object.
+ * @param options - The input options to validate.
+ * @returns The validated McpResourceTriggerOptions object.
  * @throws Error if required properties are missing or invalid.
  */
-export function convertToMcpResourceTriggerOptionsToRpc(
-    options: McpResourceTriggerOptions
-): McpResourceTriggerOptionsToRpc {
+export function convertToMcpResourceTriggerOptionsToRpc(options: McpResourceTriggerOptions): McpResourceTriggerOptions {
     // Validate required properties
     if (!options.uri || typeof options.uri !== 'string' || options.uri.trim() === '') {
         throw new Error('MCP Resource trigger requires a valid "uri" property.');
@@ -23,7 +21,7 @@ export function convertToMcpResourceTriggerOptionsToRpc(
     }
 
     // Build the result object with required properties
-    const result: McpResourceTriggerOptionsToRpc = {
+    const result: McpResourceTriggerOptions = {
         uri: options.uri,
         resourceName: options.resourceName,
     };
@@ -48,14 +46,12 @@ export function convertToMcpResourceTriggerOptionsToRpc(
         result.size = options.size;
     }
 
-    if (options.metadata !== undefined) {
+    if (options.metadata !== undefined && typeof options.metadata === 'string' && options.metadata.trim() !== '') {
         // Validate that metadata is a valid JSON string
-        if (typeof options.metadata === 'string' && options.metadata.trim() !== '') {
-            try {
-                JSON.parse(options.metadata);
-            } catch (e) {
-                throw new Error('MCP Resource trigger "metadata" must be a valid JSON string.');
-            }
+        try {
+            JSON.parse(options.metadata);
+        } catch (e) {
+            throw new Error('MCP Resource trigger "metadata" must be a valid JSON string.');
         }
         result.metadata = options.metadata;
     }

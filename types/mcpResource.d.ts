@@ -78,48 +78,7 @@ export interface McpResourceTriggerOptions {
 }
 
 /**
- * Configuration options for an MCP Resource trigger as sent to RPC.
- * These options define the behavior and metadata for the trigger.
- */
-export interface McpResourceTriggerOptionsToRpc {
-    /**
-     * Unique URI identifier for the resource (must be absolute).
-     */
-    uri: string;
-
-    /**
-     * Human-readable name of the resource.
-     */
-    resourceName: string;
-
-    /**
-     * Optional title for display purposes.
-     */
-    title?: string;
-
-    /**
-     * Description of the resource.
-     */
-    description?: string;
-
-    /**
-     * MIME type of the resource content.
-     */
-    mimeType?: string;
-
-    /**
-     * Optional size in bytes.
-     */
-    size?: number;
-
-    /**
-     * JSON-serialized metadata object.
-     */
-    metadata?: string;
-}
-
-/**
  * Represents an MCP Resource trigger, combining base function trigger options
  * with MCP Resource-specific trigger options.
  */
-export type McpResourceTrigger = FunctionTrigger & McpResourceTriggerOptionsToRpc;
+export type McpResourceTrigger = FunctionTrigger & McpResourceTriggerOptions;
