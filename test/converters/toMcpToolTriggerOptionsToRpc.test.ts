@@ -489,4 +489,187 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
             expect(() => JSON.parse(result.toolProperties || '')).to.not.throw();
         });
     });
+
+    describe('metadata validation', () => {
+        it('should throw error for invalid JSON in metadata', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '{invalid json}',
+            };
+
+            expect(() => converToMcpToolTriggerOptionsToRpc(input)).to.throw(
+                'MCP Tool trigger "metadata" must be a valid JSON string.'
+            );
+        });
+
+        it('should throw error for malformed JSON with missing quotes', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '{key: value}',
+            };
+
+            expect(() => converToMcpToolTriggerOptionsToRpc(input)).to.throw(
+                'MCP Tool trigger "metadata" must be a valid JSON string.'
+            );
+        });
+
+        it('should throw error for JSON with trailing comma', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '{"key": "value",}',
+            };
+
+            expect(() => converToMcpToolTriggerOptionsToRpc(input)).to.throw(
+                'MCP Tool trigger "metadata" must be a valid JSON string.'
+            );
+        });
+
+        it('should throw error for plain text metadata', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: 'not a json string',
+            };
+
+            expect(() => converToMcpToolTriggerOptionsToRpc(input)).to.throw(
+                'MCP Tool trigger "metadata" must be a valid JSON string.'
+            );
+        });
+
+        it('should accept valid JSON object string', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '{"key": "value"}',
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('{"key": "value"}');
+        });
+
+        it('should accept valid JSON array string', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '[1, 2, 3]',
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('[1, 2, 3]');
+        });
+
+        it('should accept valid JSON primitive string', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '"a simple string"',
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('"a simple string"');
+        });
+
+        it('should accept valid JSON number string', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '42',
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('42');
+        });
+
+        it('should accept valid JSON boolean string', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: 'true',
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('true');
+        });
+
+        it('should accept valid JSON null string', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: 'null',
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('null');
+        });
+
+        it('should skip empty string metadata and not include in result', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '',
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.be.undefined;
+        });
+
+        it('should skip whitespace-only metadata and not include in result', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '   ',
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.be.undefined;
+        });
+
+        it('should not include metadata in result when undefined', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.be.undefined;
+        });
+
+        it('should accept complex nested JSON object', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'test-tool',
+                description: 'A test tool',
+                toolProperties: [],
+                metadata: '{"nested": {"key": "value"}, "array": [1, 2, 3], "boolean": true}',
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+
+            expect(result.metadata).to.equal('{"nested": {"key": "value"}, "array": [1, 2, 3], "boolean": true}');
+        });
+    });
 });

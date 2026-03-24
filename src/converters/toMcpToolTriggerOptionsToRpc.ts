@@ -16,10 +16,26 @@ import { normalizeToolProperties } from '../utils/toolProperties';
 export function converToMcpToolTriggerOptionsToRpc(
     mcpToolTriggerOptions: McpToolTriggerOptions
 ): McpToolTriggerOptionsToRpc {
-    // Base object for the return value
+    // Validate metadata if provided - skip empty/whitespace strings
+    let validatedMetadata: string | undefined;
+    if (
+        mcpToolTriggerOptions.metadata !== undefined &&
+        typeof mcpToolTriggerOptions.metadata === 'string' &&
+        mcpToolTriggerOptions.metadata.trim() !== ''
+    ) {
+        try {
+            JSON.parse(mcpToolTriggerOptions.metadata);
+            validatedMetadata = mcpToolTriggerOptions.metadata;
+        } catch (e) {
+            throw new Error('MCP Tool trigger "metadata" must be a valid JSON string.');
+        }
+    }
+
+    // Base object for the return value - metadata is independent of toolProperties
     const baseResult = {
         toolName: mcpToolTriggerOptions.toolName,
         description: mcpToolTriggerOptions.description,
+        ...(validatedMetadata !== undefined && { metadata: validatedMetadata }),
     };
 
     // Try to normalize tool properties first (handles both array and fluent formats)
