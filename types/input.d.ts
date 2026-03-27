@@ -32,7 +32,7 @@ export function table(options: TableInputOptions): TableInput;
 export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput;
 
 /**
- * [Link to docs and examples](https://learn.microsoft.com/azure/azure-functions/functions-bindings-azure-cosmosdb-mongo-input?pivots=programming-language-javascript)
+ * [Link to docs and examples](tdb, will update later)
  */
 export function cosmosDBMongo(options: CosmosDBMongoInputOptions): CosmosDBMongoInput;
 
