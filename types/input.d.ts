@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { CosmosDBInput, CosmosDBInputOptions } from './cosmosDB';
+import { CosmosDBMongoInput, CosmosDBMongoInputOptions } from './cosmosDBMongo';
 import { GenericInputOptions } from './generic';
 import { FunctionInput } from './index';
 import { MySqlInput, MySqlInputOptions } from './mySql';
@@ -29,6 +30,11 @@ export function table(options: TableInputOptions): TableInput;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-input?pivots=programming-language-javascript)
  */
 export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput;
+
+/**
+ * [Link to docs and examples](https://learn.microsoft.com/azure/azure-functions/functions-bindings-azure-cosmosdb-mongo-input?pivots=programming-language-javascript)
+ */
+export function cosmosDBMongo(options: CosmosDBMongoInputOptions): CosmosDBMongoInput;
 
 /**
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-azure-sql-input?pivots=programming-language-javascript)

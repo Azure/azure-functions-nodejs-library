@@ -4,6 +4,8 @@
 import {
     CosmosDBInput,
     CosmosDBInputOptions,
+    CosmosDBMongoInput,
+    CosmosDBMongoInputOptions,
     FunctionInput,
     GenericInputOptions,
     MySqlInput,
@@ -39,6 +41,13 @@ export function cosmosDB(options: CosmosDBInputOptions): CosmosDBInput {
     return addInputBindingName({
         ...options,
         type: 'cosmosDB',
+    });
+}
+
+export function cosmosDBMongo(options: CosmosDBMongoInputOptions): CosmosDBMongoInput {
+    return addInputBindingName({
+        ...options,
+        type: 'cosmosDBMongo',
     });
 }
 

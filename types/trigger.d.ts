@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { CosmosDBTrigger, CosmosDBTriggerOptions } from './cosmosDB';
+import { CosmosDBMongoTrigger, CosmosDBMongoTriggerOptions } from './cosmosDBMongo';
 import { EventGridTrigger, EventGridTriggerOptions } from './eventGrid';
 import { EventHubTrigger, EventHubTriggerOptions } from './eventHub';
 import { GenericTriggerOptions } from './generic';
@@ -71,6 +72,11 @@ export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-trigger?pivots=programming-language-javascript)
  */
 export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger;
+
+/**
+ * [Link to docs and examples](https://learn.microsoft.com/azure/azure-functions/functions-bindings-azure-cosmosdb-mongo-trigger?pivots=programming-language-javascript)
+ */
+export function cosmosDBMongo(options: CosmosDBMongoTriggerOptions): CosmosDBMongoTrigger;
 
 /**
  * [Link to docs and examples](https://learn.microsoft.com/azure/azure-functions/functions-bindings-warmup?tabs=isolated-process&pivots=programming-language-javascript)

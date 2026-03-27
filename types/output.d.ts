@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import { CosmosDBOutput, CosmosDBOutputOptions } from './cosmosDB';
+import { CosmosDBMongoOutput, CosmosDBMongoOutputOptions } from './cosmosDBMongo';
 import { EventGridOutput, EventGridOutputOptions } from './eventGrid';
 import { EventHubOutput, EventHubOutputOptions } from './eventHub';
 import { GenericOutputOptions } from './generic';
@@ -63,6 +64,11 @@ export function eventGrid(options: EventGridOutputOptions): EventGridOutput;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-cosmosdb-v2-output?pivots=programming-language-javascript)
  */
 export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput;
+
+/**
+ * [Link to docs and examples](https://learn.microsoft.com/azure/azure-functions/functions-bindings-azure-cosmosdb-mongo-output?pivots=programming-language-javascript)
+ */
+export function cosmosDBMongo(options: CosmosDBMongoOutputOptions): CosmosDBMongoOutput;
 
 /**
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-azure-sql-output?pivots=programming-language-javascript)

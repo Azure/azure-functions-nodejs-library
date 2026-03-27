@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 import {
+    CosmosDBMongoTrigger,
+    CosmosDBMongoTriggerOptions,
     CosmosDBTrigger,
     CosmosDBTriggerOptions,
     EventGridTrigger,
@@ -101,6 +103,13 @@ export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
     return addTriggerBindingName({
         ...options,
         type: 'cosmosDBTrigger',
+    });
+}
+
+export function cosmosDBMongo(options: CosmosDBMongoTriggerOptions): CosmosDBMongoTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'cosmosDBMongoTrigger',
     });
 }
 
