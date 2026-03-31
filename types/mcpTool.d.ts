@@ -132,3 +132,68 @@ export type Arg = Omit<McpToolProperty, 'propertyName'>;
  * Tool properties format - an object mapping property names to their definitions
  */
 export type Args = Record<string, Arg>;
+
+/**
+ * A text content block in an MCP tool response.
+ */
+export interface TextContentBlock {
+    type: 'text';
+    text: string;
+}
+
+/**
+ * An image content block in an MCP tool response.
+ */
+export interface ImageContentBlock {
+    type: 'image';
+    data: string;
+    mimeType?: string;
+}
+
+/**
+ * An audio content block in an MCP tool response.
+ */
+export interface AudioContentBlock {
+    type: 'audio';
+    data: string;
+    mimeType?: string;
+}
+
+/**
+ * A resource-link content block in an MCP tool response.
+ */
+export interface ResourceLinkContentBlock {
+    type: 'resource_link';
+    uri: string;
+    name?: string;
+    description?: string;
+    mimeType?: string;
+}
+
+/**
+ * The known content block types for an MCP tool response.
+ */
+export type McpContentBlock =
+    | TextContentBlock
+    | ImageContentBlock
+    | AudioContentBlock
+    | ResourceLinkContentBlock
+    | Record<string, unknown>;
+
+/**
+ * Call tool result payload.
+ */
+export interface CallToolResult {
+    content: McpContentBlock[];
+    structuredContent?: unknown;
+    isError?: boolean;
+}
+
+/**
+ * Wrapper returned by MCP tool invocations.
+ */
+export interface McpToolResult {
+    type: string;
+    content?: string;
+    structuredContent?: string;
+}

@@ -16,6 +16,7 @@ import { returnBindingKey } from './constants';
 import { fromRpcBindings } from './converters/fromRpcBindings';
 import { fromRpcRetryContext, fromRpcTraceContext } from './converters/fromRpcContext';
 import { fromRpcTriggerMetadata } from './converters/fromRpcTriggerMetadata';
+import { toMcpToolResult } from './converters/toMcpToolResult';
 import { fromRpcTypedData } from './converters/fromRpcTypedData';
 import { toCamelCaseValue } from './converters/toCamelCase';
 import { toRpcHttp } from './converters/toRpcHttp';
@@ -138,7 +139,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         // but e.g., Durable uses this to pass orchestrator state back to the Durable extension, w/o
         // an explicit output binding. See here for more details: https://github.com/Azure/azure-functions-nodejs-library/pull/25
         if (!usedReturnValue && !isHttpTrigger(this.#triggerType)) {
-            response.returnValue = toRpcTypedData(result);
+            response.returnValue = toRpcTypedData(this.#transformResult(result));
         }
 
         return response;
@@ -152,8 +153,16 @@ export class InvocationModel implements coreTypes.InvocationModel {
         if (binding.type?.toLowerCase() === 'http') {
             return toRpcHttp(invocationId, value);
         } else {
-            return toRpcTypedData(value);
+            return toRpcTypedData(this.#transformResult(value));
         }
+    }
+
+    #transformResult(value: unknown): unknown {
+        if (this.#triggerType === 'mcpToolTrigger') {
+            return toMcpToolResult(value);
+        }
+
+        return value;
     }
 
     #log(level: RpcLogLevel, logCategory: RpcLogCategory, ...args: unknown[]): void {
