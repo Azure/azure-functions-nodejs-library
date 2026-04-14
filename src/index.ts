@@ -16,6 +16,7 @@ export { InvocationContext } from './InvocationContext';
 export * as output from './output';
 export * as trigger from './trigger';
 export { Disposable } from './utils/Disposable';
+export { McpContent } from './utils/mcpContentMarker';
 export { arg } from './utils/toolProperties';
 
 export enum SqlChangeOperation {

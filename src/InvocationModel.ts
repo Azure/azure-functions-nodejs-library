@@ -18,6 +18,7 @@ import { fromRpcRetryContext, fromRpcTraceContext } from './converters/fromRpcCo
 import { fromRpcTriggerMetadata } from './converters/fromRpcTriggerMetadata';
 import { fromRpcTypedData } from './converters/fromRpcTypedData';
 import { toCamelCaseValue } from './converters/toCamelCase';
+import { toMcpToolResult } from './converters/toMcpToolResult';
 import { toRpcHttp } from './converters/toRpcHttp';
 import { toRpcTypedData } from './converters/toRpcTypedData';
 import { AzFuncSystemError } from './errors';
@@ -25,7 +26,7 @@ import { waitForProxyRequest } from './http/httpProxy';
 import { createStreamRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
 import { enableHttpStream } from './setup';
-import { isHttpTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
+import { isHttpTrigger, isMcpToolTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
 import { isDefined, nonNullProp, nonNullValue } from './utils/nonNull';
 
 export class InvocationModel implements coreTypes.InvocationModel {
@@ -118,7 +119,9 @@ export class InvocationModel implements coreTypes.InvocationModel {
         for (const [name, binding] of Object.entries(this.#bindings)) {
             if (binding.direction === 'out') {
                 if (name === returnBindingKey) {
-                    response.returnValue = await this.#convertOutput(context.invocationId, binding, result);
+                    response.returnValue = isMcpToolTrigger(this.#triggerType)
+                        ? this.#convertMcpToolReturnValue(result)
+                        : await this.#convertOutput(context.invocationId, binding, result);
                     usedReturnValue = true;
                 } else {
                     const outputValue = await this.#convertOutput(
@@ -138,7 +141,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         // but e.g., Durable uses this to pass orchestrator state back to the Durable extension, w/o
         // an explicit output binding. See here for more details: https://github.com/Azure/azure-functions-nodejs-library/pull/25
         if (!usedReturnValue && !isHttpTrigger(this.#triggerType)) {
-            response.returnValue = toRpcTypedData(result);
+            response.returnValue = this.#convertMcpToolReturnValue(result);
         }
 
         return response;
@@ -154,6 +157,22 @@ export class InvocationModel implements coreTypes.InvocationModel {
         } else {
             return toRpcTypedData(value);
         }
+    }
+
+    #convertMcpToolReturnValue(value: unknown): RpcTypedData | null | undefined {
+        if (!isMcpToolTrigger(this.#triggerType)) {
+            return toRpcTypedData(value);
+        }
+
+        const converted = toMcpToolResult(value);
+
+        if (converted === null || converted === undefined) {
+            return converted;
+        }
+
+        return {
+            string: typeof converted === 'string' ? converted : JSON.stringify(converted),
+        };
     }
 
     #log(level: RpcLogLevel, logCategory: RpcLogCategory, ...args: unknown[]): void {

@@ -4,7 +4,7 @@
 import 'mocha';
 import { RpcLogCategory, RpcLogLevel } from '@azure/functions-core';
 import { expect } from 'chai';
-import { InvocationContext } from '../src';
+import { InvocationContext, McpContent } from '../src';
 import { InvocationModel } from '../src/InvocationModel';
 
 function testLog(_level: RpcLogLevel, _category: RpcLogCategory, message: string) {
@@ -106,9 +106,95 @@ describe('InvocationModel', () => {
                 },
                 log: testLog,
             });
-            await expect(model.getArguments()).to.be.rejectedWith(
-                'Failed to find binding "httpTriggerMissing" in bindings "httpTrigger1, $return".'
-            );
+
+            try {
+                await model.getArguments();
+                expect.fail('Expected getArguments() to throw for a missing binding.');
+            } catch (err) {
+                const message = err instanceof Error ? err.message : String(err);
+                expect(message).to.equal(
+                    'Failed to find binding "httpTriggerMissing" in bindings "httpTrigger1, $return".'
+                );
+            }
+        });
+
+        it('MCP trigger with explicit $return serializes as RpcTypedData.string', async () => {
+            const model = new InvocationModel({
+                invocationId: 'mcpInvocId',
+                metadata: {
+                    name: 'mcpFuncName',
+                    bindings: {
+                        mcpToolTrigger1: {
+                            type: 'mcpToolTrigger',
+                            direction: 'in',
+                        },
+                        $return: {
+                            type: 'queue',
+                            direction: 'out',
+                        },
+                    },
+                },
+                request: {},
+                log: testLog,
+            });
+
+            const context = new InvocationContext();
+            const response = await model.getResponse(context, {
+                type: 'image',
+                data: 'YmFzZTY0',
+                mimeType: 'image/png',
+            });
+
+            expect(response.invocationId).to.equal('mcpInvocId');
+            expect(response.outputData).to.deep.equal([]);
+            expect(response.returnValue).to.have.property('string');
+
+            const payload = JSON.parse((response.returnValue as { string: string }).string) as {
+                type: string;
+                content: string;
+            };
+
+            expect(payload.type).to.equal('image');
+            const imageContent = JSON.parse(payload.content) as { type: string; mimeType: string };
+            expect(imageContent.type).to.equal('image');
+            expect(imageContent.mimeType).to.equal('image/png');
+        });
+
+        it('MCP trigger without $return uses fallback and includes structuredContent for marked class', async () => {
+            class MarkedResult {
+                constructor(public id: string) {}
+            }
+            McpContent(MarkedResult);
+
+            const model = new InvocationModel({
+                invocationId: 'mcpFallbackInvocId',
+                metadata: {
+                    name: 'mcpFallbackFuncName',
+                    bindings: {
+                        mcpToolTrigger1: {
+                            type: 'mcpToolTrigger',
+                            direction: 'in',
+                        },
+                    },
+                },
+                request: {},
+                log: testLog,
+            });
+
+            const context = new InvocationContext();
+            const response = await model.getResponse(context, new MarkedResult('r1'));
+
+            expect(response.invocationId).to.equal('mcpFallbackInvocId');
+            expect(response.outputData).to.deep.equal([]);
+            expect(response.returnValue).to.have.property('string');
+
+            const payload = JSON.parse((response.returnValue as { string: string }).string) as {
+                type: string;
+                structuredContent?: string;
+            };
+
+            expect(payload.type).to.equal('text');
+            expect(payload.structuredContent).to.equal(JSON.stringify({ id: 'r1' }));
         });
     });
 });

@@ -12,3 +12,7 @@ export function isHttpTrigger(typeName: string | undefined | null): boolean {
 export function isTimerTrigger(typeName: string | undefined | null): boolean {
     return typeName?.toLowerCase() === 'timertrigger';
 }
+
+export function isMcpToolTrigger(typeName: string | undefined | null): boolean {
+    return typeName?.toLowerCase() === 'mcptooltrigger';
+}
