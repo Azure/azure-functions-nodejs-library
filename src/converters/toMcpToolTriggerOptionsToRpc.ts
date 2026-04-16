@@ -31,11 +31,27 @@ export function converToMcpToolTriggerOptionsToRpc(
         }
     }
 
+    let validatedResultSchema: string | undefined;
+    if (
+        mcpToolTriggerOptions.resultSchema !== undefined &&
+        typeof mcpToolTriggerOptions.resultSchema === 'string' &&
+        mcpToolTriggerOptions.resultSchema.trim() !== ''
+    ) {
+        try {
+            JSON.parse(mcpToolTriggerOptions.resultSchema);
+            validatedResultSchema = mcpToolTriggerOptions.resultSchema;
+        } catch (e) {
+            throw new Error('MCP Tool trigger "resultSchema" must be a valid JSON string.');
+        }
+    }
+
     // Base object for the return value - metadata is independent of toolProperties
     const baseResult = {
         toolName: mcpToolTriggerOptions.toolName,
         description: mcpToolTriggerOptions.description,
+        useResultSchema: true,
         ...(validatedMetadata !== undefined && { metadata: validatedMetadata }),
+        ...(validatedResultSchema !== undefined && { resultSchema: validatedResultSchema }),
     };
 
     // Try to normalize tool properties first (handles both array and fluent formats)

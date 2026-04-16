@@ -57,6 +57,14 @@ export interface McpToolTriggerOptions {
      * Additional metadata about the tool in JSON format.
      */
     metadata?: string;
+
+    /**
+     * Optional JSON-serialized JSON Schema describing the structured result of this tool.
+     *
+     * When provided, the value is validated as JSON and sent alongside `useResultSchema: true`
+     * so MCP clients that support structured content can use the declared schema.
+     */
+    resultSchema?: string;
 }
 
 /**
@@ -77,6 +85,11 @@ export interface McpToolTriggerOptionsToRpc {
     description: string;
 
     /**
+     * Always enabled so the host contract advertises structured-result support.
+     */
+    useResultSchema: boolean;
+
+    /**
      * Additional properties or metadata for the tool.
      * This is a dictionary of key-value pairs that can be used to configure the trigger.
      */
@@ -87,6 +100,11 @@ export interface McpToolTriggerOptionsToRpc {
      * Additional metadata about the tool in JSON format.
      */
     metadata?: string;
+
+    /**
+     * Optional JSON-serialized JSON Schema describing the structured result of this tool.
+     */
+    resultSchema?: string;
 }
 
 /**
@@ -132,3 +150,86 @@ export type Arg = Omit<McpToolProperty, 'propertyName'>;
  * Tool properties format - an object mapping property names to their definitions
  */
 export type Args = Record<string, Arg>;
+
+/**
+ * A text content block in an MCP tool response.
+ * Equivalent to .NET's TextContentBlock.
+ */
+export interface TextContentBlock {
+    type: 'text';
+    text: string;
+}
+
+/**
+ * An image content block in an MCP tool response.
+ * Equivalent to .NET's ImageContentBlock.
+ * `data` must be base64-encoded. The library automatically encodes Buffer/ArrayBuffer values.
+ */
+export interface ImageContentBlock {
+    type: 'image';
+    data: string | Buffer | ArrayBuffer;
+    mimeType?: string;
+}
+
+/**
+ * An audio content block in an MCP tool response.
+ */
+export interface AudioContentBlock {
+    type: 'audio';
+    data: string | Buffer | ArrayBuffer;
+    mimeType?: string;
+}
+
+/**
+ * A resource-link content block in an MCP tool response.
+ */
+export interface ResourceLinkContentBlock {
+    type: 'resource_link';
+    uri: string;
+    name?: string;
+    description?: string;
+    mimeType?: string;
+}
+
+/**
+ * Union of all known content block types for an MCP tool response.
+ * Equivalent to .NET's ContentBlock base class.
+ */
+export type McpContentBlock =
+    | TextContentBlock
+    | ImageContentBlock
+    | AudioContentBlock
+    | ResourceLinkContentBlock
+    | Record<string, unknown>;
+
+/**
+ * Full call-tool result with explicit content blocks and optional structured content.
+ * Use this when you need manual control over both content and structuredContent.
+ * Equivalent to constructing a CallToolResult in .NET with explicit blocks.
+ *
+ * ```typescript
+ * return {
+ *   content: [
+ *     { type: 'text', text: 'Here is the image' },
+ *     { type: 'image', data: base64Data, mimeType: 'image/png' }
+ *   ],
+ *   structuredContent: { imageId: 'logo', format: 'png' }
+ * };
+ * ```
+ */
+export interface CallToolResult {
+    content: McpContentBlock[];
+    structuredContent?: unknown;
+    isError?: boolean;
+}
+
+/**
+ * Internal wire payload emitted by the library after converting a tool's return value.
+ * Customers do not construct this directly — return one of the above types instead.
+ * @internal
+ */
+export interface McpToolResult {
+    type: string;
+    content?: string;
+    structuredContent?: string;
+}
