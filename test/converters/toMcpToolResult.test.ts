@@ -4,6 +4,13 @@
 import 'mocha';
 import { expect } from 'chai';
 import { toMcpToolResult } from '../../src/converters/toMcpToolResult';
+import {
+    AudioContent,
+    ImageContent,
+    McpToolResponse,
+    ResourceLinkContent,
+    TextContent,
+} from '../../src/mcp/McpToolResponse';
 import { McpContent } from '../../src/utils/mcpContentMarker';
 
 describe('toMcpToolResult', () => {
@@ -14,13 +21,9 @@ describe('toMcpToolResult', () => {
 
     it('wraps primitive string as text content', () => {
         const result = toMcpToolResult('hello');
-        expect(result).to.not.equal(undefined);
-        expect(result).to.not.equal(null);
         expect(result?.type).to.equal('text');
-
         const content = JSON.parse(result?.content || '{}') as { type: string; text: string };
-        expect(content.type).to.equal('text');
-        expect(content.text).to.equal('hello');
+        expect(content).to.deep.equal({ type: 'text', text: 'hello' });
         expect(result?.structuredContent).to.equal(undefined);
     });
 
@@ -34,8 +37,8 @@ describe('toMcpToolResult', () => {
         class MarkedPayload {
             constructor(public id: string) {}
         }
-
         McpContent(MarkedPayload);
+
         const instance = new MarkedPayload('p1');
         const result = toMcpToolResult(instance);
 
@@ -43,26 +46,59 @@ describe('toMcpToolResult', () => {
         expect(result?.structuredContent).to.equal(JSON.stringify(instance));
     });
 
-    it('converts direct image block and normalizes buffer data to base64', () => {
-        const buffer = Buffer.from('abc');
-        const result = toMcpToolResult({
-            type: 'image',
-            data: buffer,
-            mimeType: 'image/png',
-        });
-
-        expect(result?.type).to.equal('image');
-        const content = JSON.parse(result?.content || '{}') as { type: string; data: string };
-        expect(content.type).to.equal('image');
-        expect(content.data).to.equal(buffer.toString('base64'));
+    it('treats plain object with content array as a plain value (not a CallToolResult)', () => {
+        // Previously the structural CallToolResult detector would misclassify this.
+        // With class-based detection it must be serialized as plain text.
+        const result = toMcpToolResult({ content: ['hello'], status: 'ok' });
+        expect(result?.type).to.equal('text');
+        const content = JSON.parse(result?.content || '{}') as { type: string; text: string };
+        expect(content.type).to.equal('text');
+        expect(JSON.parse(content.text)).to.deep.equal({ content: ['hello'], status: 'ok' });
     });
 
-    it('wraps direct content block arrays as multi_content_result', () => {
-        const result = toMcpToolResult([
-            { type: 'text', text: 'first' },
-            { type: 'image', data: 'ZGF0YQ==', mimeType: 'image/png' },
-        ]);
+    it('treats user domain object with type field as a plain value', () => {
+        // Previously { type: 'report', content: '...' } would be misclassified as an MCP result.
+        const result = toMcpToolResult({ type: 'report', content: 'quarterly results' });
+        expect(result?.type).to.equal('text');
+        const content = JSON.parse(result?.content || '{}') as { type: string; text: string };
+        expect(JSON.parse(content.text)).to.deep.equal({ type: 'report', content: 'quarterly results' });
+    });
 
+    it('serializes a single TextContent block', () => {
+        const result = toMcpToolResult(new TextContent('hi there'));
+        expect(result?.type).to.equal('text');
+        expect(JSON.parse(result?.content || '{}')).to.deep.equal({ type: 'text', text: 'hi there' });
+    });
+
+    it('serializes an ImageContent block and normalizes Buffer data to base64', () => {
+        const buffer = Buffer.from('abc');
+        const result = toMcpToolResult(new ImageContent({ data: buffer, mimeType: 'image/png' }));
+        expect(result?.type).to.equal('image');
+        const content = JSON.parse(result?.content || '{}') as { type: string; data: string; mimeType: string };
+        expect(content).to.deep.equal({ type: 'image', data: buffer.toString('base64'), mimeType: 'image/png' });
+    });
+
+    it('serializes an AudioContent block', () => {
+        const result = toMcpToolResult(new AudioContent({ data: 'ZGF0YQ==', mimeType: 'audio/wav' }));
+        expect(result?.type).to.equal('audio');
+        const content = JSON.parse(result?.content || '{}');
+        expect(content).to.deep.equal({ type: 'audio', data: 'ZGF0YQ==', mimeType: 'audio/wav' });
+    });
+
+    it('serializes a ResourceLinkContent block', () => {
+        const result = toMcpToolResult(
+            new ResourceLinkContent({ uri: 'https://example.test/resource', name: 'example' })
+        );
+        expect(result?.type).to.equal('resource_link');
+        const content = JSON.parse(result?.content || '{}') as { type: string; uri: string; name: string };
+        expect(content).to.deep.equal({ type: 'resource_link', uri: 'https://example.test/resource', name: 'example' });
+    });
+
+    it('wraps arrays of content blocks as multi_content_result', () => {
+        const result = toMcpToolResult([
+            new TextContent('first'),
+            new ImageContent({ data: 'ZGF0YQ==', mimeType: 'image/png' }),
+        ]);
         expect(result?.type).to.equal('multi_content_result');
         const content = JSON.parse(result?.content || '[]') as Array<{ type: string }>;
         expect(content).to.have.length(2);
@@ -70,12 +106,27 @@ describe('toMcpToolResult', () => {
         expect(content[1]?.type).to.equal('image');
     });
 
-    it('adds fallback text block for CallToolResult with structuredContent and no text block', () => {
-        const result = toMcpToolResult({
-            content: [{ type: 'image', data: 'ZGF0YQ==', mimeType: 'image/png' }],
+    it('treats mixed arrays (non-content-block elements) as plain values', () => {
+        const result = toMcpToolResult([new TextContent('x'), { type: 'text', text: 'raw' }]);
+        expect(result?.type).to.equal('text');
+    });
+
+    it('serializes McpToolResponse with structuredContent', () => {
+        const response = new McpToolResponse({
+            content: [new TextContent('display text')],
             structuredContent: { id: 'x1' },
         });
+        const result = toMcpToolResult(response);
+        expect(result?.type).to.equal('text');
+        expect(result?.structuredContent).to.equal(JSON.stringify({ id: 'x1' }));
+    });
 
+    it('adds fallback text block when McpToolResponse has structuredContent but no TextContent', () => {
+        const response = new McpToolResponse({
+            content: [new ImageContent({ data: 'ZGF0YQ==', mimeType: 'image/png' })],
+            structuredContent: { id: 'x1' },
+        });
+        const result = toMcpToolResult(response);
         expect(result?.type).to.equal('multi_content_result');
         const content = JSON.parse(result?.content || '[]') as Array<{ type: string; text?: string }>;
         expect(content).to.have.length(2);
@@ -83,26 +134,12 @@ describe('toMcpToolResult', () => {
         expect(result?.structuredContent).to.equal(JSON.stringify({ id: 'x1' }));
     });
 
-    it('normalizes existing McpToolResult when content is not a string', () => {
-        const result = toMcpToolResult({
-            type: 'text',
-            content: { type: 'text', text: 'normalized' },
+    it('passes through string structuredContent without re-stringifying', () => {
+        const response = new McpToolResponse({
+            content: [new TextContent('t')],
+            structuredContent: 'already-string',
         });
-
-        expect(result?.type).to.equal('text');
-        expect(result?.content).to.equal(JSON.stringify({ type: 'text', text: 'normalized' }));
-    });
-
-    it('treats resource_link blocks as direct content blocks', () => {
-        const result = toMcpToolResult({
-            type: 'resource_link',
-            uri: 'https://example.test/resource',
-            name: 'example',
-        });
-
-        expect(result?.type).to.equal('resource_link');
-        const content = JSON.parse(result?.content || '{}') as { type: string; uri: string };
-        expect(content.type).to.equal('resource_link');
-        expect(content.uri).to.equal('https://example.test/resource');
+        const result = toMcpToolResult(response);
+        expect(result?.structuredContent).to.equal('already-string');
     });
 });

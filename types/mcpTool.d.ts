@@ -152,75 +152,123 @@ export type Arg = Omit<McpToolProperty, 'propertyName'>;
 export type Args = Record<string, Arg>;
 
 /**
- * A text content block in an MCP tool response.
- * Equivalent to .NET's TextContentBlock.
+ * Abstract base class for MCP tool response content blocks.
+ *
+ * The Azure Functions library discriminates content blocks from plain user values using
+ * `instanceof McpContentBlock`, so only instances of the built-in subclasses
+ * (`TextContent`, `ImageContent`, `AudioContent`, `ResourceLinkContent`, `ResourceContent`)
+ * — or a custom subclass that extends this class — will be treated as content blocks.
+ *
+ * Plain object literals like `{ type: 'text', text: '...' }` are **not** treated as
+ * content blocks and will be serialized as JSON text instead.
  */
-export interface TextContentBlock {
-    type: 'text';
-    text: string;
+export declare abstract class McpContentBlock {
+    abstract readonly type: string;
+    abstract toJSON(): Record<string, unknown>;
 }
 
-/**
- * An image content block in an MCP tool response.
- * Equivalent to .NET's ImageContentBlock.
- * `data` must be base64-encoded. The library automatically encodes Buffer/ArrayBuffer values.
- */
-export interface ImageContentBlock {
-    type: 'image';
+/** A text content block in an MCP tool response. */
+export declare class TextContent extends McpContentBlock {
+    readonly type: 'text';
+    readonly text: string;
+    constructor(text: string);
+    toJSON(): Record<string, unknown>;
+}
+
+/** Initializer for `ImageContent`. `data` is base64-encoded automatically for Buffer/ArrayBuffer values. */
+export interface ImageContentInit {
     data: string | Buffer | ArrayBuffer;
     mimeType?: string;
 }
 
-/**
- * An audio content block in an MCP tool response.
- */
-export interface AudioContentBlock {
-    type: 'audio';
+/** An image content block in an MCP tool response. */
+export declare class ImageContent extends McpContentBlock {
+    readonly type: 'image';
+    readonly data: string | Buffer | ArrayBuffer;
+    readonly mimeType?: string;
+    constructor(init: ImageContentInit);
+    toJSON(): Record<string, unknown>;
+}
+
+/** Initializer for `AudioContent`. `data` is base64-encoded automatically for Buffer/ArrayBuffer values. */
+export interface AudioContentInit {
     data: string | Buffer | ArrayBuffer;
     mimeType?: string;
 }
 
-/**
- * A resource-link content block in an MCP tool response.
- */
-export interface ResourceLinkContentBlock {
-    type: 'resource_link';
+/** An audio content block in an MCP tool response. */
+export declare class AudioContent extends McpContentBlock {
+    readonly type: 'audio';
+    readonly data: string | Buffer | ArrayBuffer;
+    readonly mimeType?: string;
+    constructor(init: AudioContentInit);
+    toJSON(): Record<string, unknown>;
+}
+
+/** Initializer for `ResourceLinkContent`. */
+export interface ResourceLinkContentInit {
     uri: string;
     name?: string;
     description?: string;
     mimeType?: string;
 }
 
-/**
- * Union of all known content block types for an MCP tool response.
- * Equivalent to .NET's ContentBlock base class.
- */
-export type McpContentBlock =
-    | TextContentBlock
-    | ImageContentBlock
-    | AudioContentBlock
-    | ResourceLinkContentBlock
-    | Record<string, unknown>;
+/** A resource-link content block in an MCP tool response. */
+export declare class ResourceLinkContent extends McpContentBlock {
+    readonly type: 'resource_link';
+    readonly uri: string;
+    readonly name?: string;
+    readonly description?: string;
+    readonly mimeType?: string;
+    constructor(init: ResourceLinkContentInit);
+    toJSON(): Record<string, unknown>;
+}
 
-/**
- * Full call-tool result with explicit content blocks and optional structured content.
- * Use this when you need manual control over both content and structuredContent.
- * Equivalent to constructing a CallToolResult in .NET with explicit blocks.
- *
- * ```typescript
- * return {
- *   content: [
- *     { type: 'text', text: 'Here is the image' },
- *     { type: 'image', data: base64Data, mimeType: 'image/png' }
- *   ],
- *   structuredContent: { imageId: 'logo', format: 'png' }
- * };
- * ```
- */
-export interface CallToolResult {
+/** Initializer for `ResourceContent`. `blob` is base64-encoded automatically for Buffer/ArrayBuffer values. */
+export interface ResourceContentInit {
+    resource: {
+        uri: string;
+        mimeType?: string;
+        text?: string;
+        blob?: string | Buffer | ArrayBuffer;
+    };
+}
+
+/** An embedded-resource content block in an MCP tool response. */
+export declare class ResourceContent extends McpContentBlock {
+    readonly type: 'resource';
+    readonly resource: ResourceContentInit['resource'];
+    constructor(init: ResourceContentInit);
+    toJSON(): Record<string, unknown>;
+}
+
+/** Initializer for `McpToolResponse`. */
+export interface McpToolResponseInit {
     content: McpContentBlock[];
     structuredContent?: unknown;
     isError?: boolean;
+}
+
+/**
+ * Full MCP tool response with explicit content blocks and optional structured content.
+ * Return an instance of this class from a tool handler when you need full control over
+ * both the content array and `structuredContent`.
+ *
+ * ```typescript
+ * return new McpToolResponse({
+ *   content: [
+ *     new TextContent('Here is the image'),
+ *     new ImageContent({ data: base64Data, mimeType: 'image/png' })
+ *   ],
+ *   structuredContent: { imageId: 'logo', format: 'png' }
+ * });
+ * ```
+ */
+export declare class McpToolResponse {
+    readonly content: McpContentBlock[];
+    readonly structuredContent?: unknown;
+    readonly isError?: boolean;
+    constructor(init: McpToolResponseInit);
 }
 
 /**
