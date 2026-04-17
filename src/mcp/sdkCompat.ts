@@ -1,6 +1,8 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import type { InvocationContext } from '@azure/functions';
+
 /**
  * Heuristically detects values that look like responses from `@modelcontextprotocol/sdk`
  * (e.g. `CallToolResult` or a raw content block) so we can warn users that those shapes
@@ -34,15 +36,18 @@ let warned = false;
  * `@modelcontextprotocol/sdk` response. Behavior is unchanged — the value still falls
  * through to the plain-text path — but the warning steers users to the supported API.
  *
+ * Routed through the invocation's `InvocationContext` so the warning surfaces to the
+ * customer via the Functions host logging pipeline. If no context is supplied, the
+ * warning is skipped.
+ *
  * Idempotent: subsequent calls are no-ops to avoid log spam.
  */
-export function warnIfLooksLikeMcpSdkValue(value: unknown): void {
-    if (warned || !looksLikeMcpSdkValue(value)) {
+export function warnIfLooksLikeMcpSdkValue(value: unknown, context: InvocationContext | undefined): void {
+    if (warned || !context || !looksLikeMcpSdkValue(value)) {
         return;
     }
     warned = true;
-    // eslint-disable-next-line no-console
-    console.warn(
+    context.warn(
         '[@azure/functions] Tool handler return value appears to use types from ' +
             '`@modelcontextprotocol/sdk` (e.g. `CallToolResult`, `TextContent`, `ImageContent`). ' +
             'These types are not supported directly and will be serialized as plain text. ' +

@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import type { McpToolResult } from '@azure/functions';
+import type { InvocationContext, McpToolResult } from '@azure/functions';
 import { McpContentBlock, McpTextContent, McpToolResponse } from '../mcp/McpToolResponse';
 import { warnIfLooksLikeMcpSdkValue } from '../mcp/sdkCompat';
 import { shouldCreateStructuredContentMarker } from '../utils/mcpContentMarker';
@@ -22,8 +22,11 @@ const textContentResultType = 'text';
  *
  * Detection uses `instanceof` exclusively — arbitrary user objects that happen to have a
  * `content`/`type`/`structuredContent` field are treated as plain values.
+ *
+ * @param context Optional `InvocationContext` used to surface a one-time warning when the
+ *   value looks like an `@modelcontextprotocol/sdk` response that is not auto-converted.
  */
-export function toMcpToolResult(result: unknown): McpToolResult | null | undefined {
+export function toMcpToolResult(result: unknown, context?: InvocationContext): McpToolResult | null | undefined {
     if (result === null || result === undefined) {
         return result;
     }
@@ -42,7 +45,7 @@ export function toMcpToolResult(result: unknown): McpToolResult | null | undefin
 
     // Plain-value path: warn once if the value looks like an MCP SDK shape that
     // the user likely intended to be converted. Behavior is unchanged.
-    warnIfLooksLikeMcpSdkValue(result);
+    warnIfLooksLikeMcpSdkValue(result, context);
 
     const text = typeof result === 'string' ? result : JSON.stringify(result);
     const mcpResult: McpToolResult = {
