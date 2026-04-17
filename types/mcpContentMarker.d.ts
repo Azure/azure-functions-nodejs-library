@@ -10,7 +10,7 @@
  * and structured content (for clients that support it).
  *
  * Without the marker, a plain object is serialized as text-only (JSON stringified).
- * Use `CallToolResult` if you need explicit control over structuredContent without a class.
+ * Use `McpToolResponse` if you need explicit control over structuredContent without a class.
  *
  * **Programmatic usage** (works without `experimentalDecorators`):
  * ```typescript
@@ -40,8 +40,8 @@
  * @param target - Optional class or constructor function to mark for structured content.
  * @returns The target class/function unchanged or a class decorator.
  *
- * @see {@link CallToolResult} - For explicit content blocks + structuredContent
- * @see {@link ImageContentBlock | TextContentBlock} - For returning single content blocks
+ * @see {@link McpToolResponse} - For explicit content blocks + structuredContent
+ * @see {@link McpTextContent} - For returning single content blocks
  */
 export function McpContent<T extends { new (...args: any[]): unknown }>(target: T): T;
 export function McpContent(): <T extends { new (...args: any[]): unknown }>(target: T) => T;

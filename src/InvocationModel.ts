@@ -120,7 +120,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
             if (binding.direction === 'out') {
                 if (name === returnBindingKey) {
                     response.returnValue = isMcpToolTrigger(this.#triggerType)
-                        ? this.#convertMcpToolReturnValue(result)
+                        ? this.#convertMcpToolReturnValue(context, result)
                         : await this.#convertOutput(context.invocationId, binding, result);
                     usedReturnValue = true;
                 } else {
@@ -141,7 +141,7 @@ export class InvocationModel implements coreTypes.InvocationModel {
         // but e.g., Durable uses this to pass orchestrator state back to the Durable extension, w/o
         // an explicit output binding. See here for more details: https://github.com/Azure/azure-functions-nodejs-library/pull/25
         if (!usedReturnValue && !isHttpTrigger(this.#triggerType)) {
-            response.returnValue = this.#convertMcpToolReturnValue(result);
+            response.returnValue = this.#convertMcpToolReturnValue(context, result);
         }
 
         return response;
@@ -159,12 +159,12 @@ export class InvocationModel implements coreTypes.InvocationModel {
         }
     }
 
-    #convertMcpToolReturnValue(value: unknown): RpcTypedData | null | undefined {
+    #convertMcpToolReturnValue(context: InvocationContext, value: unknown): RpcTypedData | null | undefined {
         if (!isMcpToolTrigger(this.#triggerType)) {
             return toRpcTypedData(value);
         }
 
-        const converted = toMcpToolResult(value);
+        const converted = toMcpToolResult(value, context);
 
         if (converted === null || converted === undefined) {
             return converted;
