@@ -161,6 +161,86 @@ export type Args = Record<string, Arg>;
  *
  * Plain object literals like `{ type: 'text', text: '...' }` are **not** treated as
  * content blocks and will be serialized as JSON text instead.
+ *
+ * ## Extending with custom content block types
+ *
+ * If the MCP spec adds a new block type — or your scenario needs a custom one — you can
+ * ship your own subclass without any library change. The converter only checks
+ * `instanceof McpContentBlock` and calls `JSON.stringify(block)`, which invokes your
+ * `toJSON()` to produce the wire payload.
+ *
+ * ### Example: adding a hypothetical `VideoContent`
+ *
+ * ```ts
+ * import { McpContentBlock } from '@azure/functions';
+ *
+ * export interface VideoContentInit {
+ *     data: string | Buffer | ArrayBuffer;
+ *     mimeType: string;          // e.g. 'video/mp4'
+ *     durationMs?: number;       // optional field from a hypothetical spec
+ * }
+ *
+ * export class VideoContent extends McpContentBlock {
+ *     readonly type = 'video' as const;
+ *     readonly data: string | Buffer | ArrayBuffer;
+ *     readonly mimeType: string;
+ *     readonly durationMs?: number;
+ *
+ *     constructor(init: VideoContentInit) {
+ *         super();
+ *         this.data = init.data;
+ *         this.mimeType = init.mimeType;
+ *         this.durationMs = init.durationMs;
+ *     }
+ *
+ *     toJSON(): Record<string, unknown> {
+ *         const out: Record<string, unknown> = {
+ *             type: this.type,
+ *             data: toBase64(this.data),
+ *             mimeType: this.mimeType,
+ *         };
+ *         if (this.durationMs !== undefined) out.durationMs = this.durationMs;
+ *         return out;
+ *     }
+ * }
+ *
+ * function toBase64(data: string | Buffer | ArrayBuffer): string {
+ *     if (typeof data === 'string') return data;
+ *     if (Buffer.isBuffer(data)) return data.toString('base64');
+ *     return Buffer.from(new Uint8Array(data)).toString('base64');
+ * }
+ * ```
+ *
+ * ### Using a custom block from a tool handler
+ *
+ * ```ts
+ * // Single block
+ * handler: async () => new VideoContent({ data: buf, mimeType: 'video/mp4' })
+ *
+ * // Mixed with built-ins + structured content
+ * handler: async () => new McpToolResponse({
+ *     content: [
+ *         new TextContent('Detected 3 scenes'),
+ *         new VideoContent({ data: buf, mimeType: 'video/mp4' }),
+ *     ],
+ *     structuredContent: { scenes: 3, confidence: 0.92 },
+ * })
+ * ```
+ *
+ * ### What the library does for you
+ *
+ *  - `instanceof McpContentBlock` treats your subclass identically to built-in blocks.
+ *  - Single-block returns propagate your `type` string to the outer result; arrays are
+ *    wrapped as `multi_content_result`.
+ *  - `structuredContent` handling, fallback-text synthesis, and nullish passthrough all
+ *    apply unchanged.
+ *
+ * ### What you must get right in your subclass
+ *
+ *  - `toJSON()` must return the exact wire shape the spec requires for your `type`.
+ *  - Binary payloads should be base64-encoded in `toJSON()` (see the `toBase64` helper
+ *    above).
+ *  - Plain object literals are **not** recognized — you must construct an instance.
  */
 export declare abstract class McpContentBlock {
     abstract readonly type: string;

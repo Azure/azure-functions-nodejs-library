@@ -7,7 +7,9 @@ import { toMcpToolResult } from '../../src/converters/toMcpToolResult';
 import {
     AudioContent,
     ImageContent,
+    McpContentBlock,
     McpToolResponse,
+    ResourceContent,
     ResourceLinkContent,
     TextContent,
 } from '../../src/mcp/McpToolResponse';
@@ -141,5 +143,105 @@ describe('toMcpToolResult', () => {
         });
         const result = toMcpToolResult(response);
         expect(result?.structuredContent).to.equal('already-string');
+    });
+
+    it('does not emit structuredContent when explicitly null or undefined', () => {
+        const nullResp = toMcpToolResult(
+            new McpToolResponse({ content: [new TextContent('t')], structuredContent: null })
+        );
+        expect(nullResp?.structuredContent).to.equal(undefined);
+
+        const undefResp = toMcpToolResult(
+            new McpToolResponse({ content: [new TextContent('t')], structuredContent: undefined })
+        );
+        expect(undefResp?.structuredContent).to.equal(undefined);
+    });
+
+    it('serializes a single ResourceContent block', () => {
+        const result = toMcpToolResult(
+            new ResourceContent({ resource: { uri: 'mem://x', text: 'inline', mimeType: 'text/plain' } })
+        );
+        expect(result?.type).to.equal('resource');
+        const content = JSON.parse(result?.content || '{}') as { type: string; resource: Record<string, unknown> };
+        expect(content).to.deep.equal({
+            type: 'resource',
+            resource: { uri: 'mem://x', text: 'inline', mimeType: 'text/plain' },
+        });
+    });
+
+    it('serializes a ResourceContent block with base64-encoded blob', () => {
+        const blob = Buffer.from('binary-data');
+        const result = toMcpToolResult(
+            new ResourceContent({
+                resource: { uri: 'file:///a.bin', mimeType: 'application/octet-stream', blob },
+            })
+        );
+        expect(result?.type).to.equal('resource');
+        const content = JSON.parse(result?.content || '{}') as {
+            type: string;
+            resource: Record<string, unknown>;
+        };
+        expect(content).to.deep.equal({
+            type: 'resource',
+            resource: {
+                uri: 'file:///a.bin',
+                mimeType: 'application/octet-stream',
+                blob: blob.toString('base64'),
+            },
+        });
+    });
+
+    it('serializes a ResourceContent block with only text (omits blob and mimeType)', () => {
+        const result = toMcpToolResult(
+            new ResourceContent({ resource: { uri: 'file:///a.txt', text: 'hello' } })
+        );
+        const content = JSON.parse(result?.content || '{}') as { resource: Record<string, unknown> };
+        expect(content.resource).to.deep.equal({ uri: 'file:///a.txt', text: 'hello' });
+        expect(content.resource).to.not.have.property('blob');
+        expect(content.resource).to.not.have.property('mimeType');
+    });
+
+    it('treats empty array as plain value (not a multi_content_result)', () => {
+        const result = toMcpToolResult([]);
+        expect(result?.type).to.equal('text');
+        const content = JSON.parse(result?.content || '{}') as { type: string; text: string };
+        expect(content.type).to.equal('text');
+        expect(content.text).to.equal('[]');
+        expect(JSON.parse(content.text)).to.deep.equal([]);
+    });
+
+    it('accepts user-defined McpContentBlock subclasses (extensibility)', () => {
+        // Demonstrates the extensibility contract documented on McpContentBlock:
+        // a custom subclass flows through the converter with its own type/toJSON shape
+        // without any library changes.
+        class VideoContent extends McpContentBlock {
+            readonly type = 'video' as const;
+            constructor(private readonly data: string, private readonly mimeType: string) {
+                super();
+            }
+            toJSON(): Record<string, unknown> {
+                return { type: this.type, data: this.data, mimeType: this.mimeType };
+            }
+        }
+
+        const single = toMcpToolResult(new VideoContent('YmFzZTY0', 'video/mp4'));
+        expect(single?.type).to.equal('video');
+        expect(JSON.parse(single?.content || '{}')).to.deep.equal({
+            type: 'video',
+            data: 'YmFzZTY0',
+            mimeType: 'video/mp4',
+        });
+
+        const mixed = toMcpToolResult(
+            new McpToolResponse({
+                content: [new TextContent('preview'), new VideoContent('YmFzZTY0', 'video/mp4')],
+                structuredContent: { scenes: 3 },
+            })
+        );
+        expect(mixed?.type).to.equal('multi_content_result');
+        const blocks = JSON.parse(mixed?.content || '[]') as Array<{ type: string }>;
+        expect(blocks).to.have.length(2);
+        expect(blocks[1]?.type).to.equal('video');
+        expect(mixed?.structuredContent).to.equal(JSON.stringify({ scenes: 3 }));
     });
 });

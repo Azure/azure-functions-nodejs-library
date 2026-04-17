@@ -3,6 +3,7 @@
 
 import type { McpToolResult } from '@azure/functions';
 import { McpContentBlock, McpToolResponse, TextContent } from '../mcp/McpToolResponse';
+import { warnIfLooksLikeMcpSdkValue } from '../mcp/sdkCompat';
 import { shouldCreateStructuredContentMarker } from '../utils/mcpContentMarker';
 
 const multiContentResultType = 'multi_content_result';
@@ -38,6 +39,10 @@ export function toMcpToolResult(result: unknown): McpToolResult | null | undefin
     if (Array.isArray(result) && result.length > 0 && result.every((b) => b instanceof McpContentBlock)) {
         return serializeToolResponse(new McpToolResponse({ content: result as McpContentBlock[] }));
     }
+
+    // Plain-value path: warn once if the value looks like an MCP SDK shape that
+    // the user likely intended to be converted. Behavior is unchanged.
+    warnIfLooksLikeMcpSdkValue(result);
 
     const text = typeof result === 'string' ? result : JSON.stringify(result);
     const mcpResult: McpToolResult = {
