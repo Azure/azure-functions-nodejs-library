@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 import type { McpToolResult } from '@azure/functions';
-import { McpContentBlock, McpToolResponse, TextContent } from '../mcp/McpToolResponse';
+import { McpContentBlock, McpTextContent, McpToolResponse } from '../mcp/McpToolResponse';
 import { warnIfLooksLikeMcpSdkValue } from '../mcp/sdkCompat';
 import { shouldCreateStructuredContentMarker } from '../utils/mcpContentMarker';
 
@@ -85,14 +85,14 @@ function serializeToolResponse(response: McpToolResponse): McpToolResult {
 
 /**
  * Some MCP clients require a text content block alongside structured content for display.
- * If the response declares `structuredContent` but has no `TextContent` block, synthesize one.
+ * If the response declares `structuredContent` but has no `McpTextContent` block, synthesize one.
  */
 function ensureTextBlockWhenStructured(response: McpToolResponse): McpContentBlock[] {
     if (response.structuredContent === null || response.structuredContent === undefined) {
         return response.content;
     }
 
-    if (response.content.some((b) => b instanceof TextContent)) {
+    if (response.content.some((b) => b instanceof McpTextContent)) {
         return response.content;
     }
 
@@ -101,5 +101,5 @@ function ensureTextBlockWhenStructured(response: McpToolResponse): McpContentBlo
             ? response.structuredContent
             : JSON.stringify(response.structuredContent);
 
-    return [...response.content, new TextContent(fallbackText)];
+    return [...response.content, new McpTextContent(fallbackText)];
 }

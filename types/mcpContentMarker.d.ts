@@ -41,7 +41,7 @@
  * @returns The target class/function unchanged or a class decorator.
  *
  * @see {@link McpToolResponse} - For explicit content blocks + structuredContent
- * @see {@link TextContent} - For returning single content blocks
+ * @see {@link McpTextContent} - For returning single content blocks
  */
 export function McpContent<T extends { new (...args: any[]): unknown }>(target: T): T;
 export function McpContent(): <T extends { new (...args: any[]): unknown }>(target: T) => T;

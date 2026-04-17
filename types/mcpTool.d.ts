@@ -156,7 +156,7 @@ export type Args = Record<string, Arg>;
  *
  * The Azure Functions library discriminates content blocks from plain user values using
  * `instanceof McpContentBlock`, so only instances of the built-in subclasses
- * (`TextContent`, `ImageContent`, `AudioContent`, `ResourceLinkContent`, `ResourceContent`)
+ * (`McpTextContent`, `McpImageContent`, `McpAudioContent`, `McpResourceLinkContent`, `McpResourceContent`)
  * — or a custom subclass that extends this class — will be treated as content blocks.
  *
  * Plain object literals like `{ type: 'text', text: '...' }` are **not** treated as
@@ -220,7 +220,7 @@ export type Args = Record<string, Arg>;
  * // Mixed with built-ins + structured content
  * handler: async () => new McpToolResponse({
  *     content: [
- *         new TextContent('Detected 3 scenes'),
+ *         new McpTextContent('Detected 3 scenes'),
  *         new VideoContent({ data: buf, mimeType: 'video/mp4' }),
  *     ],
  *     structuredContent: { scenes: 3, confidence: 0.92 },
@@ -248,45 +248,45 @@ export declare abstract class McpContentBlock {
 }
 
 /** A text content block in an MCP tool response. */
-export declare class TextContent extends McpContentBlock {
+export declare class McpTextContent extends McpContentBlock {
     readonly type: 'text';
     readonly text: string;
     constructor(text: string);
     toJSON(): Record<string, unknown>;
 }
 
-/** Initializer for `ImageContent`. `data` is base64-encoded automatically for Buffer/ArrayBuffer values. */
-export interface ImageContentInit {
+/** Initializer for `McpImageContent`. `data` is base64-encoded automatically for Buffer/ArrayBuffer values. */
+export interface McpImageContentInit {
     data: string | Buffer | ArrayBuffer;
     mimeType?: string;
 }
 
 /** An image content block in an MCP tool response. */
-export declare class ImageContent extends McpContentBlock {
+export declare class McpImageContent extends McpContentBlock {
     readonly type: 'image';
     readonly data: string | Buffer | ArrayBuffer;
     readonly mimeType?: string;
-    constructor(init: ImageContentInit);
+    constructor(init: McpImageContentInit);
     toJSON(): Record<string, unknown>;
 }
 
-/** Initializer for `AudioContent`. `data` is base64-encoded automatically for Buffer/ArrayBuffer values. */
-export interface AudioContentInit {
+/** Initializer for `McpAudioContent`. `data` is base64-encoded automatically for Buffer/ArrayBuffer values. */
+export interface McpAudioContentInit {
     data: string | Buffer | ArrayBuffer;
     mimeType?: string;
 }
 
 /** An audio content block in an MCP tool response. */
-export declare class AudioContent extends McpContentBlock {
+export declare class McpAudioContent extends McpContentBlock {
     readonly type: 'audio';
     readonly data: string | Buffer | ArrayBuffer;
     readonly mimeType?: string;
-    constructor(init: AudioContentInit);
+    constructor(init: McpAudioContentInit);
     toJSON(): Record<string, unknown>;
 }
 
-/** Initializer for `ResourceLinkContent`. */
-export interface ResourceLinkContentInit {
+/** Initializer for `McpResourceLinkContent`. */
+export interface McpResourceLinkContentInit {
     uri: string;
     name?: string;
     description?: string;
@@ -294,18 +294,18 @@ export interface ResourceLinkContentInit {
 }
 
 /** A resource-link content block in an MCP tool response. */
-export declare class ResourceLinkContent extends McpContentBlock {
+export declare class McpResourceLinkContent extends McpContentBlock {
     readonly type: 'resource_link';
     readonly uri: string;
     readonly name?: string;
     readonly description?: string;
     readonly mimeType?: string;
-    constructor(init: ResourceLinkContentInit);
+    constructor(init: McpResourceLinkContentInit);
     toJSON(): Record<string, unknown>;
 }
 
-/** Initializer for `ResourceContent`. `blob` is base64-encoded automatically for Buffer/ArrayBuffer values. */
-export interface ResourceContentInit {
+/** Initializer for `McpResourceContent`. `blob` is base64-encoded automatically for Buffer/ArrayBuffer values. */
+export interface McpResourceContentInit {
     resource: {
         uri: string;
         mimeType?: string;
@@ -315,10 +315,10 @@ export interface ResourceContentInit {
 }
 
 /** An embedded-resource content block in an MCP tool response. */
-export declare class ResourceContent extends McpContentBlock {
+export declare class McpResourceContent extends McpContentBlock {
     readonly type: 'resource';
-    readonly resource: ResourceContentInit['resource'];
-    constructor(init: ResourceContentInit);
+    readonly resource: McpResourceContentInit['resource'];
+    constructor(init: McpResourceContentInit);
     toJSON(): Record<string, unknown>;
 }
 
@@ -337,8 +337,8 @@ export interface McpToolResponseInit {
  * ```typescript
  * return new McpToolResponse({
  *   content: [
- *     new TextContent('Here is the image'),
- *     new ImageContent({ data: base64Data, mimeType: 'image/png' })
+ *     new McpTextContent('Here is the image'),
+ *     new McpImageContent({ data: base64Data, mimeType: 'image/png' })
  *   ],
  *   structuredContent: { imageId: 'logo', format: 'png' }
  * });

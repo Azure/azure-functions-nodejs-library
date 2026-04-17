@@ -5,13 +5,13 @@ import 'mocha';
 import { expect } from 'chai';
 import { toMcpToolResult } from '../../src/converters/toMcpToolResult';
 import {
-    AudioContent,
-    ImageContent,
+    McpAudioContent,
+    McpImageContent,
     McpContentBlock,
     McpToolResponse,
-    ResourceContent,
-    ResourceLinkContent,
-    TextContent,
+    McpResourceContent,
+    McpResourceLinkContent,
+    McpTextContent,
 } from '../../src/mcp/McpToolResponse';
 import { McpContent } from '../../src/utils/mcpContentMarker';
 
@@ -66,30 +66,30 @@ describe('toMcpToolResult', () => {
         expect(JSON.parse(content.text)).to.deep.equal({ type: 'report', content: 'quarterly results' });
     });
 
-    it('serializes a single TextContent block', () => {
-        const result = toMcpToolResult(new TextContent('hi there'));
+    it('serializes a single McpTextContent block', () => {
+        const result = toMcpToolResult(new McpTextContent('hi there'));
         expect(result?.type).to.equal('text');
         expect(JSON.parse(result?.content || '{}')).to.deep.equal({ type: 'text', text: 'hi there' });
     });
 
-    it('serializes an ImageContent block and normalizes Buffer data to base64', () => {
+    it('serializes an McpImageContent block and normalizes Buffer data to base64', () => {
         const buffer = Buffer.from('abc');
-        const result = toMcpToolResult(new ImageContent({ data: buffer, mimeType: 'image/png' }));
+        const result = toMcpToolResult(new McpImageContent({ data: buffer, mimeType: 'image/png' }));
         expect(result?.type).to.equal('image');
         const content = JSON.parse(result?.content || '{}') as { type: string; data: string; mimeType: string };
         expect(content).to.deep.equal({ type: 'image', data: buffer.toString('base64'), mimeType: 'image/png' });
     });
 
-    it('serializes an AudioContent block', () => {
-        const result = toMcpToolResult(new AudioContent({ data: 'ZGF0YQ==', mimeType: 'audio/wav' }));
+    it('serializes an McpAudioContent block', () => {
+        const result = toMcpToolResult(new McpAudioContent({ data: 'ZGF0YQ==', mimeType: 'audio/wav' }));
         expect(result?.type).to.equal('audio');
         const content = JSON.parse(result?.content || '{}');
         expect(content).to.deep.equal({ type: 'audio', data: 'ZGF0YQ==', mimeType: 'audio/wav' });
     });
 
-    it('serializes a ResourceLinkContent block', () => {
+    it('serializes a McpResourceLinkContent block', () => {
         const result = toMcpToolResult(
-            new ResourceLinkContent({ uri: 'https://example.test/resource', name: 'example' })
+            new McpResourceLinkContent({ uri: 'https://example.test/resource', name: 'example' })
         );
         expect(result?.type).to.equal('resource_link');
         const content = JSON.parse(result?.content || '{}') as { type: string; uri: string; name: string };
@@ -98,8 +98,8 @@ describe('toMcpToolResult', () => {
 
     it('wraps arrays of content blocks as multi_content_result', () => {
         const result = toMcpToolResult([
-            new TextContent('first'),
-            new ImageContent({ data: 'ZGF0YQ==', mimeType: 'image/png' }),
+            new McpTextContent('first'),
+            new McpImageContent({ data: 'ZGF0YQ==', mimeType: 'image/png' }),
         ]);
         expect(result?.type).to.equal('multi_content_result');
         const content = JSON.parse(result?.content || '[]') as Array<{ type: string }>;
@@ -109,13 +109,13 @@ describe('toMcpToolResult', () => {
     });
 
     it('treats mixed arrays (non-content-block elements) as plain values', () => {
-        const result = toMcpToolResult([new TextContent('x'), { type: 'text', text: 'raw' }]);
+        const result = toMcpToolResult([new McpTextContent('x'), { type: 'text', text: 'raw' }]);
         expect(result?.type).to.equal('text');
     });
 
     it('serializes McpToolResponse with structuredContent', () => {
         const response = new McpToolResponse({
-            content: [new TextContent('display text')],
+            content: [new McpTextContent('display text')],
             structuredContent: { id: 'x1' },
         });
         const result = toMcpToolResult(response);
@@ -123,9 +123,9 @@ describe('toMcpToolResult', () => {
         expect(result?.structuredContent).to.equal(JSON.stringify({ id: 'x1' }));
     });
 
-    it('adds fallback text block when McpToolResponse has structuredContent but no TextContent', () => {
+    it('adds fallback text block when McpToolResponse has structuredContent but no McpTextContent', () => {
         const response = new McpToolResponse({
-            content: [new ImageContent({ data: 'ZGF0YQ==', mimeType: 'image/png' })],
+            content: [new McpImageContent({ data: 'ZGF0YQ==', mimeType: 'image/png' })],
             structuredContent: { id: 'x1' },
         });
         const result = toMcpToolResult(response);
@@ -138,7 +138,7 @@ describe('toMcpToolResult', () => {
 
     it('passes through string structuredContent without re-stringifying', () => {
         const response = new McpToolResponse({
-            content: [new TextContent('t')],
+            content: [new McpTextContent('t')],
             structuredContent: 'already-string',
         });
         const result = toMcpToolResult(response);
@@ -147,19 +147,19 @@ describe('toMcpToolResult', () => {
 
     it('does not emit structuredContent when explicitly null or undefined', () => {
         const nullResp = toMcpToolResult(
-            new McpToolResponse({ content: [new TextContent('t')], structuredContent: null })
+            new McpToolResponse({ content: [new McpTextContent('t')], structuredContent: null })
         );
         expect(nullResp?.structuredContent).to.equal(undefined);
 
         const undefResp = toMcpToolResult(
-            new McpToolResponse({ content: [new TextContent('t')], structuredContent: undefined })
+            new McpToolResponse({ content: [new McpTextContent('t')], structuredContent: undefined })
         );
         expect(undefResp?.structuredContent).to.equal(undefined);
     });
 
-    it('serializes a single ResourceContent block', () => {
+    it('serializes a single McpResourceContent block', () => {
         const result = toMcpToolResult(
-            new ResourceContent({ resource: { uri: 'mem://x', text: 'inline', mimeType: 'text/plain' } })
+            new McpResourceContent({ resource: { uri: 'mem://x', text: 'inline', mimeType: 'text/plain' } })
         );
         expect(result?.type).to.equal('resource');
         const content = JSON.parse(result?.content || '{}') as { type: string; resource: Record<string, unknown> };
@@ -169,10 +169,10 @@ describe('toMcpToolResult', () => {
         });
     });
 
-    it('serializes a ResourceContent block with base64-encoded blob', () => {
+    it('serializes a McpResourceContent block with base64-encoded blob', () => {
         const blob = Buffer.from('binary-data');
         const result = toMcpToolResult(
-            new ResourceContent({
+            new McpResourceContent({
                 resource: { uri: 'file:///a.bin', mimeType: 'application/octet-stream', blob },
             })
         );
@@ -191,9 +191,9 @@ describe('toMcpToolResult', () => {
         });
     });
 
-    it('serializes a ResourceContent block with only text (omits blob and mimeType)', () => {
+    it('serializes a McpResourceContent block with only text (omits blob and mimeType)', () => {
         const result = toMcpToolResult(
-            new ResourceContent({ resource: { uri: 'file:///a.txt', text: 'hello' } })
+            new McpResourceContent({ resource: { uri: 'file:///a.txt', text: 'hello' } })
         );
         const content = JSON.parse(result?.content || '{}') as { resource: Record<string, unknown> };
         expect(content.resource).to.deep.equal({ uri: 'file:///a.txt', text: 'hello' });
@@ -234,7 +234,7 @@ describe('toMcpToolResult', () => {
 
         const mixed = toMcpToolResult(
             new McpToolResponse({
-                content: [new TextContent('preview'), new VideoContent('YmFzZTY0', 'video/mp4')],
+                content: [new McpTextContent('preview'), new VideoContent('YmFzZTY0', 'video/mp4')],
                 structuredContent: { scenes: 3 },
             })
         );

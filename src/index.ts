@@ -14,13 +14,13 @@ export { HttpResponse } from './http/HttpResponse';
 export * as input from './input';
 export { InvocationContext } from './InvocationContext';
 export {
-    AudioContent,
-    ImageContent,
+    McpAudioContent,
     McpContentBlock,
+    McpImageContent,
+    McpResourceContent,
+    McpResourceLinkContent,
+    McpTextContent,
     McpToolResponse,
-    ResourceContent,
-    ResourceLinkContent,
-    TextContent,
 } from './mcp/McpToolResponse';
 export * as output from './output';
 export * as trigger from './trigger';

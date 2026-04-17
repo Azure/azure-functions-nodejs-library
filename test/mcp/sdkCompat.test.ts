@@ -5,7 +5,7 @@ import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { toMcpToolResult } from '../../src/converters/toMcpToolResult';
-import { McpToolResponse, TextContent } from '../../src/mcp/McpToolResponse';
+import { McpToolResponse, McpTextContent } from '../../src/mcp/McpToolResponse';
 import { __resetMcpSdkWarning } from '../../src/mcp/sdkCompat';
 
 describe('MCP SDK compat', () => {
@@ -48,9 +48,9 @@ describe('MCP SDK compat', () => {
         });
 
         it('does not warn when proper classes are used', () => {
-            toMcpToolResult(new TextContent('x'));
-            toMcpToolResult(new McpToolResponse({ content: [new TextContent('x')] }));
-            toMcpToolResult([new TextContent('a'), new TextContent('b')]);
+            toMcpToolResult(new McpTextContent('x'));
+            toMcpToolResult(new McpToolResponse({ content: [new McpTextContent('x')] }));
+            toMcpToolResult([new McpTextContent('a'), new McpTextContent('b')]);
             expect(warnStub.notCalled).to.equal(true);
         });
 

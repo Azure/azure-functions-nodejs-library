@@ -45,7 +45,7 @@ export function warnIfLooksLikeMcpSdkValue(value: unknown): void {
     console.warn(
         '[@azure/functions] Tool handler return value looks like an @modelcontextprotocol/sdk response. ' +
             'Raw SDK shapes are not auto-converted and will be serialized as plain text. ' +
-            'Wrap the return value with `McpToolResponse`/`TextContent`/`ImageContent`/etc. ' +
+            'Wrap the return value with `McpToolResponse`/`McpTextContent`/`McpImageContent`/etc. ' +
             'from `@azure/functions`. ' +
             'To support a custom content block type, subclass `McpContentBlock` \u2014 ' +
             'see the `McpContentBlock` JSDoc for a full example.'

@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 import type {
-    AudioContentInit as IAudioContentInit,
-    ImageContentInit as IImageContentInit,
+    McpAudioContentInit as IAudioContentInit,
+    McpImageContentInit as IImageContentInit,
+    McpResourceContentInit as IResourceContentInit,
+    McpResourceLinkContentInit as IResourceLinkContentInit,
     McpToolResponseInit as IMcpToolResponseInit,
-    ResourceContentInit as IResourceContentInit,
-    ResourceLinkContentInit as IResourceLinkContentInit,
 } from '@azure/functions';
 
 type BinaryData = string | Buffer | ArrayBuffer;
@@ -33,7 +33,7 @@ function normalizeBinaryData(data: BinaryData): string {
  * ## Extending with custom content block types
  *
  * The library ships built-in subclasses for the MCP spec's current content block types
- * (`TextContent`, `ImageContent`, `AudioContent`, `ResourceLinkContent`, `ResourceContent`).
+ * (`McpTextContent`, `McpImageContent`, `McpAudioContent`, `McpResourceLinkContent`, `McpResourceContent`).
  * If the spec adds a new block type — or your scenario needs a custom one — you can ship
  * your own subclass without any library change. The converter only checks
  * `instanceof McpContentBlock` and calls `JSON.stringify(block)`, which invokes your
@@ -92,7 +92,7 @@ function normalizeBinaryData(data: BinaryData): string {
  * // Mixed with built-ins + structured content
  * handler: async () => new McpToolResponse({
  *     content: [
- *         new TextContent('Detected 3 scenes'),
+ *         new McpTextContent('Detected 3 scenes'),
  *         new VideoContent({ data: buf, mimeType: 'video/mp4' }),
  *     ],
  *     structuredContent: { scenes: 3, confidence: 0.92 },
@@ -124,7 +124,7 @@ export abstract class McpContentBlock {
     abstract toJSON(): Record<string, unknown>;
 }
 
-export class TextContent extends McpContentBlock {
+export class McpTextContent extends McpContentBlock {
     readonly type = 'text' as const;
     readonly text: string;
 
@@ -138,7 +138,7 @@ export class TextContent extends McpContentBlock {
     }
 }
 
-export class ImageContent extends McpContentBlock {
+export class McpImageContent extends McpContentBlock {
     readonly type = 'image' as const;
     readonly data: BinaryData;
     readonly mimeType?: string;
@@ -161,7 +161,7 @@ export class ImageContent extends McpContentBlock {
     }
 }
 
-export class AudioContent extends McpContentBlock {
+export class McpAudioContent extends McpContentBlock {
     readonly type = 'audio' as const;
     readonly data: BinaryData;
     readonly mimeType?: string;
@@ -184,7 +184,7 @@ export class AudioContent extends McpContentBlock {
     }
 }
 
-export class ResourceLinkContent extends McpContentBlock {
+export class McpResourceLinkContent extends McpContentBlock {
     readonly type = 'resource_link' as const;
     readonly uri: string;
     readonly name?: string;
@@ -208,7 +208,7 @@ export class ResourceLinkContent extends McpContentBlock {
     }
 }
 
-export class ResourceContent extends McpContentBlock {
+export class McpResourceContent extends McpContentBlock {
     readonly type = 'resource' as const;
     readonly resource: IResourceContentInit['resource'];
 

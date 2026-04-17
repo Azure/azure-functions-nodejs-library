@@ -4,7 +4,7 @@
 import 'mocha';
 import { RpcLogCategory, RpcLogLevel } from '@azure/functions-core';
 import { expect } from 'chai';
-import { ImageContent, InvocationContext, McpContent } from '../src';
+import { McpImageContent, InvocationContext, McpContent } from '../src';
 import { InvocationModel } from '../src/InvocationModel';
 
 function testLog(_level: RpcLogLevel, _category: RpcLogCategory, message: string) {
@@ -141,7 +141,7 @@ describe('InvocationModel', () => {
             const context = new InvocationContext();
             const response = await model.getResponse(
                 context,
-                new ImageContent({ data: 'YmFzZTY0', mimeType: 'image/png' })
+                new McpImageContent({ data: 'YmFzZTY0', mimeType: 'image/png' })
             );
 
             expect(response.invocationId).to.equal('mcpInvocId');
