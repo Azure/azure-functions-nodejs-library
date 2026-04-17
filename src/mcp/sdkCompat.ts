@@ -43,12 +43,12 @@ export function warnIfLooksLikeMcpSdkValue(value: unknown): void {
     warned = true;
     // eslint-disable-next-line no-console
     console.warn(
-        '[@azure/functions] Tool handler return value looks like an @modelcontextprotocol/sdk response. ' +
-            'Raw SDK shapes are not auto-converted and will be serialized as plain text. ' +
-            'Wrap the return value with `McpToolResponse`/`McpTextContent`/`McpImageContent`/etc. ' +
-            'from `@azure/functions`. ' +
-            'To support a custom content block type, subclass `McpContentBlock` \u2014 ' +
-            'see the `McpContentBlock` JSDoc for a full example.'
+        '[@azure/functions] Tool handler return value appears to use types from ' +
+            '`@modelcontextprotocol/sdk` (e.g. `CallToolResult`, `TextContent`, `ImageContent`). ' +
+            'These types are not supported directly and will be serialized as plain text. ' +
+            'Use the equivalent classes from `@azure/functions` instead — ' +
+            '`McpToolResponse`, `McpTextContent`, `McpImageContent`, etc. ' +
+            'See the `McpContentBlock` JSDoc for custom content block examples.'
     );
 }
 
