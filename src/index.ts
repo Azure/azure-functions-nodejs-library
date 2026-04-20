@@ -13,9 +13,19 @@ export { HttpRequest } from './http/HttpRequest';
 export { HttpResponse } from './http/HttpResponse';
 export * as input from './input';
 export { InvocationContext } from './InvocationContext';
+export {
+    McpAudioContent,
+    McpContentBlock,
+    McpImageContent,
+    McpResourceContent,
+    McpResourceLinkContent,
+    McpTextContent,
+    McpToolResponse,
+} from './mcp/McpToolResponse';
 export * as output from './output';
 export * as trigger from './trigger';
 export { Disposable } from './utils/Disposable';
+export { McpContent } from './utils/mcpContentMarker';
 export { arg } from './utils/toolProperties';
 
 export enum SqlChangeOperation {
