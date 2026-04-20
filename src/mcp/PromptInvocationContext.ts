@@ -44,7 +44,7 @@ export class PromptInvocationContext {
             this.arguments = {};
         }
 
-        // Accept both `sessionId` and Python-style `sessionid` from the host payload.
+        // Accept both `sessionId` and `sessionid` casings from the host payload.
         const sid = obj.sessionId ?? obj.sessionid;
         this.sessionId = typeof sid === 'string' ? sid : undefined;
 

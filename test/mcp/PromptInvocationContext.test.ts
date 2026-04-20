@@ -9,12 +9,12 @@ describe('PromptInvocationContext', () => {
     it('parses a full payload object', () => {
         const ctx = new PromptInvocationContext({
             name: 'code_review',
-            arguments: { code: 'print("hello")', language: 'python' },
+            arguments: { code: 'console.log("hello")', language: 'typescript' },
             sessionId: 'session-123',
             transport: { name: 'http' },
         });
         expect(ctx.name).to.equal('code_review');
-        expect(ctx.arguments).to.deep.equal({ code: 'print("hello")', language: 'python' });
+        expect(ctx.arguments).to.deep.equal({ code: 'console.log("hello")', language: 'typescript' });
         expect(ctx.sessionId).to.equal('session-123');
         expect(ctx.transport).to.deep.equal({ name: 'http' });
     });
@@ -25,7 +25,7 @@ describe('PromptInvocationContext', () => {
         expect(ctx.transport).to.equal(undefined);
     });
 
-    it('accepts Python-style "sessionid" key', () => {
+    it('accepts lowercase "sessionid" key', () => {
         const ctx = new PromptInvocationContext({ name: 'p', sessionid: 'abc' });
         expect(ctx.sessionId).to.equal('abc');
     });
