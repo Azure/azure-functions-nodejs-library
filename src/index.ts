@@ -22,6 +22,7 @@ export {
     McpTextContent,
     McpToolResponse,
 } from './mcp/McpToolResponse';
+export { PromptInvocationContext } from './mcp/PromptInvocationContext';
 export * as output from './output';
 export * as trigger from './trigger';
 export { Disposable } from './utils/Disposable';

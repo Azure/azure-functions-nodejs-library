@@ -16,3 +16,7 @@ export function isTimerTrigger(typeName: string | undefined | null): boolean {
 export function isMcpToolTrigger(typeName: string | undefined | null): boolean {
     return typeName?.toLowerCase() === 'mcptooltrigger';
 }
+
+export function isMcpPromptTrigger(typeName: string | undefined | null): boolean {
+    return typeName?.toLowerCase() === 'mcpprompttrigger';
+}

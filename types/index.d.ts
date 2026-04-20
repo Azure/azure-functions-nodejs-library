@@ -18,6 +18,7 @@ export * from './http';
 export * as input from './input';
 export * from './InvocationContext';
 export { hasMcpContentMarker, McpContent, shouldCreateStructuredContentMarker } from './mcpContentMarker';
+export * from './mcpPrompt';
 export * from './mcpResource';
 export * from './mcpTool';
 export * from './mySql';

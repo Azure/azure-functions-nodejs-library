@@ -6,6 +6,7 @@ import { EventGridEvent, EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
 import { GenericFunctionOptions } from './generic';
 import { HttpFunctionOptions, HttpHandler, HttpMethodFunctionOptions } from './http';
+import { McpPromptFunctionOptions } from './mcpPrompt';
 import { McpResourceFunctionOptions } from './mcpResource';
 import { McpToolFunctionOptions } from './mcpTool';
 import { MySqlFunctionOptions } from './mySql';
@@ -211,5 +212,12 @@ export function mcpTool<T = unknown>(name: string, options: McpToolFunctionOptio
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function mcpResource<T = unknown>(name: string, options: McpResourceFunctionOptions<T>): void;
+
+/**
+ * Registers an MCP Prompt function in your app that will be triggered when an MCP client requests the prompt.
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the prompt, its arguments, and the handler for this function
+ */
+export function mcpPrompt<T = unknown>(name: string, options: McpPromptFunctionOptions<T>): void;
 
 export * as hook from './hooks/registerHook';
