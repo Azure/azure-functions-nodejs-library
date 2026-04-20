@@ -1,4 +1,7 @@
-import { app, HttpRequest, HttpResponseInit, output, InvocationContext } from '@azure/functions';
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the MIT License.
+
+import { app, HttpRequest, HttpResponseInit, InvocationContext, output } from '@azure/functions';
 
 const cosmosOutput = output.cosmosDBMongo({
     connectionStringSetting: 'CosmosDBMongo',

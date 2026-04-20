@@ -13,7 +13,9 @@ export type CosmosDBMongoHandler<T = unknown> = (documents: T, context: Invocati
 /**
  * Options for registering a CosmosDB Mongo-triggered function via `app.cosmosDBMongo()`.
  */
-export interface CosmosDBMongoFunctionOptions<T = unknown> extends CosmosDBMongoTriggerOptions, Partial<FunctionOptions> {
+export interface CosmosDBMongoFunctionOptions<T = unknown>
+    extends CosmosDBMongoTriggerOptions,
+        Partial<FunctionOptions> {
     handler: CosmosDBMongoHandler<T>;
 
     trigger?: CosmosDBMongoTrigger;

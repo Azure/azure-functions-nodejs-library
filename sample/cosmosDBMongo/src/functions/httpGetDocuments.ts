@@ -1,3 +1,6 @@
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the MIT License.
+
 import { app, HttpRequest, HttpResponseInit, input, InvocationContext } from '@azure/functions';
 
 const cosmosInput = input.cosmosDBMongo({
@@ -10,7 +13,7 @@ app.http('httpGetDocuments', {
     methods: ['GET'],
     authLevel: 'anonymous',
     extraInputs: [cosmosInput],
-    handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
+    handler: (request: HttpRequest, context: InvocationContext): HttpResponseInit => {
         const documents = context.extraInputs.get(cosmosInput);
         context.log('Read documents from CosmosDB Mongo:', JSON.stringify(documents));
 

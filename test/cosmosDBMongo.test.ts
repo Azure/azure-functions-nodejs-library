@@ -71,6 +71,7 @@ describe('cosmosDBMongo bindings', () => {
             const bindingValues = Object.values(result.bindings) as Record<string, unknown>[];
             const trig = bindingValues.find((b) => b['type'] === 'cosmosDBMongoTrigger');
             expect(trig).to.exist;
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             expect(trig!['direction']).to.equal('in');
         });
     });
