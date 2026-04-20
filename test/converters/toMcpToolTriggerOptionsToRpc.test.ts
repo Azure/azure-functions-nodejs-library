@@ -672,4 +672,44 @@ describe('converToMcpToolTriggerOptionsToRpc', () => {
             expect(result.metadata).to.equal('{"nested": {"key": "value"}, "array": [1, 2, 3], "boolean": true}');
         });
     });
+
+    describe('result schema contract', () => {
+        it('always sets useResultSchema to true', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'schema-enabled-tool',
+                description: 'Always enables useResultSchema',
+                toolProperties: [],
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+            expect(result.useResultSchema).to.equal(true);
+        });
+
+        it('passes through valid resultSchema JSON', () => {
+            const resultSchema = '{"type":"object","properties":{"id":{"type":"string"}}}';
+            const input: McpToolTriggerOptions = {
+                toolName: 'schema-tool',
+                description: 'Schema passthrough',
+                toolProperties: [],
+                resultSchema,
+            };
+
+            const result = converToMcpToolTriggerOptionsToRpc(input);
+            expect(result.useResultSchema).to.equal(true);
+            expect(result.resultSchema).to.equal(resultSchema);
+        });
+
+        it('throws for invalid resultSchema JSON', () => {
+            const input: McpToolTriggerOptions = {
+                toolName: 'invalid-schema-tool',
+                description: 'Schema validation',
+                toolProperties: [],
+                resultSchema: '{invalid json}',
+            };
+
+            expect(() => converToMcpToolTriggerOptionsToRpc(input)).to.throw(
+                'MCP Tool trigger "resultSchema" must be a valid JSON string.'
+            );
+        });
+    });
 });
