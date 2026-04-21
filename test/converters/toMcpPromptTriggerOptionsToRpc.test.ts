@@ -4,20 +4,21 @@
 import 'mocha';
 import { expect } from 'chai';
 import { convertToMcpPromptTriggerOptionsToRpc } from '../../src/converters/toMcpPromptTriggerOptionsToRpc';
+import { promptArg } from '../../src/mcp/McpPromptArgumentBuilder';
 import { McpPromptTriggerOptions } from '../../types/mcpPrompt';
 
 describe('convertToMcpPromptTriggerOptionsToRpc', () => {
     describe('required properties validation', () => {
         it('throws when promptName is missing', () => {
-            expect(() =>
-                convertToMcpPromptTriggerOptionsToRpc({} as McpPromptTriggerOptions)
-            ).to.throw('MCP Prompt trigger requires a valid "promptName" property.');
+            expect(() => convertToMcpPromptTriggerOptionsToRpc({} as McpPromptTriggerOptions)).to.throw(
+                'MCP Prompt trigger requires a valid "promptName" property.'
+            );
         });
 
         it('throws when promptName is empty', () => {
-            expect(() =>
-                convertToMcpPromptTriggerOptionsToRpc({ promptName: '   ' })
-            ).to.throw('MCP Prompt trigger requires a valid "promptName" property.');
+            expect(() => convertToMcpPromptTriggerOptionsToRpc({ promptName: '   ' })).to.throw(
+                'MCP Prompt trigger requires a valid "promptName" property.'
+            );
         });
     });
 
@@ -67,6 +68,45 @@ describe('convertToMcpPromptTriggerOptionsToRpc', () => {
                 })
             ).to.throw('MCP Prompt trigger "promptArguments" entries require a non-empty "name".');
         });
+
+        it('accepts the fluent record form built with promptArg.describe(...)', () => {
+            const result = convertToMcpPromptTriggerOptionsToRpc({
+                promptName: 'generate_docs',
+                promptArguments: {
+                    function_name: promptArg.describe('The function to document.').isRequired(),
+                    style: promptArg.describe("Documentation style (e.g., 'concise', 'verbose')."),
+                },
+            });
+            const parsed = JSON.parse(result.promptArguments!);
+            expect(parsed).to.deep.equal([
+                { name: 'function_name', description: 'The function to document.', required: true },
+                {
+                    name: 'style',
+                    description: "Documentation style (e.g., 'concise', 'verbose').",
+                    required: false,
+                },
+            ]);
+        });
+
+        it('emits "[]" for an empty record form', () => {
+            const result = convertToMcpPromptTriggerOptionsToRpc({
+                promptName: 'p',
+                promptArguments: {},
+            });
+            expect(result.promptArguments).to.equal('[]');
+        });
+
+        it('throws when a record value is not built with promptArg.describe(...)', () => {
+            expect(() =>
+                convertToMcpPromptTriggerOptionsToRpc({
+                    promptName: 'p',
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    promptArguments: { foo: { description: 'x' } as any },
+                })
+            ).to.throw(
+                'MCP Prompt trigger "promptArguments" record values must be created with `promptArg.describe(...)`.'
+            );
+        });
     });
 
     describe('optional fields', () => {
@@ -81,9 +121,9 @@ describe('convertToMcpPromptTriggerOptionsToRpc', () => {
         });
 
         it('validates metadata is a JSON string', () => {
-            expect(() =>
-                convertToMcpPromptTriggerOptionsToRpc({ promptName: 'p', metadata: '{ not json' })
-            ).to.throw('MCP Prompt trigger "metadata" must be a valid JSON string.');
+            expect(() => 'MCP Prompt trigger "metadata" must be a valid JSON string.').to.throw(
+                
+            
         });
 
         it('accepts valid metadata JSON', () => {
@@ -95,9 +135,9 @@ describe('convertToMcpPromptTriggerOptionsToRpc', () => {
         });
 
         it('validates icons is a JSON string', () => {
-            expect(() =>
-                convertToMcpPromptTriggerOptionsToRpc({ promptName: 'p', icons: 'not json' })
-            ).to.throw('MCP Prompt trigger "icons" must be a valid JSON string.');
+            expect(() => convertToMcpPromptTriggerOptionsToRpc({ promptName: 'p', icons: 'not json' })).to.throw(
+                'MCP Prompt trigger "icons" must be a valid JSON string.'
+            );
         });
 
         it('accepts valid icons JSON', () => {
@@ -105,6 +145,7 @@ describe('convertToMcpPromptTriggerOptionsToRpc', () => {
             const result = convertToMcpPromptTriggerOptionsToRpc({ promptName: 'p', icons });
             expect(result.icons).to.equal(icons);
         });
+
         it('omits empty/whitespace-only metadata and icons', () => {
             const result = convertToMcpPromptTriggerOptionsToRpc({
                 promptName: 'p',

@@ -1,7 +1,13 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { McpPromptArgument, McpPromptTriggerOptions, McpPromptTriggerOptionsToRpc } from '../../types/mcpPrompt';
+import {
+    McpPromptArgument,
+    McpPromptArguments,
+    McpPromptTriggerOptions,
+    McpPromptTriggerOptionsToRpc,
+} from '../../types/mcpPrompt';
+import { McpPromptArgumentBuilder } from '../mcp/McpPromptArgumentBuilder';
 
 /**
  * Converts an {@link McpPromptTriggerOptions} object to the wire-format
@@ -52,19 +58,34 @@ export function convertToMcpPromptTriggerOptionsToRpc(options: McpPromptTriggerO
     return result;
 }
 
-function serializePromptArguments(args: McpPromptArgument[] | undefined): string {
-    if (!args || args.length === 0) {
+function serializePromptArguments(args: McpPromptArguments | undefined): string {
+    if (!args) {
         return '[]';
     }
 
-    const normalized = args.map((arg) => {
-        if (!arg.name || typeof arg.name !== 'string' || arg.name.trim() === '') {
+    const list: McpPromptArgument[] = Array.isArray(args)
+        ? args
+        : Object.entries(args).map(([name, builder]) => {
+              if (!(builder instanceof McpPromptArgumentBuilder)) {
+                  throw new Error(
+                      'MCP Prompt trigger "promptArguments" record values must be created with `promptArg.describe(...)`.'
+                  );
+              }
+              return builder.toPromptArgument(name);
+          });
+
+    if (list.length === 0) {
+        return '[]';
+    }
+
+    const normalized = list.map((a) => {
+        if (!a.name || typeof a.name !== 'string' || a.name.trim() === '') {
             throw new Error('MCP Prompt trigger "promptArguments" entries require a non-empty "name".');
         }
         return {
-            name: arg.name,
-            description: arg.description ?? null,
-            required: arg.required === true,
+            name: a.name,
+            description: a.description ?? null,
+            required: a.required === true,
         };
     });
 

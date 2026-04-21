@@ -55,6 +55,47 @@ export interface McpPromptArgument {
 }
 
 /**
+ * Fluent builder for declaring MCP prompt arguments in a record-shaped
+ * `promptArguments` map. The key of the map supplies the argument name.
+ *
+ * By default arguments are **optional**; call `.isRequired()` to mark them required.
+ *
+ * @example
+ * ```ts
+ * promptArguments: {
+ *     function_name: promptArg.describe('The function to document.').isRequired(),
+ *     style: promptArg.describe("Documentation style (e.g., 'concise', 'verbose')."),
+ * }
+ * ```
+ */
+export declare class McpPromptArgumentBuilder {
+    /** Set the argument's description. */
+    describe(description: string): this;
+
+    /** Mark the argument as required. Default is optional. */
+    isRequired(): this;
+}
+
+/**
+ * Factory for creating MCP **prompt** argument builders.
+ *
+ * Kept separate from the tool-property `arg` helper because prompt arguments
+ * are untyped (only `name`, optional `description`, and a `required` flag).
+ */
+export declare const promptArg: {
+    /** Start building a prompt argument with a description. */
+    describe(description: string): McpPromptArgumentBuilder;
+};
+
+/**
+ * Accepted shapes for declaring prompt arguments.
+ *
+ * - **Array form** (explicit): an array of {@link McpPromptArgument} objects with `name`, optional `description` and `required`.
+ * - **Record/fluent form**: an object whose keys are argument names and values are {@link McpPromptArgumentBuilder} instances built from `promptArg.describe(...)`.
+ */
+export type McpPromptArguments = McpPromptArgument[] | Record<string, McpPromptArgumentBuilder>;
+
+/**
  * Configuration options for an MCP Prompt trigger.
  * These options define the behavior and metadata for the trigger.
  */
@@ -66,8 +107,12 @@ export interface McpPromptTriggerOptions {
 
     /**
      * Optional list of arguments the prompt accepts.
+     *
+     * Supports two shapes:
+     * - An array of {@link McpPromptArgument} objects (explicit `name`/`description`/`required`).
+     * - A record/fluent map built with `promptArg.describe(...)` where keys are argument names.
      */
-    promptArguments?: McpPromptArgument[];
+    promptArguments?: McpPromptArguments;
 
     /**
      * Optional human-readable title for display purposes.
