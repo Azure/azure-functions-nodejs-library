@@ -28,48 +28,41 @@ describe('convertToMcpPromptTriggerOptionsToRpc', () => {
             expect(result.promptArguments).to.equal('[]');
         });
 
-        it('emits "[]" when arguments array is empty', () => {
+        it('emits "[]" for an empty fluent record', () => {
             const result = convertToMcpPromptTriggerOptionsToRpc({
                 promptName: 'p',
-                promptArguments: [],
+                promptArguments: {},
             });
             expect(result.promptArguments).to.equal('[]');
         });
 
-        it('serializes arguments with defaults (description: null, required: false)', () => {
+        it('serializes a single fluent argument with defaults (description set, required: false)', () => {
             const result = convertToMcpPromptTriggerOptionsToRpc({
                 promptName: 'p',
-                promptArguments: [{ name: 'text' }],
+                promptArguments: {
+                    text: promptArg.describe('Input text'),
+                },
             });
-            const parsed = JSON.parse(result.promptArguments!);
-            expect(parsed).to.deep.equal([{ name: 'text', description: null, required: false }]);
+            const parsed = JSON.parse(result.promptArguments ?? '');
+            expect(parsed).to.deep.equal([{ name: 'text', description: 'Input text', required: false }]);
         });
 
-        it('serializes multiple arguments with full metadata', () => {
+        it('serializes multiple fluent arguments with mixed required flags', () => {
             const result = convertToMcpPromptTriggerOptionsToRpc({
                 promptName: 'code_review',
-                promptArguments: [
-                    { name: 'code', description: 'Code to review', required: true },
-                    { name: 'language', description: 'Programming language', required: false },
-                ],
+                promptArguments: {
+                    code: promptArg.describe('Code to review').isRequired(),
+                    language: promptArg.describe('Programming language'),
+                },
             });
-            const parsed = JSON.parse(result.promptArguments!);
+            const parsed = JSON.parse(result.promptArguments ?? '');
             expect(parsed).to.deep.equal([
                 { name: 'code', description: 'Code to review', required: true },
                 { name: 'language', description: 'Programming language', required: false },
             ]);
         });
 
-        it('throws when an argument has no name', () => {
-            expect(() =>
-                convertToMcpPromptTriggerOptionsToRpc({
-                    promptName: 'p',
-                    promptArguments: [{ name: '' }],
-                })
-            ).to.throw('MCP Prompt trigger "promptArguments" entries require a non-empty "name".');
-        });
-
-        it('accepts the fluent record form built with promptArg.describe(...)', () => {
+        it('accepts the fluent record form matching the generate_docs sample', () => {
             const result = convertToMcpPromptTriggerOptionsToRpc({
                 promptName: 'generate_docs',
                 promptArguments: {
@@ -77,7 +70,7 @@ describe('convertToMcpPromptTriggerOptionsToRpc', () => {
                     style: promptArg.describe("Documentation style (e.g., 'concise', 'verbose')."),
                 },
             });
-            const parsed = JSON.parse(result.promptArguments!);
+            const parsed = JSON.parse(result.promptArguments ?? '');
             expect(parsed).to.deep.equal([
                 { name: 'function_name', description: 'The function to document.', required: true },
                 {
@@ -86,14 +79,6 @@ describe('convertToMcpPromptTriggerOptionsToRpc', () => {
                     required: false,
                 },
             ]);
-        });
-
-        it('emits "[]" for an empty record form', () => {
-            const result = convertToMcpPromptTriggerOptionsToRpc({
-                promptName: 'p',
-                promptArguments: {},
-            });
-            expect(result.promptArguments).to.equal('[]');
         });
 
         it('throws when a record value is not built with promptArg.describe(...)', () => {
@@ -121,9 +106,9 @@ describe('convertToMcpPromptTriggerOptionsToRpc', () => {
         });
 
         it('validates metadata is a JSON string', () => {
-            expect(() => 'MCP Prompt trigger "metadata" must be a valid JSON string.').to.throw(
-                
-            
+            expect(() => convertToMcpPromptTriggerOptionsToRpc({ promptName: 'p', metadata: '{ not json' })).to.throw(
+                'MCP Prompt trigger "metadata" must be a valid JSON string.'
+            );
         });
 
         it('accepts valid metadata JSON', () => {

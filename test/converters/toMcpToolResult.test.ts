@@ -6,12 +6,12 @@ import { expect } from 'chai';
 import { toMcpToolResult } from '../../src/converters/toMcpToolResult';
 import {
     McpAudioContent,
-    McpImageContent,
     McpContentBlock,
-    McpToolResponse,
+    McpImageContent,
     McpResourceContent,
     McpResourceLinkContent,
     McpTextContent,
+    McpToolResponse,
 } from '../../src/mcp/McpToolResponse';
 import { McpContent } from '../../src/utils/mcpContentMarker';
 
@@ -192,9 +192,7 @@ describe('toMcpToolResult', () => {
     });
 
     it('serializes a McpResourceContent block with only text (omits blob and mimeType)', () => {
-        const result = toMcpToolResult(
-            new McpResourceContent({ resource: { uri: 'file:///a.txt', text: 'hello' } })
-        );
+        const result = toMcpToolResult(new McpResourceContent({ resource: { uri: 'file:///a.txt', text: 'hello' } }));
         const content = JSON.parse(result?.content || '{}') as { resource: Record<string, unknown> };
         expect(content.resource).to.deep.equal({ uri: 'file:///a.txt', text: 'hello' });
         expect(content.resource).to.not.have.property('blob');

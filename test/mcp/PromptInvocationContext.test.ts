@@ -20,9 +20,7 @@ describe('PromptInvocationContext', () => {
     });
 
     it('parses a JSON string payload', () => {
-        const ctx = new PromptInvocationContext(
-            JSON.stringify({ name: 'summarize', arguments: { text: 'hi' } })
-        );
+        const ctx = new PromptInvocationContext(JSON.stringify({ name: 'summarize', arguments: { text: 'hi' } }));
         expect(ctx.name).to.equal('summarize');
         expect(ctx.arguments).to.deep.equal({ text: 'hi' });
         expect(ctx.sessionId).to.equal(undefined);
