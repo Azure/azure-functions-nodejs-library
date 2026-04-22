@@ -7,6 +7,7 @@ import { EventHubTrigger, EventHubTriggerOptions } from './eventHub';
 import { GenericTriggerOptions } from './generic';
 import { HttpTrigger, HttpTriggerOptions } from './http';
 import { FunctionTrigger } from './index';
+import { McpPromptFunctionOptions, McpPromptTrigger } from './mcpPrompt';
 import { McpResourceFunctionOptions, McpResourceTrigger } from './mcpResource';
 import { McpToolFunctionOptions, McpToolTrigger } from './mcpTool';
 import { MySqlTrigger, MySqlTriggerOptions } from './mySql';
@@ -102,6 +103,12 @@ export function mcpTool(options: McpToolFunctionOptions): McpToolTrigger;
  * [Link to docs and examples](//TODO Add link to docs and examples)
  */
 export function mcpResource(options: McpResourceFunctionOptions): McpResourceTrigger;
+
+/**
+ * Creates an MCP Prompt trigger for defining prompts that MCP clients can request.
+ * [Link to docs and examples](//TODO Add link to docs and examples)
+ */
+export function mcpPrompt(options: McpPromptFunctionOptions): McpPromptTrigger;
 
 /**
  * A generic option that can be used for any trigger type

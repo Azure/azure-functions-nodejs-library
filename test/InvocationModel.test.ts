@@ -4,7 +4,7 @@
 import 'mocha';
 import { RpcLogCategory, RpcLogLevel } from '@azure/functions-core';
 import { expect } from 'chai';
-import { McpImageContent, InvocationContext, McpContent } from '../src';
+import { InvocationContext, McpContent, McpImageContent } from '../src';
 import { InvocationModel } from '../src/InvocationModel';
 
 function testLog(_level: RpcLogLevel, _category: RpcLogCategory, message: string) {

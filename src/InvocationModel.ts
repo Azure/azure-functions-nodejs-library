@@ -25,8 +25,9 @@ import { AzFuncSystemError } from './errors';
 import { waitForProxyRequest } from './http/httpProxy';
 import { createStreamRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
+import { PromptInvocationContext } from './mcp/PromptInvocationContext';
 import { enableHttpStream } from './setup';
-import { isHttpTrigger, isMcpToolTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
+import { isHttpTrigger, isMcpPromptTrigger, isMcpToolTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
 import { isDefined, nonNullProp, nonNullValue } from './utils/nonNull';
 
 export class InvocationModel implements coreTypes.InvocationModel {
@@ -86,6 +87,10 @@ export class InvocationModel implements coreTypes.InvocationModel {
 
                 if (isTimerTrigger(bindingType)) {
                     input = toCamelCaseValue(input);
+                }
+
+                if (isMcpPromptTrigger(bindingType)) {
+                    input = new PromptInvocationContext(input);
                 }
 
                 if (isTrigger(bindingType)) {

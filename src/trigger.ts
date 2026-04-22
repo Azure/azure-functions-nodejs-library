@@ -12,6 +12,8 @@ import {
     GenericTriggerOptions,
     HttpTrigger,
     HttpTriggerOptions,
+    McpPromptTrigger,
+    McpPromptTriggerOptions,
     McpResourceTrigger,
     McpResourceTriggerOptions,
     McpToolTrigger,
@@ -36,6 +38,7 @@ import {
     WebPubSubTriggerOptions,
 } from '@azure/functions';
 import { addBindingName } from './addBindingName';
+import { convertToMcpPromptTriggerOptionsToRpc } from './converters/toMcpPromptTriggerOptionsToRpc';
 import { convertToMcpResourceTriggerOptionsToRpc } from './converters/toMcpResourceTriggerOptionsToRpc';
 import { converToMcpToolTriggerOptionsToRpc } from './converters/toMcpToolTriggerOptionsToRpc';
 
@@ -158,6 +161,21 @@ export function mcpResource(options: McpResourceTriggerOptions): McpResourceTrig
     return addTriggerBindingName({
         ...convertToMcpResourceTriggerOptionsToRpc(options),
         type: 'mcpResourceTrigger',
+    });
+}
+
+/**
+ * Creates an MCP Prompt trigger configuration.
+ * This function is used to define an MCP Prompt trigger for an Azure Function.
+ * MCP Prompts are templates that MCP clients can request by name, optionally supplying arguments.
+ *
+ * @param options - The configuration options for the MCP Prompt trigger, including prompt-specific metadata.
+ * @returns An MCP Prompt trigger object with the specified configuration.
+ */
+export function mcpPrompt(options: McpPromptTriggerOptions): McpPromptTrigger {
+    return addTriggerBindingName({
+        ...convertToMcpPromptTriggerOptionsToRpc(options),
+        type: 'mcpPromptTrigger',
     });
 }
 

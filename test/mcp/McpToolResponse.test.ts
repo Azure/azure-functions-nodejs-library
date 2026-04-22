@@ -5,12 +5,12 @@ import 'mocha';
 import { expect } from 'chai';
 import {
     McpAudioContent,
-    McpImageContent,
     McpContentBlock,
-    McpToolResponse,
+    McpImageContent,
     McpResourceContent,
     McpResourceLinkContent,
     McpTextContent,
+    McpToolResponse,
 } from '../../src/mcp/McpToolResponse';
 
 describe('MCP content block classes', () => {
