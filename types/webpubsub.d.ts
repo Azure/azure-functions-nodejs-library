@@ -49,6 +49,13 @@ export interface WebPubSubTriggerOptions {
      * Defaults to "WebPubSubConnectionString" if not specified
      */
     connections?: string[];
+
+    /**
+     * Optional - The name of the app setting that contains the Web PubSub Service connection string.
+     * Defaults to "WebPubSubConnectionString" if not specified.
+     * @deprecated Use `connections` instead.
+     */
+    connection?: string;
 }
 
 export type WebPubSubTrigger = FunctionTrigger & WebPubSubTriggerOptions;
@@ -98,6 +105,13 @@ export interface WebPubSubContextInputOptions {
      * The value is auto resolved with "WebPubSubConnectionString" by default.
      */
     connections?: string[];
+
+    /**
+     * Optional - The name of the app setting that contains the Web PubSub Service connection string.
+     * Defaults to "WebPubSubConnectionString" if not specified.
+     * @deprecated Use `connections` instead.
+     */
+    connection?: string;
 }
 export type WebPubSubContextInput = FunctionInput & WebPubSubContextInputOptions;
 
