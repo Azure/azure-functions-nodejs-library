@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import { ConnectorTrigger, ConnectorTriggerOptions } from './connectorTrigger';
 import { CosmosDBTrigger, CosmosDBTriggerOptions } from './cosmosDB';
 import { EventGridTrigger, EventGridTriggerOptions } from './eventGrid';
 import { EventHubTrigger, EventHubTriggerOptions } from './eventHub';
@@ -109,6 +110,11 @@ export function mcpResource(options: McpResourceFunctionOptions): McpResourceTri
  * [Link to docs and examples](//TODO Add link to docs and examples)
  */
 export function mcpPrompt(options: McpPromptFunctionOptions): McpPromptTrigger;
+
+/**
+ * Creates a connector trigger configuration for Azure Logic Apps connector events.
+ */
+export function connectorTrigger(options: ConnectorTriggerOptions): ConnectorTrigger;
 
 /**
  * A generic option that can be used for any trigger type

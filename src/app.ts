@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import {
+    ConnectorTriggerFunctionOptions,
     CosmosDBFunctionOptions,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
@@ -179,6 +180,10 @@ export function mcpResource(name: string, options: McpResourceFunctionOptions): 
  */
 export function mcpPrompt(name: string, options: McpPromptFunctionOptions): void {
     generic(name, convertToGenericOptions(options, trigger.mcpPrompt));
+}
+
+export function connectorTrigger(name: string, options: ConnectorTriggerFunctionOptions): void {
+    generic(name, convertToGenericOptions(options, trigger.connectorTrigger));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {
