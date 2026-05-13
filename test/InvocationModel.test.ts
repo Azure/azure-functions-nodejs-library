@@ -4,14 +4,136 @@
 import 'mocha';
 import { RpcLogCategory, RpcLogLevel } from '@azure/functions-core';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
+import { Readable } from 'stream';
 import { InvocationContext, McpContent, McpImageContent } from '../src';
 import { InvocationModel } from '../src/InvocationModel';
+import * as httpProxy from '../src/http/httpProxy';
+import { setup } from '../src/setup';
 
 function testLog(_level: RpcLogLevel, _category: RpcLogCategory, message: string) {
     console.log(message);
 }
 
 describe('InvocationModel', () => {
+    describe('getArguments', () => {
+        afterEach(() => {
+            setup({ enableHttpStream: false });
+            sinon.restore();
+        });
+
+        it('builds a stream-backed HttpRequest from forwarded headers and keeps the gRPC response shape', async () => {
+            setup({ enableHttpStream: true });
+
+            const proxyReq = Object.assign(Readable.from([JSON.stringify({ hello: 'world' })]), {
+                headers: {
+                    'x-forwarded-host': 'internal.example.com',
+                    'x-forwarded-proto': 'https',
+                },
+                method: 'POST',
+                url: '/api/categories/fiction/products/abc?source=request',
+            });
+            const waitForProxyRequestStub = sinon
+                .stub(httpProxy, 'waitForProxyRequest')
+                .resolves(proxyReq as never);
+            const sendProxyResponseStub = sinon.stub(httpProxy, 'sendProxyResponse').resolves();
+
+            const model = new InvocationModel({
+                invocationId: 'streamInvocId',
+                metadata: {
+                    name: 'streamFunc',
+                    bindings: {
+                        httpTrigger1: {
+                            type: 'httpTrigger',
+                            direction: 'in',
+                        },
+                        $return: {
+                            type: 'http',
+                            direction: 'out',
+                        },
+                    },
+                },
+                request: {
+                    inputData: [
+                        {
+                            name: 'httpTrigger1',
+                        },
+                    ],
+                    triggerMetadata: {
+                        Headers: {
+                            json: JSON.stringify({
+                                'content-type': 'application/json',
+                                'x-original-header': 'from-trigger-metadata',
+                            }),
+                        },
+                        Query: {
+                            json: JSON.stringify({
+                                source: 'trigger-metadata',
+                            }),
+                        },
+                        category: {
+                            string: 'fiction',
+                        },
+                        productId: {
+                            string: 'abc',
+                        },
+                    },
+                },
+                log: testLog,
+            });
+
+            const { context, inputs } = await model.getArguments();
+            const invocationContext = context as InvocationContext;
+            sinon.assert.calledOnceWithExactly(waitForProxyRequestStub, 'streamInvocId');
+
+            expect(inputs).to.have.length(1);
+            const req = inputs[0] as {
+                url: string;
+                params: Record<string, string>;
+                headers: Headers;
+                query: URLSearchParams;
+                json(): Promise<unknown>;
+            };
+            expect(req.url).to.equal('https://internal.example.com/api/categories/fiction/products/abc?source=request');
+            expect(req.params).to.deep.equal({
+                category: 'fiction',
+                productId: 'abc',
+            });
+            expect(req.headers.get('content-type')).to.equal('application/json');
+            expect(req.headers.get('x-original-header')).to.equal('from-trigger-metadata');
+            expect(req.query.get('source')).to.equal('request');
+            expect(await req.json()).to.deep.equal({ hello: 'world' });
+
+            expect(invocationContext.invocationId).to.equal('streamInvocId');
+            const response = await model.getResponse(invocationContext, {
+                status: 202,
+                headers: {
+                    'x-streaming-enabled': 'true',
+                },
+                body: 'accepted',
+            });
+
+            sinon.assert.calledOnce(sendProxyResponseStub);
+            const [proxyInvocationId, proxyResponse] = sendProxyResponseStub.firstCall.args as [
+                string,
+                {
+                    status: number;
+                    headers: Headers;
+                    text(): Promise<string>;
+                },
+            ];
+            expect(proxyInvocationId).to.equal('streamInvocId');
+            expect(proxyResponse.status).to.equal(202);
+            expect(proxyResponse.headers.get('x-streaming-enabled')).to.equal('true');
+            expect(await proxyResponse.text()).to.equal('accepted');
+            expect(response).to.deep.equal({
+                invocationId: 'streamInvocId',
+                outputData: [],
+                returnValue: undefined,
+            });
+        });
+    });
+
     describe('getResponse', () => {
         it('Hello world http', async () => {
             const model = new InvocationModel({
