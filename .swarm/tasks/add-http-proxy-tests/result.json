@@ -1,0 +1,17 @@
+{
+  "taskId": "add-http-proxy-tests",
+  "status": "Succeeded",
+  "summary": "Added direct httpProxy coverage for loopback reachability, request/response correlation, malformed invocation-id rejection, and port-0 fallback; linted the new test and ran the targeted proxy tests.",
+  "filesTouched": [
+    "test/http/httpProxy.test.ts"
+  ],
+  "testsRun": {
+    "executed": true,
+    "passed": 4,
+    "failed": 0,
+    "command": "mocha_grep=httpProxy npm test"
+  },
+  "failureExcerpt": null,
+  "designDeviations": null,
+  "followUps": []
+}
