@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import { ConnectorContentInput, ConnectorContentInputOptions } from './connectorTrigger';
 import { CosmosDBInput, CosmosDBInputOptions } from './cosmosDB';
 import { GenericInputOptions } from './generic';
 import { FunctionInput } from './index';
@@ -49,6 +50,12 @@ export function webPubSubConnection(options: WebPubSubConnectionInputOptions): W
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-web-pubsub-input?pivots=programming-language-javascript)
  */
 export function webPubSubContext(options: WebPubSubContextInputOptions): WebPubSubContextInput;
+
+/**
+ * Creates a connector content input binding for reading data from an Azure Logic Apps connector.
+ * @param options Configuration options including the connector name, connection setting, and optional operation
+ */
+export function connectorContent(options: ConnectorContentInputOptions): ConnectorContentInput;
 
 /**
  * A generic option that can be used for any input type

@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import { ConnectorTriggerFunctionOptions } from './connectorTrigger';
 import { CosmosDBFunctionOptions } from './cosmosDB';
 import { EventGridEvent, EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
@@ -157,6 +158,13 @@ export function eventGrid<T = EventGridEvent>(name: string, options: EventGridFu
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function cosmosDB<T = unknown>(name: string, options: CosmosDBFunctionOptions<T>): void;
+
+/**
+ * Registers a connector trigger function in your app that will be triggered by Azure Logic Apps connector events.
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the connector, connection, trigger operation, and handler for this function
+ */
+export function connectorTrigger<T = unknown>(name: string, options: ConnectorTriggerFunctionOptions<T>): void;
 
 /**
  * Registers a function in your app that will be triggered when an instance is added to scale a running function app.
