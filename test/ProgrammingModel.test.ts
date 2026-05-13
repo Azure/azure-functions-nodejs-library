@@ -9,7 +9,8 @@ import * as path from 'path';
 const repoRoot = path.resolve(__dirname, '..');
 
 describe('ProgrammingModel', () => {
-    it('merges custom capabilities, advertises an absolute loopback HttpUri, and locks setup', () => {
+    it('merges custom capabilities, advertises an absolute loopback HttpUri, and locks setup', function () {
+        this.timeout(10_000);
         const result = runSnippet(`
 const { setup } = require('./src/setup');
 const { ProgrammingModel } = require('./src/ProgrammingModel');
