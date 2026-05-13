@@ -1,0 +1,19 @@
+{
+  "taskId": "harden-http-proxy-loopback",
+  "status": "Succeeded",
+  "summary": "Bound the HTTP streaming proxy to a concrete loopback address, reused it for port-0 fallback rebinding, and reject malformed proxy requests with 400 responses; validated with npm test, npm run build, and an inline proxy smoke script.",
+  "filesTouched": [
+    "src/http/httpProxy.ts"
+  ],
+  "testsRun": {
+    "executed": true,
+    "passed": 357,
+    "failed": 0,
+    "command": "npm test"
+  },
+  "failureExcerpt": null,
+  "designDeviations": null,
+  "followUps": [
+    "Dependent tasks can add direct httpProxy and capability tests for the new loopback-selection and malformed-header paths."
+  ]
+}
