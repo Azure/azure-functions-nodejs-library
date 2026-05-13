@@ -1,0 +1,7 @@
+{
+  "roundNumber": 1,
+  "taskIds": [
+    "harden-http-proxy-loopback",
+    "add-http-proxy-hardening-tests"
+  ]
+}
