@@ -128,6 +128,10 @@ export function eventGrid(name: string, options: EventGridFunctionOptions): void
     generic(name, convertToGenericOptions(options, trigger.eventGrid));
 }
 
+export function connectorTrigger<T = unknown>(name: string, options: ConnectorTriggerFunctionOptions<T>): void {
+    generic(name, convertToGenericOptions(options, trigger.connectorTrigger));
+}
+
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     generic(name, convertToGenericOptions(options, <any>trigger.cosmosDB));
@@ -180,10 +184,6 @@ export function mcpResource(name: string, options: McpResourceFunctionOptions): 
  */
 export function mcpPrompt(name: string, options: McpPromptFunctionOptions): void {
     generic(name, convertToGenericOptions(options, trigger.mcpPrompt));
-}
-
-export function connectorTrigger(name: string, options: ConnectorTriggerFunctionOptions): void {
-    generic(name, convertToGenericOptions(options, trigger.connectorTrigger));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {

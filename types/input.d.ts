@@ -53,6 +53,7 @@ export function webPubSubContext(options: WebPubSubContextInputOptions): WebPubS
 
 /**
  * Creates a connector content input binding for reading data from an Azure Logic Apps connector.
+ * @param options Configuration options including the connector name, connection setting, and optional operation
  */
 export function connectorContent(options: ConnectorContentInputOptions): ConnectorContentInput;
 

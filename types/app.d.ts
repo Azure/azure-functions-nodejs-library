@@ -160,6 +160,13 @@ export function eventGrid<T = EventGridEvent>(name: string, options: EventGridFu
 export function cosmosDB<T = unknown>(name: string, options: CosmosDBFunctionOptions<T>): void;
 
 /**
+ * Registers a connector trigger function in your app that will be triggered by Azure Logic Apps connector events.
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the connector, connection, trigger operation, and handler for this function
+ */
+export function connectorTrigger<T = unknown>(name: string, options: ConnectorTriggerFunctionOptions<T>): void;
+
+/**
  * Registers a function in your app that will be triggered when an instance is added to scale a running function app.
  * The warmup trigger is only called during scale-out operations, not during restarts or other non-scale startups.
  * Make sure your logic can load all required dependencies without relying on the warmup trigger.
@@ -184,13 +191,6 @@ export function sql<T = unknown>(name: string, options: SqlFunctionOptions<T>): 
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function mySql<T = unknown>(name: string, options: MySqlFunctionOptions<T>): void;
-
-/**
- * Registers a connector trigger function in your app that will be triggered by Azure Logic Apps connector events.
- * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
- * @param options Configuration options describing the connector, connection, trigger operation, and handler for this function
- */
-export function connectorTrigger(name: string, options: ConnectorTriggerFunctionOptions): void;
 
 /**
  * Registers a generic function in your app that will be triggered based on the type specified in `options.trigger.type`

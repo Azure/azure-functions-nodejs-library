@@ -82,6 +82,7 @@ export function webPubSub(options: WebPubSubOutputOptions): WebPubSubOutput;
 
 /**
  * Creates a connector content output binding for writing data to an Azure Logic Apps connector.
+ * @param options Configuration options including the connector name, connection setting, and optional operation
  */
 export function connectorContent(options: ConnectorContentOutputOptions): ConnectorContentOutput;
 

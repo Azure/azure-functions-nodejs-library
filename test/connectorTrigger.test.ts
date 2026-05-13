@@ -3,13 +3,12 @@
 
 import 'mocha';
 import { expect } from 'chai';
-import { input, output, trigger } from '../src';
+import { app, input, output, trigger } from '../src';
 import { toCoreFunctionMetadata } from '../src/converters/toCoreFunctionMetadata';
 import { InvocationContext } from '../types';
 
 describe('connectorTrigger', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handler = (triggerInput: unknown, context: InvocationContext) => {};
+    const _handler = (_triggerInput: unknown, _context: InvocationContext) => {};
 
     describe('trigger.connectorTrigger', () => {
         it('should create a trigger with correct type and options', () => {
@@ -65,7 +64,7 @@ describe('connectorTrigger', () => {
             });
 
             const result = toCoreFunctionMetadata('onNewEmail', {
-                handler,
+                handler: _handler,
                 trigger: connectorTriggerBinding,
             });
 
@@ -108,7 +107,7 @@ describe('connectorTrigger', () => {
             });
 
             const result = toCoreFunctionMetadata('processEmail', {
-                handler,
+                handler: _handler,
                 trigger: connectorTriggerBinding,
                 extraInputs: [contentInput],
                 extraOutputs: [contentOutput],
@@ -150,6 +149,44 @@ describe('connectorTrigger', () => {
                 },
                 retryOptions: undefined,
             });
+        });
+    });
+
+    describe('app.connectorTrigger', () => {
+        it('should register without throwing', () => {
+            expect(() => {
+                app.connectorTrigger('testConnectorTrigger', {
+                    connection: 'Office365Connection',
+                    connector: 'office365',
+                    triggerOperation: 'OnNewEmail',
+                    handler: _handler,
+                });
+            }).to.not.throw();
+        });
+
+        it('should register with extraInputs and extraOutputs', () => {
+            const contentInput = input.connectorContent({
+                connector: 'office365',
+                connection: 'Office365Connection',
+                operation: 'GetEmail',
+            });
+
+            const contentOutput = output.connectorContent({
+                connector: 'office365',
+                connection: 'Office365Connection',
+                operation: 'SendEmail',
+            });
+
+            expect(() => {
+                app.connectorTrigger('testWithBindings', {
+                    connection: 'Office365Connection',
+                    connector: 'office365',
+                    triggerOperation: 'OnNewEmail',
+                    extraInputs: [contentInput],
+                    extraOutputs: [contentOutput],
+                    handler: _handler,
+                });
+            }).to.not.throw();
         });
     });
 });

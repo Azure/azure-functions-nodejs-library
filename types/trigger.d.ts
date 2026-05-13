@@ -113,6 +113,7 @@ export function mcpPrompt(options: McpPromptFunctionOptions): McpPromptTrigger;
 
 /**
  * Creates a connector trigger configuration for Azure Logic Apps connector events.
+ * @param options Configuration options including the connector name, connection setting, and trigger operation
  */
 export function connectorTrigger(options: ConnectorTriggerOptions): ConnectorTrigger;
 

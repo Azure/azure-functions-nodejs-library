@@ -4,10 +4,12 @@
 import { FunctionInput, FunctionOptions, FunctionOutput, FunctionResult, FunctionTrigger, RetryOptions } from './index';
 import { InvocationContext } from './InvocationContext';
 
-export type ConnectorTriggerHandler = (triggerInput: unknown, context: InvocationContext) => FunctionResult;
+export type ConnectorTriggerHandler<T = unknown> = (triggerInput: T, context: InvocationContext) => FunctionResult;
 
-export interface ConnectorTriggerFunctionOptions extends ConnectorTriggerOptions, Partial<FunctionOptions> {
-    handler: ConnectorTriggerHandler;
+export interface ConnectorTriggerFunctionOptions<T = unknown>
+    extends ConnectorTriggerOptions,
+        Partial<FunctionOptions> {
+    handler: ConnectorTriggerHandler<T>;
 
     trigger?: ConnectorTrigger;
 
