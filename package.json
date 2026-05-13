@@ -1,88 +1,88 @@
 {
-    "name": "@azure/functions",
-    "version": "4.14.0",
-    "description": "Microsoft Azure Functions NodeJS Framework",
-    "keywords": [
-        "azure",
-        "azure-functions",
-        "serverless",
-        "typescript"
-    ],
-    "author": "Microsoft",
-    "license": "MIT",
-    "homepage": "https://github.com/Azure/azure-functions-nodejs-library",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Azure/azure-functions-nodejs-library.git"
-    },
-    "bugs": {
-        "url": "https://github.com/Azure/azure-functions-nodejs-library/issues"
-    },
-    "main": "./dist/azure-functions.js",
-    "types": "types/index.d.ts",
-    "files": [
-        "dist/",
-        "src/",
-        "types/",
-        "LICENSE",
-        "README.md"
-    ],
-    "engines": {
-        "node": ">=20.0"
-    },
-    "scripts": {
-        "build": "webpack --mode development",
-        "minify": "webpack --mode production",
-        "test": "ts-node ./test/index.ts",
-        "format": "prettier . --write",
-        "lint": "eslint . --fix",
-        "updateVersion": "ts-node ./scripts/updateVersion.ts",
-        "validateRelease": "ts-node ./scripts/validateRelease.ts",
-        "watch": "webpack --watch --mode development"
-    },
-    "dependencies": {
-        "@azure/functions-extensions-base": "0.2.0",
-        "cookie": "^0.7.0"
-    },
-    "devDependencies": {
-        "@types/chai": "^4.2.22",
-        "@types/chai-as-promised": "^7.1.5",
-        "@types/cookie": "^0.6.0",
-        "@types/fs-extra": "^9.0.13",
-        "@types/long": "^4.0.2",
-        "@types/minimist": "^1.2.2",
-        "@types/mocha": "^9.1.1",
-        "@types/node": "^20.0.0",
-        "@types/semver": "^7.3.9",
-        "@types/sinon": "^17.0.4",
-        "@typescript-eslint/eslint-plugin": "^5.12.1",
-        "@typescript-eslint/parser": "^5.12.1",
-        "chai": "^4.2.0",
-        "chai-as-promised": "^7.1.1",
-        "eslint": "^7.32.0",
-        "eslint-config-prettier": "^8.3.0",
-        "eslint-plugin-deprecation": "^1.3.2",
-        "eslint-plugin-header": "^3.1.1",
-        "eslint-plugin-import": "^2.29.0",
-        "eslint-plugin-prettier": "^4.0.0",
-        "eslint-plugin-simple-import-sort": "^10.0.0",
-        "eslint-webpack-plugin": "^3.2.0",
-        "fork-ts-checker-webpack-plugin": "^7.2.13",
-        "fs-extra": "^10.0.1",
-        "globby": "^11.0.0",
-        "long": "^4.0.0",
-        "minimist": "^1.2.6",
-        "mocha": "^11.1.0",
-        "mocha-junit-reporter": "^2.0.2",
-        "mocha-multi-reporters": "^1.5.1",
-        "prettier": "^2.4.1",
-        "semver": "^7.3.5",
-        "sinon": "^20.0.0",
-        "ts-loader": "^9.5.1",
-        "ts-node": "^10.9.2",
-        "typescript": "~5.0.0",
-        "typescript4": "npm:typescript@~4.0.0",
-        "webpack": "^5.74.0",
-        "webpack-cli": "^4.10.0"
-    }
+  "name": "@azure/functions",
+  "version": "4.16.0",
+  "description": "Microsoft Azure Functions NodeJS Framework",
+  "keywords": [
+    "azure",
+    "azure-functions",
+    "serverless",
+    "typescript"
+  ],
+  "author": "Microsoft",
+  "license": "MIT",
+  "homepage": "https://github.com/Azure/azure-functions-nodejs-library",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Azure/azure-functions-nodejs-library.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Azure/azure-functions-nodejs-library/issues"
+  },
+  "main": "./dist/azure-functions.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "dist/",
+    "src/",
+    "types/",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0"
+  },
+  "scripts": {
+    "build": "webpack --mode development",
+    "minify": "webpack --mode production",
+    "test": "ts-node ./test/index.ts; node .github/setup.js",
+    "format": "prettier . --write",
+    "lint": "eslint . --fix",
+    "updateVersion": "ts-node ./scripts/updateVersion.ts",
+    "validateRelease": "ts-node ./scripts/validateRelease.ts",
+    "watch": "webpack --watch --mode development"
+  },
+  "dependencies": {
+    "@azure/functions-extensions-base": "0.3.0",
+    "cookie": "^0.7.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.22",
+    "@types/chai-as-promised": "^7.1.5",
+    "@types/cookie": "^0.6.0",
+    "@types/fs-extra": "^9.0.13",
+    "@types/long": "^4.0.2",
+    "@types/minimist": "^1.2.2",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^20.0.0",
+    "@types/semver": "^7.3.9",
+    "@types/sinon": "^17.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-deprecation": "^1.3.2",
+    "eslint-plugin-header": "^3.1.1",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-webpack-plugin": "^3.2.0",
+    "fork-ts-checker-webpack-plugin": "^7.2.13",
+    "fs-extra": "^10.0.1",
+    "globby": "^11.0.0",
+    "long": "^4.0.0",
+    "minimist": "^1.2.6",
+    "mocha": "^11.1.0",
+    "mocha-junit-reporter": "^2.0.2",
+    "mocha-multi-reporters": "^1.5.1",
+    "prettier": "^2.4.1",
+    "semver": "^7.3.5",
+    "sinon": "^20.0.0",
+    "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.0.0",
+    "typescript4": "npm:typescript@~4.0.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  }
 }
