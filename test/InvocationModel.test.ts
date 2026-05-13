@@ -7,8 +7,8 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { Readable } from 'stream';
 import { InvocationContext, McpContent, McpImageContent } from '../src';
-import { InvocationModel } from '../src/InvocationModel';
 import * as httpProxy from '../src/http/httpProxy';
+import { InvocationModel } from '../src/InvocationModel';
 import { setup } from '../src/setup';
 
 function testLog(_level: RpcLogLevel, _category: RpcLogCategory, message: string) {
@@ -33,9 +33,7 @@ describe('InvocationModel', () => {
                 method: 'POST',
                 url: '/api/categories/fiction/products/abc?source=request',
             });
-            const waitForProxyRequestStub = sinon
-                .stub(httpProxy, 'waitForProxyRequest')
-                .resolves(proxyReq as never);
+            const waitForProxyRequestStub = sinon.stub(httpProxy, 'waitForProxyRequest').resolves(proxyReq as never);
             const sendProxyResponseStub = sinon.stub(httpProxy, 'sendProxyResponse').resolves();
 
             const model = new InvocationModel({
@@ -120,7 +118,7 @@ describe('InvocationModel', () => {
                     status: number;
                     headers: Headers;
                     text(): Promise<string>;
-                },
+                }
             ];
             expect(proxyInvocationId).to.equal('streamInvocId');
             expect(proxyResponse.status).to.equal(202);

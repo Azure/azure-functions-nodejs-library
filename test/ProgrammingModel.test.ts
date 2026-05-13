@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 import 'mocha';
-import { spawnSync } from 'child_process';
 import { expect } from 'chai';
+import { spawnSync } from 'child_process';
 import * as path from 'path';
 
 const repoRoot = path.resolve(__dirname, '..');

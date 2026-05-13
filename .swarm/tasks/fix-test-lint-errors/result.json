@@ -1,0 +1,18 @@
+{
+  "taskId": "fix-test-lint-errors",
+  "status": "Succeeded",
+  "summary": "Auto-fixed the requested lint issues in the two test files, verified eslint reports 0 errors with only the 2 expected non-null assertion warnings, and confirmed the full test suite passes.",
+  "filesTouched": [
+    "test/InvocationModel.test.ts",
+    "test/ProgrammingModel.test.ts"
+  ],
+  "testsRun": {
+    "executed": true,
+    "passed": 364,
+    "failed": 0,
+    "command": "npx eslint test/InvocationModel.test.ts test/ProgrammingModel.test.ts \u0026\u0026 npm test"
+  },
+  "failureExcerpt": null,
+  "designDeviations": null,
+  "followUps": []
+}
