@@ -57,7 +57,9 @@ const { ProgrammingModel } = require('./src/ProgrammingModel');
         const httpUri = new URL(httpUriValue!);
         expect(httpUri.protocol).to.equal('http:');
         expect(httpUri.pathname).to.equal('/');
-        expect(httpUri.hostname).to.satisfy((value: string) => ['127.0.0.1', '::1'].includes(value));
+        expect(httpUri.hostname).to.satisfy((value: string) =>
+            ['127.0.0.1', '::1'].includes(value.replace(/^\[(.*)\]$/, '$1'))
+        );
         expect(httpUri.port).to.not.equal('');
 
         expect(result.lockError).to.equal("Setup options can't be changed after app startup has finished.");
