@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import {
+    ConnectorTriggerFunctionOptions,
     CosmosDBFunctionOptions,
     CosmosDBMongoFunctionOptions,
     EventGridFunctionOptions,
@@ -12,6 +13,7 @@ import {
     HttpHandler,
     HttpMethod,
     HttpMethodFunctionOptions,
+    McpPromptFunctionOptions,
     McpResourceFunctionOptions,
     McpToolFunctionOptions,
     MySqlFunctionOptions,
@@ -127,6 +129,10 @@ export function eventGrid(name: string, options: EventGridFunctionOptions): void
     generic(name, convertToGenericOptions(options, trigger.eventGrid));
 }
 
+export function connectorTrigger<T = unknown>(name: string, options: ConnectorTriggerFunctionOptions<T>): void {
+    generic(name, convertToGenericOptions(options, trigger.connectorTrigger));
+}
+
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     generic(name, convertToGenericOptions(options, <any>trigger.cosmosDB));
@@ -173,6 +179,17 @@ export function mcpTool(name: string, options: McpToolFunctionOptions): void {
  */
 export function mcpResource(name: string, options: McpResourceFunctionOptions): void {
     generic(name, convertToGenericOptions(options, trigger.mcpResource));
+}
+
+/**
+ * Registers an MCP Prompt function in your app.
+ * The handler receives a structured `PromptInvocationContext` describing the prompt invocation.
+ *
+ * @param name - The name of the function. This must be unique within your app and is primarily used for tracking purposes.
+ * @param options - Configuration options for the MCP Prompt function, including the handler, prompt name, and arguments.
+ */
+export function mcpPrompt(name: string, options: McpPromptFunctionOptions): void {
+    generic(name, convertToGenericOptions(options, trigger.mcpPrompt));
 }
 
 export function generic(name: string, options: GenericFunctionOptions): void {

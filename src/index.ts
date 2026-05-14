@@ -13,6 +13,7 @@ export { HttpRequest } from './http/HttpRequest';
 export { HttpResponse } from './http/HttpResponse';
 export * as input from './input';
 export { InvocationContext } from './InvocationContext';
+export { promptArg } from './mcp/McpPromptArgumentBuilder';
 export {
     McpAudioContent,
     McpContentBlock,
@@ -22,6 +23,7 @@ export {
     McpTextContent,
     McpToolResponse,
 } from './mcp/McpToolResponse';
+export { PromptInvocationContext } from './mcp/PromptInvocationContext';
 export * as output from './output';
 export * as trigger from './trigger';
 export { Disposable } from './utils/Disposable';

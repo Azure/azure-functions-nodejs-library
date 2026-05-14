@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 import 'mocha';
+import type { InvocationContext } from '@azure/functions';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import type { InvocationContext } from '@azure/functions';
 import { toMcpToolResult } from '../../src/converters/toMcpToolResult';
-import { McpToolResponse, McpTextContent } from '../../src/mcp/McpToolResponse';
+import { McpTextContent, McpToolResponse } from '../../src/mcp/McpToolResponse';
 import { __resetMcpSdkWarning } from '../../src/mcp/sdkCompat';
 
 describe('MCP SDK compat', () => {

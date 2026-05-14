@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import { ConnectorContentOutput, ConnectorContentOutputOptions } from './connectorTrigger';
 import { CosmosDBOutput, CosmosDBOutputOptions } from './cosmosDB';
 import { CosmosDBMongoOutput, CosmosDBMongoOutputOptions } from './cosmosDBMongo';
 import { EventGridOutput, EventGridOutputOptions } from './eventGrid';
@@ -84,6 +85,12 @@ export function mySql(options: MySqlOutputOptions): MySqlOutput;
  * [Link to docs and examples](https://docs.microsoft.com/azure/azure-functions/functions-bindings-web-pubsub-output?pivots=programming-language-javascript)
  */
 export function webPubSub(options: WebPubSubOutputOptions): WebPubSubOutput;
+
+/**
+ * Creates a connector content output binding for writing data to an Azure Logic Apps connector.
+ * @param options Configuration options including the connector name, connection setting, and optional operation
+ */
+export function connectorContent(options: ConnectorContentOutputOptions): ConnectorContentOutput;
 
 /**
  * A generic option that can be used for any output type
