@@ -15,6 +15,8 @@ describe('cosmosDBMongo bindings', () => {
         connectionStringSetting: 'CosmosDBMongo',
         databaseName: 'MyDatabase',
         collectionName: 'MyCollection',
+        leaseDatabaseName: 'MyDatabase',
+        leaseCollectionName: 'leases',
     };
 
     // -------------------------------------------------------------------------
@@ -73,6 +75,55 @@ describe('cosmosDBMongo bindings', () => {
             expect(trig).to.exist;
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             expect(trig!['direction']).to.equal('in');
+        });
+    });
+
+    describe('app.cosmosDBMongo', () => {
+        it('registers a function through the public wrapper', () => {
+            const registerCalls: Array<{ metadata: { bindings: Record<string, unknown> }; handler: unknown }> = [];
+            const fakeCoreApi = {
+                registerFunction: (metadata: { bindings: Record<string, unknown> }, registeredHandler: unknown) => {
+                    registerCalls.push({ metadata, handler: registeredHandler });
+                },
+                setProgrammingModel: () => {},
+            };
+
+            const moduleCtor = require('module') as { _load: (...args: unknown[]) => unknown };
+            const originalLoad = moduleCtor._load;
+            const appPath = require.resolve('../src/app');
+            const coreApiPath = require.resolve('../src/utils/tryGetCoreApiLazy');
+
+            delete require.cache[appPath];
+            delete require.cache[coreApiPath];
+
+            moduleCtor._load = function (...args: unknown[]) {
+                if (args[0] === '@azure/functions-core') {
+                    return fakeCoreApi;
+                }
+                return originalLoad.apply(this, args);
+            };
+
+            try {
+                const appModule = require('../src/app') as typeof import('../src/app');
+                const appHandler = (_doc: unknown, _context: InvocationContext) => {};
+
+                appModule.cosmosDBMongo('mongoAppFunc', {
+                    ...minimalTriggerOptions,
+                    handler: appHandler,
+                });
+
+                expect(registerCalls).to.have.lengthOf(1);
+                expect(registerCalls[0]?.handler).to.equal(appHandler);
+
+                const bindingValues = Object.values(registerCalls[0]!.metadata.bindings) as Record<string, unknown>[];
+                const triggerBinding = bindingValues.find((b) => b['type'] === 'cosmosDBMongoTrigger');
+                expect(triggerBinding).to.exist;
+                expect(triggerBinding?.['direction']).to.equal('in');
+            } finally {
+                moduleCtor._load = originalLoad;
+                delete require.cache[appPath];
+                delete require.cache[coreApiPath];
+            }
         });
     });
 

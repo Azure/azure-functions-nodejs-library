@@ -64,15 +64,15 @@ export interface CosmosDBMongoTriggerOptions {
 
     /**
      * The name of the database that holds the lease collection.
-     * Defaults to the monitored database name.
+     * The name of the database that holds the lease collection.
      */
-    leaseDatabaseName?: string;
+    leaseDatabaseName: string;
 
     /**
      * The name of the collection used to store leases.
-     * Defaults to "leases".
+     * The name of the collection used to store leases.
      */
-    leaseCollectionName?: string;
+    leaseCollectionName: string;
 
     /**
      * An app setting name for the connection string of the lease account.
