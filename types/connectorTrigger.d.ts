@@ -20,5 +20,6 @@ export interface ConnectorTriggerFunctionOptions<T = unknown>
     retry?: RetryOptions;
 }
 
-export interface ConnectorTriggerOptions extends Record<string, unknown> {
+export interface ConnectorTriggerOptions extends Record<string, unknown> {}
+
 export type ConnectorTrigger = FunctionTrigger & ConnectorTriggerOptions;
