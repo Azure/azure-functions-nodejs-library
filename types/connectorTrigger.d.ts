@@ -20,23 +20,7 @@ export interface ConnectorTriggerFunctionOptions<T = unknown>
     retry?: RetryOptions;
 }
 
-export interface ConnectorTriggerOptions {
-    /**
-     * The connection setting name (maps to an app setting with the connector runtime URL).
-     */
-    connection: string;
-
-    /**
-     * The connector name (e.g., 'office365', 'sharepointonline', 'teams', 'kusto').
-     */
-    connector: string;
-
-    /**
-     * The trigger operation (e.g., 'OnNewEmail', 'OnNewFile', 'OnNewChannelMessage').
-     */
-    triggerOperation: string;
-}
-
+export interface ConnectorTriggerOptions extends Record<string, unknown> {
 export type ConnectorTrigger = FunctionTrigger & ConnectorTriggerOptions;
 
 // ---------------------------------------------------------------------------
