@@ -3,6 +3,7 @@
 
 import 'mocha';
 import { expect } from 'chai';
+import Module = require('module');
 import { input, output, trigger } from '../src';
 import { toCoreFunctionMetadata } from '../src/converters/toCoreFunctionMetadata';
 import { InvocationContext } from '../types';
@@ -79,7 +80,7 @@ describe('cosmosDBMongo bindings', () => {
     });
 
     describe('app.cosmosDBMongo', () => {
-        it('registers a function through the public wrapper', () => {
+        it('registers a function through the public wrapper', async () => {
             const registerCalls: Array<{ metadata: { bindings: Record<string, unknown> }; handler: unknown }> = [];
             const fakeCoreApi = {
                 registerFunction: (metadata: { bindings: Record<string, unknown> }, registeredHandler: unknown) => {
@@ -88,7 +89,7 @@ describe('cosmosDBMongo bindings', () => {
                 setProgrammingModel: () => {},
             };
 
-            const moduleCtor = require('module') as { _load: (...args: unknown[]) => unknown };
+            const moduleCtor = Module as unknown as { _load: (...args: unknown[]) => unknown };
             const originalLoad = moduleCtor._load;
             const appPath = require.resolve('../src/app');
             const coreApiPath = require.resolve('../src/utils/tryGetCoreApiLazy');
@@ -104,7 +105,7 @@ describe('cosmosDBMongo bindings', () => {
             };
 
             try {
-                const appModule = require('../src/app') as typeof import('../src/app');
+                const appModule = await import('../src/app');
                 const appHandler = (_doc: unknown, _context: InvocationContext) => {};
 
                 appModule.cosmosDBMongo('mongoAppFunc', {
@@ -113,9 +114,13 @@ describe('cosmosDBMongo bindings', () => {
                 });
 
                 expect(registerCalls).to.have.lengthOf(1);
-                expect(registerCalls[0]?.handler).to.equal(appHandler);
+                const registerCall = registerCalls[0];
+                if (!registerCall) {
+                    throw new Error('Expected app.cosmosDBMongo to register a function.');
+                }
+                expect(registerCall.handler).to.equal(appHandler);
 
-                const bindingValues = Object.values(registerCalls[0]!.metadata.bindings) as Record<string, unknown>[];
+                const bindingValues = Object.values(registerCall.metadata.bindings) as Record<string, unknown>[];
                 const triggerBinding = bindingValues.find((b) => b['type'] === 'cosmosDBMongoTrigger');
                 expect(triggerBinding).to.exist;
                 expect(triggerBinding?.['direction']).to.equal('in');
