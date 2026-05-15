@@ -27,13 +27,11 @@ describe('connectorTrigger', () => {
             expect(result1.name).to.equal(result2.name);
         });
 
-        it('should generate different names for different options', () => {
+        it('should generate a stable binding name for equivalent options', () => {
             const result1 = trigger.connectorTrigger({});
 
             const result2 = trigger.connectorTrigger({});
 
-            // NOTE(swapnilnagar): Both are empty options so names will be the same.
-            // Test kept for structural consistency.
             expect(result1.name).to.equal(result2.name);
         });
     });
