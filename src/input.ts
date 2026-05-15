@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 
 import {
-    ConnectorContentInput,
-    ConnectorContentInputOptions,
     CosmosDBInput,
     CosmosDBInputOptions,
     FunctionInput,
@@ -69,13 +67,6 @@ export function webPubSubContext(options: WebPubSubContextInputOptions): WebPubS
     return addInputBindingName({
         ...options,
         type: 'webPubSubContext',
-    });
-}
-
-export function connectorContent(options: ConnectorContentInputOptions): ConnectorContentInput {
-    return addInputBindingName({
-        ...options,
-        type: 'connectorContent',
     });
 }
 

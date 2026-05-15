@@ -2,8 +2,6 @@
 // Licensed under the MIT License.
 
 import {
-    ConnectorContentOutput,
-    ConnectorContentOutputOptions,
     CosmosDBOutput,
     CosmosDBOutputOptions,
     EventGridOutput,
@@ -114,13 +112,6 @@ export function webPubSub(options: WebPubSubOutputOptions): WebPubSubOutput {
     return addOutputBindingName({
         ...options,
         type: 'webPubSub',
-    });
-}
-
-export function connectorContent(options: ConnectorContentOutputOptions): ConnectorContentOutput {
-    return addOutputBindingName({
-        ...options,
-        type: 'connectorContent',
     });
 }
 
