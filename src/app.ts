@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import {
+    ConnectorTriggerFunctionOptions,
     CosmosDBFunctionOptions,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
@@ -125,6 +126,10 @@ export function eventHub(name: string, options: EventHubFunctionOptions): void {
 
 export function eventGrid(name: string, options: EventGridFunctionOptions): void {
     generic(name, convertToGenericOptions(options, trigger.eventGrid));
+}
+
+export function connectorTrigger<T = unknown>(name: string, options: ConnectorTriggerFunctionOptions<T>): void {
+    generic(name, convertToGenericOptions(options, trigger.connectorTrigger));
 }
 
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
