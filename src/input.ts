@@ -64,8 +64,11 @@ export function webPubSubConnection(options: WebPubSubConnectionInputOptions): W
 }
 
 export function webPubSubContext(options: WebPubSubContextInputOptions): WebPubSubContextInput {
+    // eslint-disable-next-line deprecation/deprecation
+    const { connection, ...rest } = options;
     return addInputBindingName({
-        ...options,
+        ...rest,
+        connections: rest.connections ?? (connection ? [connection] : undefined),
         type: 'webPubSubContext',
     });
 }

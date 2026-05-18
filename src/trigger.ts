@@ -131,8 +131,11 @@ export function mySql(options: MySqlTriggerOptions): MySqlTrigger {
 }
 
 export function webPubSub(options: WebPubSubTriggerOptions): WebPubSubTrigger {
+    // eslint-disable-next-line deprecation/deprecation
+    const { connection, ...rest } = options;
     return addTriggerBindingName({
-        ...options,
+        ...rest,
+        connections: rest.connections ?? (connection ? [connection] : undefined),
         type: 'webPubSubTrigger',
     });
 }
