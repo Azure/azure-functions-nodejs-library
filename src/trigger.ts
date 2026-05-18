@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 import {
+    ConnectorTrigger,
+    ConnectorTriggerOptions,
     CosmosDBTrigger,
     CosmosDBTriggerOptions,
     EventGridTrigger,
@@ -179,6 +181,13 @@ export function mcpPrompt(options: McpPromptTriggerOptions): McpPromptTrigger {
     return addTriggerBindingName({
         ...convertToMcpPromptTriggerOptionsToRpc(options),
         type: 'mcpPromptTrigger',
+    });
+}
+
+export function connectorTrigger(options: ConnectorTriggerOptions): ConnectorTrigger {
+    return addTriggerBindingName({
+        ...options,
+        type: 'connectorTrigger',
     });
 }
 
