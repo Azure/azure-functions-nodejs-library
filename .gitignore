@@ -37,6 +37,9 @@ jspm_packages
 .node_repl_history
 azure-functions-language-worker-protobuf/*
 
+# IntelliJ
+.idea/
+
 dist
 out
 pkg
