@@ -15,6 +15,19 @@ const responses: Record<string, http.ServerResponse> = {};
 const minPort = 55000;
 const maxPort = 55025;
 
+const blockedProxyResponseHeaders = new Set([
+    'connection',
+    'keep-alive',
+    'proxy-authenticate',
+    'proxy-authorization',
+    'te',
+    'trailer',
+    'trailers',
+    'transfer-encoding',
+    'upgrade',
+    'content-length',
+]);
+
 const invocRequestEmitter = new EventEmitter();
 
 export async function waitForProxyRequest(invocationId: string): Promise<http.IncomingMessage> {
@@ -40,7 +53,9 @@ export async function sendProxyResponse(invocationId: string, userRes: HttpRespo
     const proxyRes = nonNullProp(responses, invocationId);
     delete responses[invocationId];
     for (const [key, val] of userRes.headers.entries()) {
-        proxyRes.setHeader(key, val);
+        if (isAllowedProxyResponseHeader(key)) {
+            proxyRes.setHeader(key, val);
+        }
     }
     proxyRes.setHeader(invocationIdHeader, invocationId);
     proxyRes.statusCode = userRes.status;
@@ -55,6 +70,10 @@ export async function sendProxyResponse(invocationId: string, userRes: HttpRespo
         }
     }
     proxyRes.end();
+}
+
+export function isAllowedProxyResponseHeader(headerName: string): boolean {
+    return !blockedProxyResponseHeaders.has(headerName.toLowerCase());
 }
 
 function setCookies(userRes: HttpResponse, proxyRes: http.ServerResponse): void {

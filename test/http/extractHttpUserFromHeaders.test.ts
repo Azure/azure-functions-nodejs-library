@@ -82,4 +82,14 @@ describe('Extract Http User Claims Principal from Headers', () => {
 
         expect(user).to.be.null;
     });
+
+    it('Returns null when client principal header is not valid JSON', () => {
+        const headers: Headers = new Headers({
+            'x-ms-client-principal': Buffer.from('not json').toString('base64'),
+        });
+
+        const user: HttpRequestUser | null = extractHttpUserFromHeaders(headers);
+
+        expect(user).to.be.null;
+    });
 });
