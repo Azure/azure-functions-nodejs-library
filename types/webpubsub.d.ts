@@ -104,7 +104,7 @@ export interface WebPubSubContextInputOptions {
      * This replaces the deprecated `connection` option.
      * The values are used for Abuse Protection and Signature validation.
      * When multiple values are provided, each configured service is considered during signature validation.
-     * The value is auto resolved with "WebPubSubConnectionString" by default.
+     * The values are auto resolved with "WebPubSubConnectionString" by default.
      */
     connections?: string[];
 
