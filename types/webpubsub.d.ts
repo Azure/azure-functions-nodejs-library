@@ -101,7 +101,9 @@ export interface WebPubSubContextInputOptions {
 
     /**
      * Optional - The names of app settings or setting collections that specify the upstream Azure Web PubSub services.
-     * The value is used for Abuse Protection and Signature validation.
+     * This replaces the deprecated `connection` option.
+     * The values are used for Abuse Protection and Signature validation.
+     * When multiple values are provided, each configured service is considered during signature validation.
      * The value is auto resolved with "WebPubSubConnectionString" by default.
      */
     connections?: string[];
