@@ -2,8 +2,8 @@
 
 |Branch|Status|Support level|Node.js Versions|
 |---|---|---|---|
-|v4.x (default)|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/public/514/v4.x)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v4.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/public/514/v4.x?compact_message)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v4.x)|GA|20, 18|
-|v3.x|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/public/514/v3.x)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v3.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/public/514/v3.x?compact_message)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v3.x)|GA|20, 18|
+|v4.x (default)|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/public/514/v4.x)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v4.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/public/514/v4.x?compact_message)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v4.x)|GA|24, 22|
+|v3.x|[![Build Status](https://img.shields.io/azure-devops/build/azfunc/public/514/v3.x)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v3.x) [![Test Status](https://img.shields.io/azure-devops/tests/azfunc/public/514/v3.x?compact_message)](https://azfunc.visualstudio.com/public/_build/latest?definitionId=514&branchName=v3.x)|GA|24, 22|
 
 ## Install
 
