@@ -92,4 +92,24 @@ describe('Extract Http User Claims Principal from Headers', () => {
 
         expect(user).to.be.null;
     });
+
+    it('Returns null when client principal header parses to null', () => {
+        const headers: Headers = new Headers({
+            'x-ms-client-principal': Buffer.from(JSON.stringify(null)).toString('base64'),
+        });
+
+        const user: HttpRequestUser | null = extractHttpUserFromHeaders(headers);
+
+        expect(user).to.be.null;
+    });
+
+    it('Returns null when client principal header parses to a string', () => {
+        const headers: Headers = new Headers({
+            'x-ms-client-principal': Buffer.from(JSON.stringify('not an object')).toString('base64'),
+        });
+
+        const user: HttpRequestUser | null = extractHttpUserFromHeaders(headers);
+
+        expect(user).to.be.null;
+    });
 });

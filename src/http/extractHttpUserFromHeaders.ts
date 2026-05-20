@@ -24,6 +24,15 @@ export function extractHttpUserFromHeaders(headers: Headers): HttpRequestUser | 
             return null;
         }
 
+        if (
+            claimsPrincipalData === null ||
+            typeof claimsPrincipalData !== 'object' ||
+            Array.isArray(claimsPrincipalData)
+        ) {
+            workerSystemLog('warning', 'Parsed x-ms-client-principal header was not a JSON object.');
+            return null;
+        }
+
         if (claimsPrincipalData['identityProvider']) {
             user = {
                 type: 'StaticWebApps',
