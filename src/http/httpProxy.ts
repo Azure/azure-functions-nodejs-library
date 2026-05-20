@@ -6,6 +6,7 @@ import { EventEmitter } from 'events';
 import * as http from 'http';
 import * as net from 'net';
 import { AzFuncSystemError, ensureErrorType } from '../errors';
+import { sanitizeErrorString } from '../utils/errorSanitizer';
 import { nonNullProp } from '../utils/nonNull';
 import { workerSystemLog } from '../utils/workerSystemLog';
 import { HttpResponse } from './HttpResponse';
@@ -103,7 +104,7 @@ export async function setupHttpProxy(): Promise<string> {
 
         server.on('error', (err) => {
             err = ensureErrorType(err);
-            workerSystemLog('error', `Http proxy error: ${err.stack || err.message}`);
+            workerSystemLog('error', `Http proxy error: ${sanitizeErrorString(err.stack || err.message)}`);
         });
 
         server.listen(() => {
