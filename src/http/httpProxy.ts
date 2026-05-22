@@ -25,7 +25,6 @@ const blockedProxyResponseHeaders = new Set([
     'trailers',
     'transfer-encoding',
     'upgrade',
-    'content-length',
 ]);
 
 const invocRequestEmitter = new EventEmitter();
@@ -52,8 +51,9 @@ const invocationIdHeader = 'x-ms-invocation-id';
 export async function sendProxyResponse(invocationId: string, userRes: HttpResponse): Promise<void> {
     const proxyRes = nonNullProp(responses, invocationId);
     delete responses[invocationId];
+    const connectionHeader = userRes.headers.get('connection');
     for (const [key, val] of userRes.headers.entries()) {
-        if (isAllowedProxyResponseHeader(key)) {
+        if (isAllowedProxyResponseHeader(key, connectionHeader)) {
             proxyRes.setHeader(key, val);
         }
     }
@@ -72,8 +72,21 @@ export async function sendProxyResponse(invocationId: string, userRes: HttpRespo
     proxyRes.end();
 }
 
-export function isAllowedProxyResponseHeader(headerName: string): boolean {
-    return !blockedProxyResponseHeaders.has(headerName.toLowerCase());
+export function isAllowedProxyResponseHeader(headerName: string, connectionHeader?: string | null): boolean {
+    const normalizedHeaderName = headerName.toLowerCase();
+    return (
+        !blockedProxyResponseHeaders.has(normalizedHeaderName) &&
+        !getConnectionHeaderNames(connectionHeader).has(normalizedHeaderName)
+    );
+}
+
+function getConnectionHeaderNames(connectionHeader?: string | null): Set<string> {
+    return new Set(
+        connectionHeader
+            ?.split(',')
+            .map((headerName) => headerName.trim().toLowerCase())
+            .filter((headerName) => headerName.length > 0)
+    );
 }
 
 function setCookies(userRes: HttpResponse, proxyRes: http.ServerResponse): void {

@@ -14,9 +14,9 @@ describe('Http proxy', () => {
             'proxy-authorization',
             'te',
             'trailer',
+            'trailers',
             'transfer-encoding',
             'upgrade',
-            'content-length',
         ];
 
         for (const header of blockedHeaders) {
@@ -26,10 +26,18 @@ describe('Http proxy', () => {
     });
 
     it('Allows end-to-end response headers', () => {
-        const allowedHeaders = ['content-type', 'cache-control', 'set-cookie', 'x-frame-options'];
+        const allowedHeaders = ['content-type', 'cache-control', 'set-cookie', 'x-frame-options', 'content-length'];
 
         for (const header of allowedHeaders) {
             expect(isAllowedProxyResponseHeader(header), header).to.be.true;
         }
+    });
+
+    it('Blocks headers named by the Connection response header', () => {
+        const connectionHeader = 'keep-alive, x-private-hop, X-Another-Hop';
+
+        expect(isAllowedProxyResponseHeader('x-private-hop', connectionHeader)).to.be.false;
+        expect(isAllowedProxyResponseHeader('x-another-hop', connectionHeader)).to.be.false;
+        expect(isAllowedProxyResponseHeader('content-type', connectionHeader)).to.be.true;
     });
 });
