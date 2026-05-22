@@ -4,7 +4,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import { ensureErrorType, trySetErrorMessage } from '../src/errors';
-import { sanitizeErrorString } from '../src/utils/errorSanitizer';
+import { sanitizeErrorString } from '../src/utils/credentialSanitizer';
 
 describe('ensureErrorType', () => {
     it('null', () => {

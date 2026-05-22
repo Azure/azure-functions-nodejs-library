@@ -6,7 +6,7 @@ import { EventEmitter } from 'events';
 import * as http from 'http';
 import * as net from 'net';
 import { AzFuncSystemError, ensureErrorType } from '../errors';
-import { sanitizeErrorString } from '../utils/errorSanitizer';
+import { sanitizeErrorString } from '../utils/credentialSanitizer';
 import { nonNullProp } from '../utils/nonNull';
 import { workerSystemLog } from '../utils/workerSystemLog';
 import { HttpResponse } from './HttpResponse';

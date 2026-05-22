@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { sanitizeErrorString, stringifySanitizedErrorObject } from './utils/errorSanitizer';
+import { sanitizeErrorString, stringifySanitizedErrorObject } from './utils/credentialSanitizer';
 
 export interface AzFuncError {
     /**
