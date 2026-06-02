@@ -41,7 +41,7 @@
         "watch": "webpack --watch --mode development"
     },
     "dependencies": {
-        "@azure/functions-extensions-base": "0.2.0",
+        "@azure/functions-extensions-base": "0.3.0",
         "cookie": "^0.7.0"
     },
     "devDependencies": {
