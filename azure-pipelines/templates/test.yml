@@ -3,6 +3,10 @@ jobs:
 
       strategy:
           matrix:
+              Node16:
+                  NODE_VERSION: '16.x'
+              Node18:
+                  NODE_VERSION: '18.x'
               Node20:
                   NODE_VERSION: '20.x'
               Node22:
