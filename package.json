@@ -1,6 +1,6 @@
 {
     "name": "@azure/functions",
-    "version": "3.5.2",
+    "version": "3.6.0",
     "description": "Microsoft Azure Functions NodeJS Framework",
     "keywords": [
         "azure",
@@ -27,6 +27,9 @@
         "LICENSE",
         "README.md"
     ],
+    "engines": {
+        "node": ">=22.0"
+    },
     "scripts": {
         "build": "webpack --mode development",
         "minify": "webpack --mode production",
@@ -38,7 +41,6 @@
     },
     "dependencies": {
         "long": "^4.0.0",
-        "uuid": "^13.0.2",
         "iconv-lite": "^0.6.3"
     },
     "devDependencies": {

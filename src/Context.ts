@@ -11,7 +11,7 @@ import {
     TraceContext,
 } from '@azure/functions';
 import { RpcInvocationRequest, RpcLogLevel, RpcParameterBinding } from '@azure/functions-core';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'crypto';
 import {
     convertKeysToCamelCase,
     getBindingDefinitions,
@@ -61,7 +61,7 @@ export function CreateContextAndInputs(
         context.bindingData.sys = {
             methodName: info.name,
             utcNow: new Date().toISOString(),
-            randGuid: uuid(),
+            randGuid: randomUUID(),
         };
         // Populate from HTTP request for backwards compatibility if missing
         if (!context.bindingData.query) {
