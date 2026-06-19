@@ -161,6 +161,48 @@ describe('toCoreFunctionMetadata', () => {
             retryOptions: undefined,
         });
     });
+
+    it('cosmosDB trigger preserves changeFeedMode', () => {
+        const result = toCoreFunctionMetadata('funcName', {
+            handler,
+            trigger: trigger.cosmosDB({
+                connection: 'CosmosConnection',
+                databaseName: 'dbName',
+                containerName: 'containerName',
+                changeFeedMode: 'AllVersionsAndDeletes',
+            }),
+            return: output.http({}),
+        });
+
+        const cosmosBinding = Object.values(result.bindings).find((b) => b.type === 'cosmosDBTrigger');
+        expect(cosmosBinding).to.include({
+            connection: 'CosmosConnection',
+            databaseName: 'dbName',
+            containerName: 'containerName',
+            changeFeedMode: 'AllVersionsAndDeletes',
+        });
+    });
+
+    it('cosmosDB trigger preserves changeFeedMode LatestVersion', () => {
+        const result = toCoreFunctionMetadata('funcName', {
+            handler,
+            trigger: trigger.cosmosDB({
+                connection: 'CosmosConnection',
+                databaseName: 'dbName',
+                containerName: 'containerName',
+                changeFeedMode: 'LatestVersion',
+            }),
+            return: output.http({}),
+        });
+
+        const cosmosBinding = Object.values(result.bindings).find((b) => b.type === 'cosmosDBTrigger');
+        expect(cosmosBinding).to.include({
+            connection: 'CosmosConnection',
+            databaseName: 'dbName',
+            containerName: 'containerName',
+            changeFeedMode: 'LatestVersion',
+        });
+    });
 });
 
 describe('toCoreFunctionMetadata sdk binding tests', () => {

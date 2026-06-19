@@ -12,6 +12,7 @@ import {
     CosmosDBv3TriggerOptions,
 } from './cosmosDB.v3';
 import {
+    CosmosDBv4ChangeFeedMode,
     CosmosDBv4FunctionOptions,
     CosmosDBv4Handler,
     CosmosDBv4Input,
@@ -31,6 +32,8 @@ export type CosmosDBInput = CosmosDBv3Input | CosmosDBv4Input;
 
 export type CosmosDBTriggerOptions = CosmosDBv3TriggerOptions | CosmosDBv4TriggerOptions;
 export type CosmosDBTrigger = CosmosDBv3Trigger | CosmosDBv4Trigger;
+
+export type CosmosDBChangeFeedMode = CosmosDBv4ChangeFeedMode;
 
 export type CosmosDBOutputOptions = CosmosDBv3OutputOptions | CosmosDBv4OutputOptions;
 export type CosmosDBOutput = CosmosDBv3Output | CosmosDBv4Output;

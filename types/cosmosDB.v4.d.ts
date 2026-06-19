@@ -6,6 +6,11 @@ import { InvocationContext } from './InvocationContext';
 
 export type CosmosDBv4Handler<T = unknown> = (documents: T[], context: InvocationContext) => FunctionResult;
 
+/**
+ * Change feed mode for Cosmos DB trigger bindings.
+ */
+export type CosmosDBv4ChangeFeedMode = 'LatestVersion' | 'AllVersionsAndDeletes';
+
 export interface CosmosDBv4FunctionOptions<T = unknown> extends CosmosDBv4TriggerOptions, Partial<FunctionOptions> {
     handler: CosmosDBv4Handler<T>;
 
@@ -153,6 +158,13 @@ export interface CosmosDBv4TriggerOptions {
      * This is only used to set the initial trigger state. After the trigger has a lease state, changing this value has no effect.
      */
     startFromTime?: string;
+
+    /**
+     * Gets or sets the change feed mode used to process document changes.
+     * `LatestVersion` processes the latest document version.
+     * `AllVersionsAndDeletes` includes intermediate mutations and delete events.
+     */
+    changeFeedMode?: CosmosDBv4ChangeFeedMode;
 
     /**
      * Defines preferred locations (regions) for geo-replicated database accounts in the Azure Cosmos DB service.

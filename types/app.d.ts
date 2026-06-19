@@ -153,7 +153,9 @@ export function eventHub<T = unknown>(name: string, options: EventHubFunctionOpt
 export function eventGrid<T = EventGridEvent>(name: string, options: EventGridFunctionOptions<T>): void;
 
 /**
- * Registers a Cosmos DB function in your app that will be triggered whenever inserts and updates occur (not deletions)
+ * Registers a Cosmos DB function in your app that will be triggered by container changes.
+ * By default, this trigger processes latest document versions. To include delete events and
+ * intermediate mutations, set `changeFeedMode` to `AllVersionsAndDeletes`.
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
