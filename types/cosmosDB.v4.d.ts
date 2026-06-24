@@ -7,14 +7,42 @@ import { InvocationContext } from './InvocationContext';
 export type CosmosDBv4Handler<T = unknown> = (documents: T[], context: InvocationContext) => FunctionResult;
 
 /**
+ * Metadata included with each change feed item when using `AllVersionsAndDeletes`.
+ * Property names follow the wire format emitted by Cosmos DB.
+ */
+export interface CosmosDBv4ChangeFeedMetadata {
+    crts: number;
+    lsn: number;
+    operationType: string;
+    previousImageLSN?: number;
+    timeToLiveExpired?: boolean;
+    id?: string;
+    partitionKey?: Record<string, unknown>;
+}
+
+/**
+ * Full-fidelity change feed item payload emitted when `changeFeedMode` is `AllVersionsAndDeletes`.
+ * Property names follow the wire format emitted by Cosmos DB.
+ */
+export interface CosmosDBv4ChangeFeedItem<T = unknown> {
+    current: T | null;
+    previous?: T;
+    metadata?: CosmosDBv4ChangeFeedMetadata;
+}
+
+/**
  * Change feed mode for Cosmos DB trigger bindings.
  */
 export type CosmosDBv4ChangeFeedMode = 'LatestVersion' | 'AllVersionsAndDeletes';
 
-export interface CosmosDBv4FunctionOptions<T = unknown> extends CosmosDBv4TriggerOptions, Partial<FunctionOptions> {
+export interface CosmosDBv4LatestVersionFunctionOptions<T = unknown>
+    extends Omit<CosmosDBv4TriggerOptions, 'changeFeedMode'>,
+        Partial<FunctionOptions> {
     handler: CosmosDBv4Handler<T>;
 
     trigger?: CosmosDBv4Trigger;
+
+    changeFeedMode?: 'LatestVersion';
 
     /**
      * An optional retry policy to rerun a failed execution until either successful completion occurs or the maximum number of retries is reached.
@@ -22,6 +50,26 @@ export interface CosmosDBv4FunctionOptions<T = unknown> extends CosmosDBv4Trigge
      */
     retry?: RetryOptions;
 }
+
+export interface CosmosDBv4AllVersionsAndDeletesFunctionOptions<T = unknown>
+    extends Omit<CosmosDBv4TriggerOptions, 'changeFeedMode'>,
+        Partial<FunctionOptions> {
+    handler: CosmosDBv4Handler<CosmosDBv4ChangeFeedItem<T>>;
+
+    trigger?: CosmosDBv4Trigger;
+
+    changeFeedMode: 'AllVersionsAndDeletes';
+
+    /**
+     * An optional retry policy to rerun a failed execution until either successful completion occurs or the maximum number of retries is reached.
+     * Learn more [here](https://learn.microsoft.com/azure/azure-functions/functions-bindings-error-pages)
+     */
+    retry?: RetryOptions;
+}
+
+export type CosmosDBv4FunctionOptions<T = unknown> =
+    | CosmosDBv4LatestVersionFunctionOptions<T>
+    | CosmosDBv4AllVersionsAndDeletesFunctionOptions<T>;
 
 export interface CosmosDBv4InputOptions {
     /**
