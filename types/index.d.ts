@@ -8,6 +8,7 @@ export * from './connectorTrigger';
 export * from './cosmosDB';
 export * from './cosmosDB.v3';
 export * from './cosmosDB.v4';
+export * from './cosmosDBMongo';
 export * from './eventGrid';
 export * from './eventHub';
 export * from './generic';

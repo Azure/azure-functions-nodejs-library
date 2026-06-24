@@ -32,8 +32,8 @@ function validateRelease(publishTag: string, dropPath: string): void {
     let expectedFormat: string;
     switch (publishTag) {
         case 'preview':
-            regex = /^[0-9]+\.[0-9]+\.[0-9]+-alpha\.[0-9]+$/;
-            expectedFormat = 'x.x.x-alpha.x';
+            regex = /^[0-9]+\.[0-9]+\.[0-9]+-preview$/;
+            expectedFormat = 'x.x.x-preview';
             break;
         case 'latest':
         case 'legacy':

@@ -4,6 +4,7 @@
 import {
     ConnectorTriggerFunctionOptions,
     CosmosDBFunctionOptions,
+    CosmosDBMongoFunctionOptions,
     EventGridFunctionOptions,
     EventHubFunctionOptions,
     FunctionTrigger,
@@ -135,6 +136,11 @@ export function connectorTrigger<T = unknown>(name: string, options: ConnectorTr
 export function cosmosDB(name: string, options: CosmosDBFunctionOptions): void {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     generic(name, convertToGenericOptions(options, <any>trigger.cosmosDB));
+}
+
+export function cosmosDBMongo<T = unknown>(name: string, options: CosmosDBMongoFunctionOptions<T>): void {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    generic(name, convertToGenericOptions(options, <any>trigger.cosmosDBMongo));
 }
 
 export function warmup(name: string, options: WarmupFunctionOptions): void {

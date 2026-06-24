@@ -44,7 +44,8 @@ export interface WebPubSubTriggerOptions {
     clientProtocols?: 'all' | 'webPubSub' | 'mqtt';
 
     /**
-     * Optional - The names of app settings or setting collections that specify the upstream Azure Web PubSub services
+     * Optional - The names of app settings or app setting collections (for identity-based grouped settings)
+     * that specify the upstream Azure Web PubSub services.
      * Used for signature validation
      * Defaults to "WebPubSubConnectionString" if not specified
      */
@@ -101,8 +102,10 @@ export interface WebPubSubContextInputOptions {
 
     /**
      * Optional - The names of app settings or setting collections that specify the upstream Azure Web PubSub services.
-     * The value is used for Abuse Protection and Signature validation.
-     * The value is auto resolved with "WebPubSubConnectionString" by default.
+     * This replaces the deprecated `connection` option.
+     * The values are used for Abuse Protection and Signature validation.
+     * When multiple values are provided, each configured service is considered during signature validation.
+     * The values are auto resolved with "WebPubSubConnectionString" by default.
      */
     connections?: string[];
 

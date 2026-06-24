@@ -3,6 +3,7 @@
 
 import { ConnectorTriggerFunctionOptions } from './connectorTrigger';
 import { CosmosDBFunctionOptions } from './cosmosDB';
+import { CosmosDBMongoFunctionOptions } from './cosmosDBMongo';
 import { EventGridEvent, EventGridFunctionOptions } from './eventGrid';
 import { EventHubFunctionOptions } from './eventHub';
 import { GenericFunctionOptions } from './generic';
@@ -158,6 +159,13 @@ export function eventGrid<T = EventGridEvent>(name: string, options: EventGridFu
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */
 export function cosmosDB<T = unknown>(name: string, options: CosmosDBFunctionOptions<T>): void;
+
+/**
+ * Registers an Azure Cosmos DB for MongoDB function in your app that will be triggered whenever change stream events occur
+ * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
+ * @param options Configuration options describing the inputs, outputs, and handler for this function
+ */
+export function cosmosDBMongo<T = unknown>(name: string, options: CosmosDBMongoFunctionOptions<T>): void;
 
 /**
  * Registers a connector trigger function in your app that will be triggered by Azure Logic Apps connector events.

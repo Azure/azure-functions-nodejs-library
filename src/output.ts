@@ -2,6 +2,8 @@
 // Licensed under the MIT License.
 
 import {
+    CosmosDBMongoOutput,
+    CosmosDBMongoOutputOptions,
     CosmosDBOutput,
     CosmosDBOutputOptions,
     EventGridOutput,
@@ -91,6 +93,13 @@ export function cosmosDB(options: CosmosDBOutputOptions): CosmosDBOutput {
     return addOutputBindingName({
         ...options,
         type: 'cosmosDB',
+    });
+}
+
+export function cosmosDBMongo(options: CosmosDBMongoOutputOptions): CosmosDBMongoOutput {
+    return addOutputBindingName({
+        ...options,
+        type: 'cosmosDBMongo',
     });
 }
 
