@@ -3,6 +3,7 @@
 
 import { HttpRequestUser } from '@azure/functions';
 import { nonNullValue } from '../utils/nonNull';
+import { workerSystemLog } from '../utils/workerSystemLog';
 
 /* grandfathered in. Should fix when possible */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
@@ -12,7 +13,25 @@ export function extractHttpUserFromHeaders(headers: Headers): HttpRequestUser | 
 
     const clientPrincipal = headers.get('x-ms-client-principal');
     if (clientPrincipal) {
-        const claimsPrincipalData = JSON.parse(Buffer.from(clientPrincipal, 'base64').toString('utf-8'));
+        let claimsPrincipalData: any;
+        try {
+            claimsPrincipalData = JSON.parse(Buffer.from(clientPrincipal, 'base64').toString('utf-8'));
+        } catch (err) {
+            workerSystemLog(
+                'warning',
+                `Failed to parse x-ms-client-principal header: ${err instanceof Error ? err.message : String(err)}`
+            );
+            return null;
+        }
+
+        if (
+            claimsPrincipalData === null ||
+            typeof claimsPrincipalData !== 'object' ||
+            Array.isArray(claimsPrincipalData)
+        ) {
+            workerSystemLog('warning', 'Parsed x-ms-client-principal header was not a JSON object.');
+            return null;
+        }
 
         if (claimsPrincipalData['identityProvider']) {
             user = {
