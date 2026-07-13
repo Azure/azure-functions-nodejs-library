@@ -155,7 +155,7 @@ export function eventGrid<T = EventGridEvent>(name: string, options: EventGridFu
 /**
  * Registers a Cosmos DB function in your app that will be triggered by container changes.
  * By default, this trigger processes latest document versions. To include delete events and
- * intermediate mutations, set `changeFeedMode` to `AllVersionsAndDeletes`.
+ * intermediate mutations, set `changeFeedMode` to `FullFidelity`.
  * @param name The name of the function. The name must be unique within your app and will mostly be used for your own tracking purposes
  * @param options Configuration options describing the inputs, outputs, and handler for this function
  */

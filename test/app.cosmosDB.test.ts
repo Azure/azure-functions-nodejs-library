@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 import 'mocha';
+import { RpcBindingInfo } from '@azure/functions-core';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as app from '../src/app';
 import * as tryGetCoreApiLazyModule from '../src/utils/tryGetCoreApiLazy';
-import { RpcBindingInfo } from '@azure/functions-core';
 import { InvocationContext } from '../types';
 
 describe('app.cosmosDB', () => {
@@ -30,7 +30,7 @@ describe('app.cosmosDB', () => {
             connection: 'CosmosConnection',
             databaseName: 'dbName',
             containerName: 'containerName',
-            changeFeedMode: 'AllVersionsAndDeletes',
+            changeFeedMode: 'FullFidelity',
         });
 
         sinon.assert.calledOnce(registerFunction);

@@ -9,8 +9,8 @@ interface TodoItem {
 
 type CosmosDBv4LatestVersionFunctionOptions<T = unknown> =
     import('../../types').CosmosDBv4LatestVersionFunctionOptions<T>;
-type CosmosDBv4AllVersionsAndDeletesFunctionOptions<T = unknown> =
-    import('../../types').CosmosDBv4AllVersionsAndDeletesFunctionOptions<T>;
+type CosmosDBv4FullFidelityFunctionOptions<T = unknown> =
+    import('../../types').CosmosDBv4FullFidelityFunctionOptions<T>;
 type CosmosDBChangeFeedItem<T = unknown> = import('../../types').CosmosDBChangeFeedItem<T>;
 
 const latestVersionOptions: CosmosDBv4LatestVersionFunctionOptions<TodoItem> = {
@@ -23,11 +23,11 @@ const latestVersionOptions: CosmosDBv4LatestVersionFunctionOptions<TodoItem> = {
     },
 };
 
-const allVersionsAndDeletesOptions: CosmosDBv4AllVersionsAndDeletesFunctionOptions<TodoItem> = {
+const fullFidelityOptions: CosmosDBv4FullFidelityFunctionOptions<TodoItem> = {
     connection: 'CosmosConnection',
     databaseName: 'dbName',
     containerName: 'containerName',
-    changeFeedMode: 'AllVersionsAndDeletes',
+    changeFeedMode: 'FullFidelity',
     handler: (documents: CosmosDBChangeFeedItem<TodoItem>[]) => {
         const item: CosmosDBChangeFeedItem<TodoItem> | undefined = documents[0];
         const currentId: string | undefined = item?.current?.id;
@@ -56,6 +56,6 @@ const validHandlerAssignableToAvad: IsValidHandlerAssignableToAvad = true;
 const invalidHandlerAssignableToAvad: IsInvalidHandlerAssignableToAvad = false;
 
 void latestVersionOptions;
-void allVersionsAndDeletesOptions;
+void fullFidelityOptions;
 void validHandlerAssignableToAvad;
 void invalidHandlerAssignableToAvad;

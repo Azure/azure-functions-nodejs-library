@@ -162,14 +162,14 @@ describe('toCoreFunctionMetadata', () => {
         });
     });
 
-    it('cosmosDB trigger preserves changeFeedMode', () => {
+    it('cosmosDB trigger maps FullFidelity changeFeedMode to AllVersionsAndDeletes', () => {
         const result = toCoreFunctionMetadata('funcName', {
             handler,
             trigger: trigger.cosmosDB({
                 connection: 'CosmosConnection',
                 databaseName: 'dbName',
                 containerName: 'containerName',
-                changeFeedMode: 'AllVersionsAndDeletes',
+                changeFeedMode: 'FullFidelity',
             }),
             return: output.http({}),
         });

@@ -103,10 +103,18 @@ export function eventGrid(options: EventGridTriggerOptions): EventGridTrigger {
 }
 
 export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
-    return addTriggerBindingName({
+    const binding = addTriggerBindingName({
         ...options,
         type: 'cosmosDBTrigger',
     });
+
+    // The Functions host (Cosmos DB extension) only recognizes 'AllVersionsAndDeletes' on the wire,
+    // so translate the developer-facing 'FullFidelity' value before registration.
+    if ('changeFeedMode' in binding && binding.changeFeedMode === 'FullFidelity') {
+        (binding as { changeFeedMode?: string }).changeFeedMode = 'AllVersionsAndDeletes';
+    }
+
+    return binding;
 }
 
 export function warmup(options: WarmupTriggerOptions): WarmupTrigger {
