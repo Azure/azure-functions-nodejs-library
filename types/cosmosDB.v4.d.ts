@@ -6,10 +6,43 @@ import { InvocationContext } from './InvocationContext';
 
 export type CosmosDBv4Handler<T = unknown> = (documents: T[], context: InvocationContext) => FunctionResult;
 
-export interface CosmosDBv4FunctionOptions<T = unknown> extends CosmosDBv4TriggerOptions, Partial<FunctionOptions> {
+/**
+ * Metadata included with each change feed item when using `FullFidelity`.
+ * Property names follow the wire format emitted by Cosmos DB.
+ */
+export interface CosmosDBv4ChangeFeedMetadata {
+    crts: number;
+    lsn: number;
+    operationType: string;
+    previousImageLSN?: number;
+    timeToLiveExpired?: boolean;
+    id?: string;
+    partitionKey?: Record<string, unknown>;
+}
+
+/**
+ * Full-fidelity change feed item payload emitted when `changeFeedMode` is `FullFidelity`.
+ * Property names follow the wire format emitted by Cosmos DB.
+ */
+export interface CosmosDBv4ChangeFeedItem<T = unknown> {
+    current: T | null;
+    previous?: T;
+    metadata?: CosmosDBv4ChangeFeedMetadata;
+}
+
+/**
+ * Change feed mode for Cosmos DB trigger bindings.
+ */
+export type CosmosDBv4ChangeFeedMode = 'LatestVersion' | 'FullFidelity';
+
+export interface CosmosDBv4LatestVersionFunctionOptions<T = unknown>
+    extends Omit<CosmosDBv4TriggerOptions, 'changeFeedMode'>,
+        Partial<FunctionOptions> {
     handler: CosmosDBv4Handler<T>;
 
     trigger?: CosmosDBv4Trigger;
+
+    changeFeedMode?: 'LatestVersion';
 
     /**
      * An optional retry policy to rerun a failed execution until either successful completion occurs or the maximum number of retries is reached.
@@ -17,6 +50,26 @@ export interface CosmosDBv4FunctionOptions<T = unknown> extends CosmosDBv4Trigge
      */
     retry?: RetryOptions;
 }
+
+export interface CosmosDBv4FullFidelityFunctionOptions<T = unknown>
+    extends Omit<CosmosDBv4TriggerOptions, 'changeFeedMode'>,
+        Partial<FunctionOptions> {
+    handler: CosmosDBv4Handler<CosmosDBv4ChangeFeedItem<T>>;
+
+    trigger?: CosmosDBv4Trigger;
+
+    changeFeedMode: 'FullFidelity';
+
+    /**
+     * An optional retry policy to rerun a failed execution until either successful completion occurs or the maximum number of retries is reached.
+     * Learn more [here](https://learn.microsoft.com/azure/azure-functions/functions-bindings-error-pages)
+     */
+    retry?: RetryOptions;
+}
+
+export type CosmosDBv4FunctionOptions<T = unknown> =
+    | CosmosDBv4LatestVersionFunctionOptions<T>
+    | CosmosDBv4FullFidelityFunctionOptions<T>;
 
 export interface CosmosDBv4InputOptions {
     /**
@@ -144,6 +197,7 @@ export interface CosmosDBv4TriggerOptions {
      * This option tells the Trigger to read changes from the beginning of the container's change history instead of starting at the current time.
      * Reading from the beginning only works the first time the trigger starts, as in subsequent runs, the checkpoints are already stored.
      * Setting this option to true when there are leases already created has no effect.
+     * Not supported when `changeFeedMode` is `FullFidelity`.
      */
     startFromBeginning?: boolean;
 
@@ -151,8 +205,16 @@ export interface CosmosDBv4TriggerOptions {
      * Gets or sets the date and time from which to initialize the change feed read operation.
      * The recommended format is ISO 8601 with the UTC designator, such as 2021-02-16T14:19:29Z.
      * This is only used to set the initial trigger state. After the trigger has a lease state, changing this value has no effect.
+     * Not supported when `changeFeedMode` is `FullFidelity`.
      */
     startFromTime?: string;
+
+    /**
+     * Gets or sets the change feed mode used to process document changes.
+     * `LatestVersion` processes the latest document version.
+     * `FullFidelity` includes intermediate mutations and delete events.
+     */
+    changeFeedMode?: CosmosDBv4ChangeFeedMode;
 
     /**
      * Defines preferred locations (regions) for geo-replicated database accounts in the Azure Cosmos DB service.
