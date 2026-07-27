@@ -102,6 +102,11 @@ describe('toRpcHttp', () => {
         expect(result).to.deep.equal(getExpectedRpcHttp('', {}, '204'));
     });
 
+    it('status 205 with a body converts to an empty body', async () => {
+        const result = await toRpcHttp('invocId', { status: 205, body: 'dropped' });
+        expect(result).to.deep.equal(getExpectedRpcHttp('', {}, '205'));
+    });
+
     it('status 304 with a jsonBody converts to an empty body', async () => {
         const result = await toRpcHttp('invocId', { status: 304, jsonBody: { a: 1 } });
         expect(result).to.deep.equal(getExpectedRpcHttp('', {}, '304'));

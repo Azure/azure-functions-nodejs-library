@@ -5,7 +5,9 @@ import 'mocha';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
+import * as sinon from 'sinon';
 import { HttpRequest } from '../../src/http/HttpRequest';
+import * as workerLogModule from '../../src/utils/workerSystemLog';
 
 chai.use(chaiAsPromised);
 
@@ -431,6 +433,18 @@ value2
     // The RPC (non-streaming) constructor must not pass a body to the WHATWG Request for GET/HEAD,
     // otherwise it throws "Request with GET/HEAD method cannot have body." before the handler runs.
     describe('GET/HEAD body handling', () => {
+        let workerSystemLogStub: sinon.SinonStub;
+
+        beforeEach(() => {
+            // Stub the system logger so the discard warning (issue #458) doesn't spam test output,
+            // and so the logging tests below can assert on it.
+            workerSystemLogStub = sinon.stub(workerLogModule, 'workerSystemLog');
+        });
+
+        afterEach(() => {
+            sinon.restore();
+        });
+
         for (const method of ['GET', 'HEAD']) {
             it(`does not throw and omits string body for ${method}`, async () => {
                 const req = new HttpRequest({
@@ -493,6 +507,57 @@ value2
                     body: { bytes: Buffer.from(bodyContent) },
                 });
                 expect(await req.text()).to.equal(bodyContent);
+            });
+        }
+
+        // The body is discarded for GET/HEAD, but that must not be silent (issue #458): it is logged
+        // as a warning so a dropped body is discoverable when debugging.
+        for (const method of ['GET', 'HEAD']) {
+            it(`logs a warning when a ${method} request carries a string body`, () => {
+                new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { string: 'discard me' },
+                });
+                expect(workerSystemLogStub.calledOnce).to.be.true;
+                expect(workerSystemLogStub.firstCall.args[0]).to.equal('warning');
+                expect(workerSystemLogStub.firstCall.args[1]).to.include(method);
+                expect(workerSystemLogStub.firstCall.args[1]).to.match(/discard/i);
+            });
+
+            it(`logs a warning when a ${method} request carries a bytes body`, () => {
+                new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { bytes: Buffer.from('discard me') },
+                });
+                expect(workerSystemLogStub.calledOnce).to.be.true;
+                expect(workerSystemLogStub.firstCall.args[0]).to.equal('warning');
+            });
+
+            it(`does not log when a ${method} request has no body`, () => {
+                new HttpRequest({ method, url: 'https://example.test/api/probe' });
+                expect(workerSystemLogStub.called).to.be.false;
+            });
+
+            it(`does not log when a ${method} request has an empty bytes body`, () => {
+                new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { bytes: Buffer.from([]) },
+                });
+                expect(workerSystemLogStub.called).to.be.false;
+            });
+        }
+
+        for (const method of ['POST', 'PUT', 'PATCH', 'DELETE']) {
+            it(`does not log a discard warning when a ${method} request carries a body`, () => {
+                new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { string: 'keep me' },
+                });
+                expect(workerSystemLogStub.called).to.be.false;
             });
         }
     });
