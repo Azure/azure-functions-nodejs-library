@@ -11,6 +11,10 @@ interface InternalHttpResponseInit extends HttpResponseInit {
     nativeResponse?: Response;
 }
 
+// Statuses that cannot have a body per the WHATWG fetch spec ("null body status"), limited to the
+// valid Response status range (200-599). The global Response constructor throws if a body is provided.
+const nullBodyStatuses = new Set([204, 205, 304]);
+
 export class HttpResponse implements types.HttpResponse {
     readonly cookies: types.Cookie[];
     readonly enableContentNegotiation: boolean;
@@ -26,7 +30,12 @@ export class HttpResponse implements types.HttpResponse {
             this.#nativeRes = init.nativeResponse;
         } else {
             const resInit: ResponseInit = { status: init.status, headers: init.headers };
-            if (isDefined(init.jsonBody)) {
+            // 204/205/304 responses cannot have a body. The global Response constructor throws if one
+            // is provided, so omit it to avoid crashing when converting a handler's response. This
+            // mirrors the GET/HEAD body handling in HttpRequest.
+            // See https://github.com/Azure/azure-functions-nodejs-library/issues/458
+            const isNullBodyStatus = isDefined(init.status) && nullBodyStatuses.has(init.status);
+            if (isDefined(init.jsonBody) && !isNullBodyStatus) {
                 // Response.json is not available in all versions, so we create it manually
                 const jsonBody = JSON.stringify(init.jsonBody);
                 const jsonHeaders = new Headers(resInit.headers);
@@ -38,7 +47,7 @@ export class HttpResponse implements types.HttpResponse {
                 // Cast to any to satisfy the native Response constructor
                 // Our HttpResponseBodyInit type is compatible with what Node.js accepts
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                this.#nativeRes = new Response(init.body as any, resInit);
+                this.#nativeRes = new Response(isNullBodyStatus ? undefined : (init.body as any), resInit);
             }
         }
 

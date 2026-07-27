@@ -5,7 +5,9 @@ import 'mocha';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
+import * as sinon from 'sinon';
 import { HttpRequest } from '../../src/http/HttpRequest';
+import * as workerLogModule from '../../src/utils/workerSystemLog';
 
 chai.use(chaiAsPromised);
 
@@ -424,6 +426,288 @@ value2
                     /Content-Type.*not.*one of|Could not parse content as FormData/i
                 );
             }
+        });
+    });
+
+    // Regression tests for https://github.com/Azure/azure-functions-nodejs-library/issues/458
+    // The RPC (non-streaming) constructor must not pass a body to the WHATWG Request for GET/HEAD,
+    // otherwise it throws "Request with GET/HEAD method cannot have body." before the handler runs.
+    describe('GET/HEAD body handling', () => {
+        let workerSystemLogStub: sinon.SinonStub;
+
+        beforeEach(() => {
+            // Stub the system logger so the discard warning (issue #458) doesn't spam test output,
+            // and so the logging tests below can assert on it.
+            workerSystemLogStub = sinon.stub(workerLogModule, 'workerSystemLog');
+        });
+
+        afterEach(() => {
+            sinon.restore();
+        });
+
+        for (const method of ['GET', 'HEAD']) {
+            it(`does not throw and omits string body for ${method}`, async () => {
+                const req = new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { string: 'x' },
+                });
+                expect(req.body).to.be.null;
+                expect(await req.text()).to.equal('');
+            });
+
+            it(`does not throw and omits bytes body for ${method}`, async () => {
+                const req = new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { bytes: Buffer.from('x') },
+                });
+                expect(req.body).to.be.null;
+                expect(await req.text()).to.equal('');
+            });
+
+            it(`does not throw for zero-length bytes body for ${method}`, () => {
+                expect(() => {
+                    new HttpRequest({
+                        method,
+                        url: 'https://example.test/api/probe',
+                        body: { bytes: Buffer.from([]) },
+                    });
+                }).to.not.throw();
+            });
+        }
+
+        for (const method of ['get', 'Get', 'gEt', 'head', 'Head', 'hEaD']) {
+            it(`does not throw for mixed-case method "${method}" with a body`, () => {
+                expect(() => {
+                    new HttpRequest({
+                        method,
+                        url: 'https://example.test/api/probe',
+                        body: { string: 'x' },
+                    });
+                }).to.not.throw();
+            });
+        }
+
+        for (const method of ['POST', 'PUT', 'PATCH', 'DELETE']) {
+            it(`preserves string body for ${method}`, async () => {
+                const req = new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { string: 'preserved-body' },
+                });
+                expect(await req.text()).to.equal('preserved-body');
+            });
+
+            it(`preserves bytes body for ${method}`, async () => {
+                const bodyContent = 'preserved-bytes-body';
+                const req = new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { bytes: Buffer.from(bodyContent) },
+                });
+                expect(await req.text()).to.equal(bodyContent);
+            });
+        }
+
+        // The body is discarded for GET/HEAD, but that must not be silent (issue #458): it is logged
+        // as a warning so a dropped body is discoverable when debugging.
+        for (const method of ['GET', 'HEAD']) {
+            it(`logs a warning when a ${method} request carries a string body`, () => {
+                new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { string: 'discard me' },
+                });
+                expect(workerSystemLogStub.calledOnce).to.be.true;
+                expect(workerSystemLogStub.firstCall.args[0]).to.equal('warning');
+                expect(workerSystemLogStub.firstCall.args[1]).to.include(method);
+                expect(workerSystemLogStub.firstCall.args[1]).to.match(/discard/i);
+            });
+
+            it(`logs a warning when a ${method} request carries a bytes body`, () => {
+                new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { bytes: Buffer.from('discard me') },
+                });
+                expect(workerSystemLogStub.calledOnce).to.be.true;
+                expect(workerSystemLogStub.firstCall.args[0]).to.equal('warning');
+            });
+
+            it(`does not log when a ${method} request has no body`, () => {
+                new HttpRequest({ method, url: 'https://example.test/api/probe' });
+                expect(workerSystemLogStub.called).to.be.false;
+            });
+
+            it(`does not log when a ${method} request has an empty bytes body`, () => {
+                new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { bytes: Buffer.from([]) },
+                });
+                expect(workerSystemLogStub.called).to.be.false;
+            });
+        }
+
+        for (const method of ['POST', 'PUT', 'PATCH', 'DELETE']) {
+            it(`does not log a discard warning when a ${method} request carries a body`, () => {
+                new HttpRequest({
+                    method,
+                    url: 'https://example.test/api/probe',
+                    body: { string: 'keep me' },
+                });
+                expect(workerSystemLogStub.called).to.be.false;
+            });
+        }
+    });
+
+    // Edge cases around the native (WHATWG) Request the library now wraps after removing the
+    // standalone undici dependency. These lock in behavior that differs between undici versions.
+    describe('body and content parsing (native fetch edge cases)', () => {
+        it('parses a JSON string body via json()', async () => {
+            const req = new HttpRequest({
+                method: 'POST',
+                url: 'http://localhost:7071/api/json',
+                body: { string: JSON.stringify({ a: 1, b: [2, 3] }) },
+                headers: { 'content-type': 'application/json' },
+            });
+            expect(await req.json()).to.deep.equal({ a: 1, b: [2, 3] });
+        });
+
+        it('reads a bytes body via arrayBuffer()', async () => {
+            const bytes = Buffer.from([0x00, 0x01, 0x02, 0xff]);
+            const req = new HttpRequest({
+                method: 'POST',
+                url: 'http://localhost:7071/api/bin',
+                body: { bytes },
+            });
+            expect(Buffer.from(await req.arrayBuffer())).to.deep.equal(bytes);
+        });
+
+        it('reads a body via blob()', async () => {
+            const req = new HttpRequest({
+                method: 'POST',
+                url: 'http://localhost:7071/api/blob',
+                body: { string: 'blob-body' },
+            });
+            const blob = await req.blob();
+            expect(await blob.text()).to.equal('blob-body');
+        });
+
+        it('prefers bytes over string when both are provided', async () => {
+            const req = new HttpRequest({
+                method: 'POST',
+                url: 'http://localhost:7071/api/both',
+                body: { bytes: Buffer.from('from-bytes'), string: 'from-string' },
+            });
+            expect(await req.text()).to.equal('from-bytes');
+        });
+
+        it('treats an empty-string body as no body', async () => {
+            const req = new HttpRequest({
+                method: 'POST',
+                url: 'http://localhost:7071/api/empty',
+                body: { string: '' },
+            });
+            expect(req.body).to.be.null;
+            expect(await req.text()).to.equal('');
+        });
+
+        it('exposes a readable body stream for non-empty bodies', async () => {
+            const req = new HttpRequest({
+                method: 'POST',
+                url: 'http://localhost:7071/api/stream',
+                body: { string: 'streamed' },
+            });
+            const body = req.body;
+            expect(body).to.not.be.null;
+            if (body === null) {
+                throw new Error('expected a non-null body stream');
+            }
+            const reader = body.getReader();
+            const chunks: Uint8Array[] = [];
+            for (;;) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    break;
+                }
+                chunks.push(value);
+            }
+            expect(Buffer.concat(chunks).toString()).to.equal('streamed');
+        });
+
+        it('marks bodyUsed after consuming the body', async () => {
+            const req = new HttpRequest({
+                method: 'POST',
+                url: 'http://localhost:7071/api/used',
+                body: { string: 'consume-me' },
+            });
+            expect(req.bodyUsed).to.be.false;
+            await req.text();
+            expect(req.bodyUsed).to.be.true;
+        });
+    });
+
+    describe('headers, query, and method (native fetch edge cases)', () => {
+        it('normalizes known method casing to uppercase', () => {
+            const req = new HttpRequest({
+                method: 'post',
+                url: 'http://localhost:7071/api/x',
+                body: { string: 'x' },
+            });
+            expect(req.method).to.equal('POST');
+        });
+
+        it('preserves custom (non-standard) methods', () => {
+            const req = new HttpRequest({
+                method: 'PURGE',
+                url: 'http://localhost:7071/api/x',
+            });
+            expect(req.method).to.equal('PURGE');
+        });
+
+        it('parses repeated query params from the URL when none are provided', () => {
+            const req = new HttpRequest({
+                method: 'GET',
+                url: 'http://localhost:7071/api/x?a=1&b=2&a=3',
+            });
+            expect(req.query.get('a')).to.equal('1');
+            expect(req.query.getAll('a')).to.deep.equal(['1', '3']);
+            expect(req.query.get('b')).to.equal('2');
+        });
+
+        it('explicit query replaces the URL query string', () => {
+            const req = new HttpRequest({
+                method: 'GET',
+                url: 'http://localhost:7071/api/x?fromUrl=1',
+                query: { fromInit: 'yes' },
+            });
+            expect(req.query.get('fromInit')).to.equal('yes');
+            expect(req.query.has('fromUrl')).to.be.false;
+        });
+
+        it('treats header names case-insensitively', () => {
+            const req = new HttpRequest({
+                method: 'GET',
+                url: 'http://localhost:7071/api/x',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            expect(req.headers.get('content-type')).to.equal('application/json');
+            expect(req.headers.get('CONTENT-TYPE')).to.equal('application/json');
+        });
+
+        it('converts null nullableHeaders values to empty-string headers', () => {
+            const req = new HttpRequest({
+                method: 'GET',
+                url: 'http://localhost:7071/api/x',
+                nullableHeaders: {
+                    present: { value: 'yes' },
+                    absent: { value: null },
+                },
+            });
+            expect(req.headers.get('present')).to.equal('yes');
+            expect(req.headers.get('absent')).to.equal('');
         });
     });
 });

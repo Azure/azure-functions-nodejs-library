@@ -13,6 +13,7 @@ import { fromNullableMapping } from '../converters/fromRpcNullable';
 import { fromRpcTypedData } from '../converters/fromRpcTypedData';
 import { AzFuncSystemError } from '../errors';
 import { isDefined, nonNullProp } from '../utils/nonNull';
+import { workerSystemLog } from '../utils/workerSystemLog';
 import { extractHttpUserFromHeaders } from './extractHttpUserFromHeaders';
 
 interface InternalHttpRequestInit extends RpcHttpData {
@@ -33,17 +34,31 @@ export class HttpRequest implements types.HttpRequest {
         let nativeReq = init.nativeRequest;
         if (!nativeReq) {
             const url = nonNullProp(init, 'url');
+            const method = nonNullProp(init, 'method');
 
+            // GET/HEAD requests cannot have a body. The global Request constructor throws if one is
+            // provided, so omit it for these methods to match the streaming path (createStreamRequest).
+            // See https://github.com/Azure/azure-functions-nodejs-library/issues/458
             let body: Buffer | string | undefined;
-            if (init.body?.bytes) {
-                body = Buffer.from(init.body?.bytes);
-            } else if (init.body?.string) {
-                body = init.body.string;
+            const lowerMethod = method.toLowerCase();
+            if (lowerMethod !== 'get' && lowerMethod !== 'head') {
+                if (init.body?.bytes) {
+                    body = Buffer.from(init.body?.bytes);
+                } else if (init.body?.string) {
+                    body = init.body.string;
+                }
+            } else if (init.body?.bytes?.length || init.body?.string) {
+                // The incoming GET/HEAD request has a body, which the global Request constructor forbids.
+                // We drop it to avoid crashing, but log it so the behavior isn't silent and is easier to debug.
+                workerSystemLog(
+                    'warning',
+                    `Discarding the body of the incoming ${method} request because GET and HEAD requests cannot have a body.`
+                );
             }
 
             nativeReq = new Request(url, {
                 body,
-                method: nonNullProp(init, 'method'),
+                method,
                 headers: fromNullableMapping(init.nullableHeaders, init.headers),
             });
         }
