@@ -33,17 +33,24 @@ export class HttpRequest implements types.HttpRequest {
         let nativeReq = init.nativeRequest;
         if (!nativeReq) {
             const url = nonNullProp(init, 'url');
+            const method = nonNullProp(init, 'method');
 
+            // GET/HEAD requests cannot have a body. The global Request constructor throws if one is
+            // provided, so omit it for these methods to match the streaming path (createStreamRequest).
+            // See https://github.com/Azure/azure-functions-nodejs-library/issues/458
             let body: Buffer | string | undefined;
-            if (init.body?.bytes) {
-                body = Buffer.from(init.body?.bytes);
-            } else if (init.body?.string) {
-                body = init.body.string;
+            const lowerMethod = method.toLowerCase();
+            if (lowerMethod !== 'get' && lowerMethod !== 'head') {
+                if (init.body?.bytes) {
+                    body = Buffer.from(init.body?.bytes);
+                } else if (init.body?.string) {
+                    body = init.body.string;
+                }
             }
 
             nativeReq = new Request(url, {
                 body,
-                method: nonNullProp(init, 'method'),
+                method,
                 headers: fromNullableMapping(init.nullableHeaders, init.headers),
             });
         }

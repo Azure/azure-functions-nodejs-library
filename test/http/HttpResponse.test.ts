@@ -606,4 +606,100 @@ describe('HttpResponse', () => {
             expect(res.headers.get('X-Custom-Header')).to.equal('map-value');
         });
     });
+
+    // Edge cases around the native (WHATWG) Response the library now wraps after removing the
+    // standalone undici dependency. The newer global Response is stricter than older undici versions.
+    describe('status and null-body handling (native fetch edge cases)', () => {
+        it('defaults status to 200 when not provided', () => {
+            const res = new HttpResponse({ body: 'x' });
+            expect(res.status).to.equal(200);
+        });
+
+        it('uses the provided status', () => {
+            const res = new HttpResponse({ status: 201, body: 'created' });
+            expect(res.status).to.equal(201);
+        });
+
+        // Regression parallel to https://github.com/Azure/azure-functions-nodejs-library/issues/458:
+        // 204/205/304 responses cannot have a body, and the global Response constructor throws if one
+        // is provided. The library must omit the body rather than turn the handler's response into a 500.
+        for (const status of [204, 205, 304]) {
+            it(`omits a string body for null-body status ${status} instead of throwing`, async () => {
+                const res = new HttpResponse({ status, body: 'should-be-dropped' });
+                expect(res.status).to.equal(status);
+                expect(res.body).to.be.null;
+                expect(await res.text()).to.equal('');
+            });
+
+            it(`omits a jsonBody for null-body status ${status} instead of throwing`, () => {
+                const res = new HttpResponse({ status, jsonBody: { dropped: true } });
+                expect(res.status).to.equal(status);
+                expect(res.body).to.be.null;
+            });
+
+            it(`clone preserves null-body status ${status} with no body`, () => {
+                const res = new HttpResponse({ status, body: 'x' });
+                const cloned = res.clone();
+                expect(cloned.status).to.equal(status);
+                expect(cloned.body).to.be.null;
+            });
+        }
+
+        it('still preserves the body for regular statuses', async () => {
+            const res = new HttpResponse({ status: 200, body: 'ok' });
+            expect(await res.text()).to.equal('ok');
+        });
+
+        // The global Response constructor rejects statuses outside 200-599 with a RangeError.
+        // Documented here so the constraint is visible.
+        for (const status of [100, 199, 600, 1000]) {
+            it(`throws a RangeError for out-of-range status ${status}`, () => {
+                expect(() => new HttpResponse({ status, body: 'x' })).to.throw(RangeError);
+            });
+        }
+    });
+
+    describe('jsonBody edge cases', () => {
+        it('serializes falsy-but-defined jsonBody (0)', async () => {
+            const res = new HttpResponse({ jsonBody: 0 });
+            expect(res.headers.get('content-type')).to.equal('application/json');
+            const clone = res.clone();
+            expect(await res.text()).to.equal('0');
+            expect(await clone.json()).to.equal(0);
+        });
+
+        it('serializes falsy-but-defined jsonBody (false)', async () => {
+            const res = new HttpResponse({ jsonBody: false });
+            expect(await res.text()).to.equal('false');
+        });
+
+        it('serializes falsy-but-defined jsonBody (empty string)', async () => {
+            const res = new HttpResponse({ jsonBody: '' });
+            expect(res.headers.get('content-type')).to.equal('application/json');
+            expect(await res.text()).to.equal('""');
+        });
+
+        it('treats null jsonBody as no body without forcing a content-type', () => {
+            const res = new HttpResponse({ jsonBody: null });
+            expect(res.body).to.be.null;
+            expect(res.headers.get('content-type')).to.be.null;
+        });
+
+        it('does not override an explicit content-type for jsonBody', async () => {
+            const res = new HttpResponse({
+                jsonBody: { a: 1 },
+                headers: { 'content-type': 'application/problem+json' },
+            });
+            expect(res.headers.get('content-type')).to.equal('application/problem+json');
+            expect(await res.json()).to.deep.equal({ a: 1 });
+        });
+
+        it('respects an explicit content-type regardless of casing', () => {
+            const res = new HttpResponse({
+                jsonBody: { a: 1 },
+                headers: { 'Content-Type': 'text/plain' },
+            });
+            expect(res.headers.get('content-type')).to.equal('text/plain');
+        });
+    });
 });

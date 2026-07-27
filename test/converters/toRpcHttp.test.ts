@@ -95,6 +95,18 @@ describe('toRpcHttp', () => {
         await expect(toRpcHttp('invocId', { status: {} })).to.eventually.be.rejectedWith(/status/i);
     });
 
+    // https://github.com/Azure/azure-functions-nodejs-library/issues/458 (Response-side parallel):
+    // null-body statuses must not crash conversion when a handler returns a body.
+    it('status 204 with a body converts to an empty body', async () => {
+        const result = await toRpcHttp('invocId', { status: 204, body: 'dropped' });
+        expect(result).to.deep.equal(getExpectedRpcHttp('', {}, '204'));
+    });
+
+    it('status 304 with a jsonBody converts to an empty body', async () => {
+        const result = await toRpcHttp('invocId', { status: 304, jsonBody: { a: 1 } });
+        expect(result).to.deep.equal(getExpectedRpcHttp('', {}, '304'));
+    });
+
     it('headers object', async () => {
         const result = await toRpcHttp('invocId', {
             headers: {
