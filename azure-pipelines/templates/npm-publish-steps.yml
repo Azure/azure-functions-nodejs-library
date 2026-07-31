@@ -9,6 +9,11 @@ steps:
     inputs:
       versionSpec: 18.x
 
+  - task: npmAuthenticate@0
+    displayName: 'Authenticate to Central Feed Service'
+    inputs:
+      workingFile: '$(Build.SourcesDirectory)/.npmrc'
+
   - script: npm ci
     displayName: 'npm ci'
 
