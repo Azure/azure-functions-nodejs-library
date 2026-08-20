@@ -48,6 +48,10 @@ extends:
                           displayName: 'Install Node.js'
                           inputs:
                               versionSpec: 14.x
+                        - task: npmAuthenticate@0
+                          displayName: 'Authenticate to Central Feed Service'
+                          inputs:
+                              workingFile: '$(Build.SourcesDirectory)/.npmrc'
                         - script: npm ci
                           displayName: 'npm ci'
                         - script: 'npm run validateRelease -- --publishTag ${{ parameters.NpmPublishTag }} --dropPath "$(Pipeline.Workspace)/officialBuild/drop"'
