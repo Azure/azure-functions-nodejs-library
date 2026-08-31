@@ -341,6 +341,31 @@ describe('toCoreFunctionMetadata sdk binding tests', () => {
         });
     }
 
+    it('should not enable deferred binding for null or malformed service bus topic sdkBinding values', () => {
+        const invalidSdkBindingValues: unknown[] = [null, 0, 1, '', 'true', {}, []];
+
+        for (const sdkBinding of invalidSdkBindingValues) {
+            const result = toCoreFunctionMetadata('serviceBusTopicFunction', {
+                handler,
+                trigger: {
+                    type: 'serviceBusTrigger',
+                    name: 'serviceBusTopicTrigger',
+                    topicName: 'topic',
+                    subscriptionName: 'subscription',
+                    connection: 'ServiceBusConnection',
+                    sdkBinding,
+                },
+            });
+
+            expect(result.bindings['serviceBusTopicTrigger']).to.deep.include({
+                sdkBinding,
+                properties: {
+                    supportsDeferredBinding: 'false',
+                },
+            });
+        }
+    });
+
     it('should handle sdk binding for extra inputs', () => {
         const result = toCoreFunctionMetadata('funcName', {
             handler,
