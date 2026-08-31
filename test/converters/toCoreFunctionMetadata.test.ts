@@ -303,6 +303,44 @@ describe('toCoreFunctionMetadata sdk binding tests', () => {
         });
     });
 
+    for (const testCase of [
+        { sdkBinding: true, expectedDeferredBinding: 'true' },
+        { sdkBinding: false, expectedDeferredBinding: 'false' },
+        { sdkBinding: undefined, expectedDeferredBinding: 'false' },
+    ] as const) {
+        it(`should set supportsDeferredBinding to ${
+            testCase.expectedDeferredBinding
+        } for service bus topic trigger when sdkBinding is ${String(testCase.sdkBinding)}`, () => {
+            const result = toCoreFunctionMetadata('serviceBusTopicFunction', {
+                handler,
+                trigger: trigger.serviceBusTopic({
+                    topicName: 'topic',
+                    subscriptionName: 'subscription',
+                    connection: 'ServiceBusConnection',
+                    ...(testCase.sdkBinding === undefined ? {} : { sdkBinding: testCase.sdkBinding }),
+                }),
+            });
+
+            const serviceBusTopicBinding = Object.values(result.bindings).find(
+                (binding) => binding.type === 'serviceBusTrigger'
+            );
+
+            expect(serviceBusTopicBinding).to.deep.include({
+                topicName: 'topic',
+                subscriptionName: 'subscription',
+                connection: 'ServiceBusConnection',
+                properties: {
+                    supportsDeferredBinding: testCase.expectedDeferredBinding,
+                },
+            });
+            if (testCase.sdkBinding === undefined) {
+                expect(serviceBusTopicBinding).not.to.have.property('sdkBinding');
+            } else {
+                expect(serviceBusTopicBinding).to.have.property('sdkBinding', testCase.sdkBinding);
+            }
+        });
+    }
+
     it('should handle sdk binding for extra inputs', () => {
         const result = toCoreFunctionMetadata('funcName', {
             handler,

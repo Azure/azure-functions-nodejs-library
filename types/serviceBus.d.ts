@@ -43,7 +43,7 @@ export interface ServiceBusQueueTriggerOptions {
     cardinality?: 'many' | 'one';
 
     /**
-     * Whether to use sdk binding for this blob operation.
+     * Whether to use SDK binding for this Service Bus trigger.
      * */
     sdkBinding?: boolean;
 }
@@ -97,6 +97,11 @@ export interface ServiceBusTopicTriggerOptions {
      * Set to `many` in order to enable batching. If omitted or set to `one`, a single message is passed to the function.
      */
     cardinality?: 'many' | 'one';
+
+    /**
+     * Whether to use SDK binding for this Service Bus trigger.
+     */
+    sdkBinding?: boolean;
 }
 export type ServiceBusTopicTrigger = FunctionTrigger & ServiceBusTopicTriggerOptions;
 

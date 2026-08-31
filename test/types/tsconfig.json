@@ -3,6 +3,8 @@
         "module": "commonjs",
         "target": "es6",
         "strict": true,
+        "skipLibCheck": true,
+        "types": ["mocha"],
         "outDir": "dist",
         "baseUrl": "./",
         "paths": {
