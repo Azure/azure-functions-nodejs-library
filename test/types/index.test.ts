@@ -39,6 +39,37 @@ const fullFidelityOptions: CosmosDBv4FullFidelityFunctionOptions<TodoItem> = {
     },
 };
 
+type ServiceBusTopicFunctionOptions<T = unknown> = import('../../types').ServiceBusTopicFunctionOptions<T>;
+type ServiceBusTopicTriggerOptions = import('../../types').ServiceBusTopicTriggerOptions;
+
+const serviceBusTopicTriggerOptions: ServiceBusTopicTriggerOptions = {
+    connection: 'ServiceBusConnection',
+    topicName: 'topic',
+    subscriptionName: 'subscription',
+    sdkBinding: true,
+};
+
+const serviceBusTopicFunctionOptions: ServiceBusTopicFunctionOptions<string> = {
+    ...serviceBusTopicTriggerOptions,
+    handler: (message) => {
+        const typedMessage: string = message;
+        void typedMessage;
+    },
+};
+
+const invalidServiceBusTopicTriggerOptions: ServiceBusTopicTriggerOptions = {
+    connection: 'ServiceBusConnection',
+    topicName: 'topic',
+    subscriptionName: 'subscription',
+    // @ts-expect-error sdkBinding only accepts boolean values
+    sdkBinding: 'true',
+};
+
+declare const app: typeof import('../../types').app;
+function registerServiceBusTopic(): void {
+    app.serviceBusTopic<string>('serviceBusTopic', serviceBusTopicFunctionOptions);
+}
+
 type ExpectedAvadHandler = import('../../types').CosmosDBv4Handler<CosmosDBChangeFeedItem<TodoItem>>;
 type ValidAvadHandler = (
     documents: CosmosDBChangeFeedItem<TodoItem>[],
@@ -57,5 +88,9 @@ const invalidHandlerAssignableToAvad: IsInvalidHandlerAssignableToAvad = false;
 
 void latestVersionOptions;
 void fullFidelityOptions;
+void serviceBusTopicTriggerOptions;
+void serviceBusTopicFunctionOptions;
+void invalidServiceBusTopicTriggerOptions;
+void registerServiceBusTopic;
 void validHandlerAssignableToAvad;
 void invalidHandlerAssignableToAvad;
