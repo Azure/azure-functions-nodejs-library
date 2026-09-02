@@ -208,6 +208,119 @@ describe('toMcpToolResult', () => {
         expect(JSON.parse(content.text)).to.deep.equal([]);
     });
 
+    describe('isError passthrough (call_tool_result)', () => {
+        it('routes McpToolResponse with isError=true through call_tool_result envelope', () => {
+            const response = new McpToolResponse({
+                content: [new McpTextContent('validation failed: missing field')],
+                isError: true,
+            });
+            const result = toMcpToolResult(response);
+
+            expect(result?.type).to.equal('call_tool_result');
+            const payload = JSON.parse(result?.content || '{}') as {
+                content: Array<{ type: string; text: string }>;
+                isError: boolean;
+                structuredContent?: unknown;
+            };
+            expect(payload.isError).to.equal(true);
+            expect(payload.content).to.deep.equal([{ type: 'text', text: 'validation failed: missing field' }]);
+            expect(payload).to.not.have.property('structuredContent');
+            expect(result?.structuredContent).to.equal(undefined);
+        });
+
+        it('routes McpToolResponse with isError=false through call_tool_result envelope', () => {
+            const response = new McpToolResponse({
+                content: [new McpTextContent('ok')],
+                isError: false,
+            });
+            const result = toMcpToolResult(response);
+
+            expect(result?.type).to.equal('call_tool_result');
+            const payload = JSON.parse(result?.content || '{}') as { isError: boolean };
+            expect(payload.isError).to.equal(false);
+        });
+
+        it('preserves multiple content blocks inside call_tool_result payload', () => {
+            const response = new McpToolResponse({
+                content: [
+                    new McpTextContent('first'),
+                    new McpImageContent({ data: 'ZGF0YQ==', mimeType: 'image/png' }),
+                ],
+                isError: true,
+            });
+            const result = toMcpToolResult(response);
+
+            expect(result?.type).to.equal('call_tool_result');
+            const payload = JSON.parse(result?.content || '{}') as {
+                content: Array<{ type: string }>;
+                isError: boolean;
+            };
+            expect(payload.isError).to.equal(true);
+            expect(payload.content).to.have.length(2);
+            expect(payload.content[0]?.type).to.equal('text');
+            expect(payload.content[1]?.type).to.equal('image');
+        });
+
+        it('embeds structuredContent inside call_tool_result payload and on the envelope', () => {
+            const response = new McpToolResponse({
+                content: [new McpTextContent('display')],
+                structuredContent: { id: 'x1', code: 42 },
+                isError: true,
+            });
+            const result = toMcpToolResult(response);
+
+            expect(result?.type).to.equal('call_tool_result');
+            const payload = JSON.parse(result?.content || '{}') as {
+                isError: boolean;
+                structuredContent: Record<string, unknown>;
+            };
+            expect(payload.isError).to.equal(true);
+            expect(payload.structuredContent).to.deep.equal({ id: 'x1', code: 42 });
+            expect(result?.structuredContent).to.equal(JSON.stringify({ id: 'x1', code: 42 }));
+        });
+
+        it('parses already-serialized structuredContent string into payload but keeps envelope raw', () => {
+            const response = new McpToolResponse({
+                content: [new McpTextContent('display')],
+                structuredContent: JSON.stringify({ id: 'x1' }),
+                isError: true,
+            });
+            const result = toMcpToolResult(response);
+
+            const payload = JSON.parse(result?.content || '{}') as {
+                structuredContent: Record<string, unknown>;
+            };
+            expect(payload.structuredContent).to.deep.equal({ id: 'x1' });
+            expect(result?.structuredContent).to.equal(JSON.stringify({ id: 'x1' }));
+        });
+
+        it('synthesizes a fallback text block when structuredContent is set without a text block', () => {
+            const response = new McpToolResponse({
+                content: [new McpImageContent({ data: 'ZGF0YQ==', mimeType: 'image/png' })],
+                structuredContent: { id: 'x1' },
+                isError: true,
+            });
+            const result = toMcpToolResult(response);
+
+            const payload = JSON.parse(result?.content || '{}') as {
+                content: Array<{ type: string }>;
+            };
+            expect(payload.content).to.have.length(2);
+            expect(payload.content.some((b) => b.type === 'text')).to.equal(true);
+        });
+
+        it('does not route through call_tool_result when isError is undefined', () => {
+            const response = new McpToolResponse({
+                content: [new McpTextContent('ok')],
+                structuredContent: { id: 'x1' },
+            });
+            const result = toMcpToolResult(response);
+
+            expect(result?.type).to.equal('text');
+            expect(result?.structuredContent).to.equal(JSON.stringify({ id: 'x1' }));
+        });
+    });
+
     it('accepts user-defined McpContentBlock subclasses (extensibility)', () => {
         // Demonstrates the extensibility contract documented on McpContentBlock:
         // a custom subclass flows through the converter with its own type/toJSON shape
