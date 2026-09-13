@@ -8,6 +8,7 @@ import { shouldCreateStructuredContentMarker } from '../utils/mcpContentMarker';
 
 const multiContentResultType = 'multi_content_result';
 const textContentResultType = 'text';
+const callToolResultType = 'call_tool_result';
 
 /**
  * Converts a tool handler's return value into the wire-format MCP tool result.
@@ -63,6 +64,16 @@ export function toMcpToolResult(result: unknown, context?: InvocationContext): M
 function serializeToolResponse(response: McpToolResponse): McpToolResult {
     const blocks = ensureTextBlockWhenStructured(response);
 
+    // When `isError` is set, route the response through the host's `call_tool_result`
+    // passthrough so the boolean reaches the MCP client. The host's ToolReturnValueBinder
+    // recognizes `type == "call_tool_result"` and deserializes `content` directly into
+    // the MCP SDK's full `CallToolResult` (including `isError`, `structuredContent`, `_meta`).
+    // The non-passthrough envelope only carries `content` + `structuredContent`, so any
+    // `isError` value would otherwise be silently dropped.
+    if (response.isError !== undefined) {
+        return serializeAsCallToolResult(response, blocks);
+    }
+
     let type: string;
     let contentStr: string;
     if (blocks.length === 1) {
@@ -81,6 +92,41 @@ function serializeToolResponse(response: McpToolResponse): McpToolResult {
             typeof response.structuredContent === 'string'
                 ? response.structuredContent
                 : JSON.stringify(response.structuredContent);
+    }
+
+    return out;
+}
+
+function serializeAsCallToolResult(response: McpToolResponse, blocks: McpContentBlock[]): McpToolResult {
+    const callToolResult: Record<string, unknown> = {
+        content: blocks.map((b) => b.toJSON()),
+        isError: response.isError,
+    };
+
+    let structuredEnvelope: string | undefined;
+    if (response.structuredContent !== undefined && response.structuredContent !== null) {
+        if (typeof response.structuredContent === 'string') {
+            // Already-serialized JSON: embed parsed value in the CallToolResult payload
+            // and surface the raw string on the envelope (matches the .NET SDK shape).
+            try {
+                callToolResult.structuredContent = JSON.parse(response.structuredContent);
+            } catch {
+                callToolResult.structuredContent = response.structuredContent;
+            }
+            structuredEnvelope = response.structuredContent;
+        } else {
+            callToolResult.structuredContent = response.structuredContent;
+            structuredEnvelope = JSON.stringify(response.structuredContent);
+        }
+    }
+
+    const out: McpToolResult = {
+        type: callToolResultType,
+        content: JSON.stringify(callToolResult),
+    };
+
+    if (structuredEnvelope !== undefined) {
+        out.structuredContent = structuredEnvelope;
     }
 
     return out;
