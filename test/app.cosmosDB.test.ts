@@ -7,7 +7,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as app from '../src/app';
 import * as tryGetCoreApiLazyModule from '../src/utils/tryGetCoreApiLazy';
-import { InvocationContext } from '../types';
+import { CosmosDBv4ChangeFeedMode, InvocationContext } from '../types';
 
 describe('app.cosmosDB', () => {
     const handler = (_documents: unknown[], _context: InvocationContext) => {};
@@ -30,7 +30,7 @@ describe('app.cosmosDB', () => {
             connection: 'CosmosConnection',
             databaseName: 'dbName',
             containerName: 'containerName',
-            changeFeedMode: 'FullFidelity',
+            changeFeedMode: CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes,
         });
 
         sinon.assert.calledOnce(registerFunction);

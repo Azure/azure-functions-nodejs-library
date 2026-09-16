@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 import { output, trigger } from '../../src';
 import { addSdkBindingsFlag, toCoreFunctionMetadata } from '../../src/converters/toCoreFunctionMetadata';
 import * as workerLogModule from '../../src/utils/workerSystemLog';
-import { InvocationContext } from '../../types';
+import { CosmosDBv4ChangeFeedMode, InvocationContext } from '../../types';
 
 describe('toCoreFunctionMetadata', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -162,14 +162,14 @@ describe('toCoreFunctionMetadata', () => {
         });
     });
 
-    it('cosmosDB trigger maps FullFidelity changeFeedMode to AllVersionsAndDeletes', () => {
+    it('cosmosDB trigger preserves AllVersionsAndDeletes changeFeedMode', () => {
         const result = toCoreFunctionMetadata('funcName', {
             handler,
             trigger: trigger.cosmosDB({
                 connection: 'CosmosConnection',
                 databaseName: 'dbName',
                 containerName: 'containerName',
-                changeFeedMode: 'FullFidelity',
+                changeFeedMode: CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes,
             }),
             return: output.http({}),
         });
@@ -190,7 +190,7 @@ describe('toCoreFunctionMetadata', () => {
                 connection: 'CosmosConnection',
                 databaseName: 'dbName',
                 containerName: 'containerName',
-                changeFeedMode: 'LatestVersion',
+                changeFeedMode: CosmosDBv4ChangeFeedMode.LatestVersion,
             }),
             return: output.http({}),
         });

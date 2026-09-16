@@ -108,12 +108,7 @@ export function cosmosDB(options: CosmosDBTriggerOptions): CosmosDBTrigger {
         type: 'cosmosDBTrigger',
     });
 
-    // The Functions host (Cosmos DB extension) only recognizes 'AllVersionsAndDeletes' on the wire,
-    // so translate the developer-facing 'FullFidelity' value before registration.
-    if ('changeFeedMode' in binding && binding.changeFeedMode === 'FullFidelity') {
-        (binding as { changeFeedMode?: string }).changeFeedMode = 'AllVersionsAndDeletes';
-    }
-
+    // The host feature is named 'AllVersionsAndDeletes'; keep the binding metadata aligned to that contract.
     return binding;
 }
 
