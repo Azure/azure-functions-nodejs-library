@@ -30,7 +30,7 @@ export { Disposable } from './utils/Disposable';
 export { McpContent } from './utils/mcpContentMarker';
 export { arg } from './utils/toolProperties';
 
-export const enum CosmosDBChangeFeedMode {
+export enum CosmosDBChangeFeedMode {
     LatestVersion = 'LatestVersion',
     AllVersionsAndDeletes = 'AllVersionsAndDeletes',
 }

@@ -33,7 +33,7 @@ export interface CosmosDBv4ChangeFeedItem<T = unknown> {
 /**
  * Change feed mode for Cosmos DB trigger bindings.
  */
-export const enum CosmosDBv4ChangeFeedMode {
+export enum CosmosDBv4ChangeFeedMode {
     LatestVersion = 'LatestVersion',
     AllVersionsAndDeletes = 'AllVersionsAndDeletes',
 }
@@ -54,7 +54,7 @@ export interface CosmosDBv4LatestVersionFunctionOptions<T = unknown>
     retry?: RetryOptions;
 }
 
-export interface CosmosDBv4FullFidelityFunctionOptions<T = unknown>
+export interface CosmosDBv4AllVersionsAndDeletesFunctionOptions<T = unknown>
     extends Omit<CosmosDBv4TriggerOptions, 'changeFeedMode'>,
         Partial<FunctionOptions> {
     handler: CosmosDBv4Handler<CosmosDBv4ChangeFeedItem<T>>;
@@ -72,7 +72,7 @@ export interface CosmosDBv4FullFidelityFunctionOptions<T = unknown>
 
 export type CosmosDBv4FunctionOptions<T = unknown> =
     | CosmosDBv4LatestVersionFunctionOptions<T>
-    | CosmosDBv4FullFidelityFunctionOptions<T>;
+    | CosmosDBv4AllVersionsAndDeletesFunctionOptions<T>;
 
 export interface CosmosDBv4InputOptions {
     /**

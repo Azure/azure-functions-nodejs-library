@@ -11,8 +11,8 @@ interface TodoItem {
 
 type CosmosDBv4LatestVersionFunctionOptions<T = unknown> =
     import('../../types').CosmosDBv4LatestVersionFunctionOptions<T>;
-type CosmosDBv4FullFidelityFunctionOptions<T = unknown> =
-    import('../../types').CosmosDBv4FullFidelityFunctionOptions<T>;
+type CosmosDBv4AllVersionsAndDeletesFunctionOptions<T = unknown> =
+    import('../../types').CosmosDBv4AllVersionsAndDeletesFunctionOptions<T>;
 type CosmosDBChangeFeedItem<T = unknown> = import('../../types').CosmosDBChangeFeedItem<T>;
 
 const latestVersionOptions: CosmosDBv4LatestVersionFunctionOptions<TodoItem> = {
@@ -25,7 +25,7 @@ const latestVersionOptions: CosmosDBv4LatestVersionFunctionOptions<TodoItem> = {
     },
 };
 
-const fullFidelityOptions: CosmosDBv4FullFidelityFunctionOptions<TodoItem> = {
+const allVersionsAndDeletesOptions: CosmosDBv4AllVersionsAndDeletesFunctionOptions<TodoItem> = {
     connection: 'CosmosConnection',
     databaseName: 'dbName',
     containerName: 'containerName',
@@ -89,7 +89,7 @@ const validHandlerAssignableToAvad: IsValidHandlerAssignableToAvad = true;
 const invalidHandlerAssignableToAvad: IsInvalidHandlerAssignableToAvad = false;
 
 void latestVersionOptions;
-void fullFidelityOptions;
+void allVersionsAndDeletesOptions;
 void serviceBusTopicTriggerOptions;
 void serviceBusTopicFunctionOptions;
 void invalidServiceBusTopicTriggerOptions;
