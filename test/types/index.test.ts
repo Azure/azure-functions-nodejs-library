@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { CosmosDBv4ChangeFeedMode } from '../../types';
+import type { CosmosDBv4ChangeFeedMode } from '../../types';
 
 // This file will be compiled by multiple versions of TypeScript as decribed in ./test/TypesTests.ts to verify there are no errors
 interface TodoItem {
@@ -29,7 +29,7 @@ const allVersionsAndDeletesOptions: CosmosDBv4AllVersionsAndDeletesFunctionOptio
     connection: 'CosmosConnection',
     databaseName: 'dbName',
     containerName: 'containerName',
-    changeFeedMode: CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes,
+    changeFeedMode: 'AllVersionsAndDeletes' as CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes,
     handler: (documents: CosmosDBChangeFeedItem<TodoItem>[]) => {
         const item: CosmosDBChangeFeedItem<TodoItem> | undefined = documents[0];
         const currentId: string | undefined = item?.current?.id;

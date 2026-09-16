@@ -4,7 +4,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { output, trigger } from '../../src';
+import { CosmosDBv4ChangeFeedMode as RuntimeCosmosDBv4ChangeFeedMode, output, trigger } from '../../src';
 import { addSdkBindingsFlag, toCoreFunctionMetadata } from '../../src/converters/toCoreFunctionMetadata';
 import * as workerLogModule from '../../src/utils/workerSystemLog';
 import { CosmosDBv4ChangeFeedMode, InvocationContext } from '../../types';
@@ -169,7 +169,8 @@ describe('toCoreFunctionMetadata', () => {
                 connection: 'CosmosConnection',
                 databaseName: 'dbName',
                 containerName: 'containerName',
-                changeFeedMode: CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes,
+                changeFeedMode:
+                    RuntimeCosmosDBv4ChangeFeedMode.AllVersionsAndDeletes as unknown as CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes,
             }),
             return: output.http({}),
         });
@@ -190,7 +191,8 @@ describe('toCoreFunctionMetadata', () => {
                 connection: 'CosmosConnection',
                 databaseName: 'dbName',
                 containerName: 'containerName',
-                changeFeedMode: CosmosDBv4ChangeFeedMode.LatestVersion,
+                changeFeedMode:
+                    RuntimeCosmosDBv4ChangeFeedMode.LatestVersion as unknown as CosmosDBv4ChangeFeedMode.LatestVersion,
             }),
             return: output.http({}),
         });

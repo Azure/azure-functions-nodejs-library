@@ -5,6 +5,7 @@ import 'mocha';
 import { RpcBindingInfo } from '@azure/functions-core';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
+import { CosmosDBv4ChangeFeedMode as RuntimeCosmosDBv4ChangeFeedMode } from '../src';
 import * as app from '../src/app';
 import * as tryGetCoreApiLazyModule from '../src/utils/tryGetCoreApiLazy';
 import { CosmosDBv4ChangeFeedMode, InvocationContext } from '../types';
@@ -30,7 +31,8 @@ describe('app.cosmosDB', () => {
             connection: 'CosmosConnection',
             databaseName: 'dbName',
             containerName: 'containerName',
-            changeFeedMode: CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes,
+            changeFeedMode:
+                RuntimeCosmosDBv4ChangeFeedMode.AllVersionsAndDeletes as unknown as CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes,
         });
 
         sinon.assert.calledOnce(registerFunction);
