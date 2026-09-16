@@ -1,6 +1,8 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
+import type { CosmosDBv4ChangeFeedMode } from '../../types';
+
 // This file will be compiled by multiple versions of TypeScript as decribed in ./test/TypesTests.ts to verify there are no errors
 interface TodoItem {
     id: string;
@@ -9,6 +11,8 @@ interface TodoItem {
 
 type CosmosDBv4LatestVersionFunctionOptions<T = unknown> =
     import('../../types').CosmosDBv4LatestVersionFunctionOptions<T>;
+type CosmosDBv4AllVersionsAndDeletesFunctionOptions<T = unknown> =
+    import('../../types').CosmosDBv4AllVersionsAndDeletesFunctionOptions<T>;
 type CosmosDBv4FullFidelityFunctionOptions<T = unknown> =
     import('../../types').CosmosDBv4FullFidelityFunctionOptions<T>;
 type CosmosDBChangeFeedItem<T = unknown> = import('../../types').CosmosDBChangeFeedItem<T>;
@@ -23,11 +27,11 @@ const latestVersionOptions: CosmosDBv4LatestVersionFunctionOptions<TodoItem> = {
     },
 };
 
-const fullFidelityOptions: CosmosDBv4FullFidelityFunctionOptions<TodoItem> = {
+const allVersionsAndDeletesOptions: CosmosDBv4AllVersionsAndDeletesFunctionOptions<TodoItem> = {
     connection: 'CosmosConnection',
     databaseName: 'dbName',
     containerName: 'containerName',
-    changeFeedMode: 'FullFidelity',
+    changeFeedMode: 'AllVersionsAndDeletes' as CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes,
     handler: (documents: CosmosDBChangeFeedItem<TodoItem>[]) => {
         const item: CosmosDBChangeFeedItem<TodoItem> | undefined = documents[0];
         const currentId: string | undefined = item?.current?.id;
@@ -38,6 +42,8 @@ const fullFidelityOptions: CosmosDBv4FullFidelityFunctionOptions<TodoItem> = {
         void operationType;
     },
 };
+
+const deprecatedFullFidelityOptions: CosmosDBv4FullFidelityFunctionOptions<TodoItem> = allVersionsAndDeletesOptions;
 
 type ServiceBusTopicFunctionOptions<T = unknown> = import('../../types').ServiceBusTopicFunctionOptions<T>;
 type ServiceBusTopicTriggerOptions = import('../../types').ServiceBusTopicTriggerOptions;
@@ -87,7 +93,8 @@ const validHandlerAssignableToAvad: IsValidHandlerAssignableToAvad = true;
 const invalidHandlerAssignableToAvad: IsInvalidHandlerAssignableToAvad = false;
 
 void latestVersionOptions;
-void fullFidelityOptions;
+void allVersionsAndDeletesOptions;
+void deprecatedFullFidelityOptions;
 void serviceBusTopicTriggerOptions;
 void serviceBusTopicFunctionOptions;
 void invalidServiceBusTopicTriggerOptions;

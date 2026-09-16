@@ -35,7 +35,7 @@ export type CosmosDBInput = CosmosDBv3Input | CosmosDBv4Input;
 export type CosmosDBTriggerOptions = CosmosDBv3TriggerOptions | CosmosDBv4TriggerOptions;
 export type CosmosDBTrigger = CosmosDBv3Trigger | CosmosDBv4Trigger;
 
-export type CosmosDBChangeFeedMode = CosmosDBv4ChangeFeedMode;
+export { CosmosDBv4ChangeFeedMode as CosmosDBChangeFeedMode };
 export type CosmosDBChangeFeedMetadata = CosmosDBv4ChangeFeedMetadata;
 export type CosmosDBChangeFeedItem<T = unknown> = CosmosDBv4ChangeFeedItem<T>;
 
