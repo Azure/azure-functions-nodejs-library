@@ -13,6 +13,8 @@ type CosmosDBv4LatestVersionFunctionOptions<T = unknown> =
     import('../../types').CosmosDBv4LatestVersionFunctionOptions<T>;
 type CosmosDBv4AllVersionsAndDeletesFunctionOptions<T = unknown> =
     import('../../types').CosmosDBv4AllVersionsAndDeletesFunctionOptions<T>;
+type CosmosDBv4FullFidelityFunctionOptions<T = unknown> =
+    import('../../types').CosmosDBv4FullFidelityFunctionOptions<T>;
 type CosmosDBChangeFeedItem<T = unknown> = import('../../types').CosmosDBChangeFeedItem<T>;
 
 const latestVersionOptions: CosmosDBv4LatestVersionFunctionOptions<TodoItem> = {
@@ -40,6 +42,8 @@ const allVersionsAndDeletesOptions: CosmosDBv4AllVersionsAndDeletesFunctionOptio
         void operationType;
     },
 };
+
+const deprecatedFullFidelityOptions: CosmosDBv4FullFidelityFunctionOptions<TodoItem> = allVersionsAndDeletesOptions;
 
 type ServiceBusTopicFunctionOptions<T = unknown> = import('../../types').ServiceBusTopicFunctionOptions<T>;
 type ServiceBusTopicTriggerOptions = import('../../types').ServiceBusTopicTriggerOptions;
@@ -90,6 +94,7 @@ const invalidHandlerAssignableToAvad: IsInvalidHandlerAssignableToAvad = false;
 
 void latestVersionOptions;
 void allVersionsAndDeletesOptions;
+void deprecatedFullFidelityOptions;
 void serviceBusTopicTriggerOptions;
 void serviceBusTopicFunctionOptions;
 void invalidServiceBusTopicTriggerOptions;

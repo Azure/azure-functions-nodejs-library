@@ -70,6 +70,11 @@ export interface CosmosDBv4AllVersionsAndDeletesFunctionOptions<T = unknown>
     retry?: RetryOptions;
 }
 
+/**
+ * @deprecated Use `CosmosDBv4AllVersionsAndDeletesFunctionOptions` instead.
+ */
+export type CosmosDBv4FullFidelityFunctionOptions<T = unknown> = CosmosDBv4AllVersionsAndDeletesFunctionOptions<T>;
+
 export type CosmosDBv4FunctionOptions<T = unknown> =
     | CosmosDBv4LatestVersionFunctionOptions<T>
     | CosmosDBv4AllVersionsAndDeletesFunctionOptions<T>;
