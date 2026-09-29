@@ -283,4 +283,67 @@ describe('fromRpcTriggerMetadata', () => {
             },
         });
     });
+
+    it('serviceBusTrigger with date fields missing timezone', () => {
+        const testData: Record<string, RpcTypedDataExtended> = {
+            ExpiresAtUtc: {
+                json: '"2025-06-07T14:46:55.145"', // Missing 'Z' timezone info
+                data: 'json',
+                http: undefined,
+            },
+            EnqueuedTimeUtc: {
+                json: '"2025-06-07T14:46:55.145"', // Missing 'Z' timezone info
+                data: 'json',
+                http: undefined,
+            },
+            MessageId: {
+                string: 'test-message-id',
+                data: 'string',
+                http: undefined,
+            },
+        };
+
+        const result = fromRpcTriggerMetadata(testData, 'serviceBusTrigger');
+        expect(result).to.deep.equal({
+            expiresAtUtc: '2025-06-07T14:46:55.145Z',
+            enqueuedTimeUtc: '2025-06-07T14:46:55.145Z',
+            messageId: 'test-message-id',
+        });
+    });
+
+    it('serviceBusTrigger with date fields already having timezone should not be modified', () => {
+        const testData: Record<string, RpcTypedDataExtended> = {
+            ExpiresAtUtc: {
+                json: '"2025-06-07T14:46:55.145Z"', // Already has 'Z' timezone info
+                data: 'json',
+                http: undefined,
+            },
+            EnqueuedTimeUtc: {
+                json: '"2025-06-07T14:46:55.145Z"', // Already has 'Z' timezone info
+                data: 'json',
+                http: undefined,
+            },
+        };
+
+        const result = fromRpcTriggerMetadata(testData, 'serviceBusTrigger');
+        expect(result).to.deep.equal({
+            expiresAtUtc: '2025-06-07T14:46:55.145Z',
+            enqueuedTimeUtc: '2025-06-07T14:46:55.145Z',
+        });
+    });
+
+    it('non-serviceBus triggers should not have date format fixes applied', () => {
+        const testData: Record<string, RpcTypedDataExtended> = {
+            SomeDate: {
+                json: '"2025-06-07T14:46:55.145"', // Missing 'Z' timezone info
+                data: 'json',
+                http: undefined,
+            },
+        };
+
+        const result = fromRpcTriggerMetadata(testData, 'queueTrigger');
+        expect(result).to.deep.equal({
+            someDate: '2025-06-07T14:46:55.145', // Should remain unchanged
+        });
+    });
 });
