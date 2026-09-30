@@ -201,6 +201,7 @@ export interface HttpRequestUser {
 
     /**
      * unique username
+     * Empty for App Service callers without a name, such as service principals
      */
     username: string;
 
