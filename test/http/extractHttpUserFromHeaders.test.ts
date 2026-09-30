@@ -48,6 +48,40 @@ describe('Extract Http User Claims Principal from Headers', () => {
         expect(user?.claimsPrincipalData).to.deep.equal(claimsPrincipalData);
     });
 
+    it('Parses AppService headers without a principal name', () => {
+        // A service principal token has no name claim, so App Service leaves out x-ms-client-principal-name
+        const id = 'testId';
+        const provider = 'aad';
+        const claimsPrincipalData = {
+            auth_typ: provider,
+            claims: [
+                { typ: 'appid', val: 'testAppId' },
+                {
+                    typ: 'http://schemas.microsoft.com/identity/claims/objectidentifier',
+                    val: id,
+                },
+                { typ: 'ver', val: '2.0' },
+            ],
+            name_typ: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name',
+            role_typ: 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role',
+        };
+
+        const headers: Headers = new Headers({
+            'x-ms-client-principal-id': id,
+            'x-ms-client-principal-idp': provider,
+            'x-ms-client-principal': Buffer.from(JSON.stringify(claimsPrincipalData)).toString('base64'),
+        });
+
+        const user: HttpRequestUser | null = extractHttpUserFromHeaders(headers);
+
+        expect(user).to.not.be.null;
+        expect(user?.type).to.equal('AppService');
+        expect(user?.id).to.equal(id);
+        expect(user?.username).to.equal('');
+        expect(user?.identityProvider).to.equal(provider);
+        expect(user?.claimsPrincipalData).to.deep.equal(claimsPrincipalData);
+    });
+
     it('Correctly parses StaticWebApps headers', () => {
         const id = 'testId';
         const username = 'test@example.com';
