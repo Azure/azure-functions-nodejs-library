@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import type { CosmosDBv4ChangeFeedMode } from '../../types';
+import type { SetupOptions } from '../../types';
 
 // This file will be compiled by multiple versions of TypeScript as decribed in ./test/TypesTests.ts to verify there are no errors
 interface TodoItem {
@@ -92,6 +93,13 @@ type IsInvalidHandlerAssignableToAvad = InvalidAvadHandler extends ExpectedAvadH
 const validHandlerAssignableToAvad: IsValidHandlerAssignableToAvad = true;
 const invalidHandlerAssignableToAvad: IsInvalidHandlerAssignableToAvad = false;
 
+const setupOptions: SetupOptions = {
+    enableHttpStream: false,
+    capabilities: { a: 'b', c: false },
+    enablePlainRpcStrings: false,
+};
+const emptySetupOptions: SetupOptions = {};
+
 void latestVersionOptions;
 void allVersionsAndDeletesOptions;
 void deprecatedFullFidelityOptions;
@@ -101,3 +109,5 @@ void invalidServiceBusTopicTriggerOptions;
 void registerServiceBusTopic;
 void validHandlerAssignableToAvad;
 void invalidHandlerAssignableToAvad;
+void setupOptions;
+void emptySetupOptions;
