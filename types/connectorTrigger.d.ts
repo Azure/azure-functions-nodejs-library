@@ -20,6 +20,46 @@ export interface ConnectorTriggerFunctionOptions<T = unknown>
     retry?: RetryOptions;
 }
 
-export interface ConnectorTriggerOptions extends Record<string, unknown> {}
+export interface ConnectorTriggerOptions extends Record<string, unknown> {
+    /**
+     * The connector event delivery mode. If omitted, the Functions host defaults to `Webhook`.
+     */
+    deliveryMode?: 'Poll' | 'Webhook';
+
+    /**
+     * The connector connection setting. Required when `deliveryMode` is `Poll`.
+     */
+    connection?: string;
+
+    /**
+     * The connector trigger configuration name. Supports app setting expressions such as `%TriggerConfigName%`.
+     * Required when `deliveryMode` is `Poll`.
+     */
+    triggerConfigName?: string;
+
+    /**
+     * Set to `many` to enable batching. If omitted or set to `one`, a single event is passed to the function.
+     * For batches, use an array as the handler's payload type, for example `app.connectorTrigger<MyEvent[]>`.
+     */
+    cardinality?: 'many' | 'one';
+
+    /**
+     * An optional per-function override for the maximum number of events per batch.
+     * If omitted, Poll delivery uses the extension's app-wide host.json default.
+     */
+    maxBatchSize?: number;
+
+    /**
+     * An optional per-function override for the maximum number of concurrent single-event invocations.
+     * If omitted, Poll delivery uses the extension's app-wide host.json default.
+     * Batched invocations are processed one at a time by the extension.
+     */
+    maxConcurrentCalls?: number;
+
+    /**
+     * The target number of pending events per function instance used for scaling.
+     */
+    targetPendingEventThreshold?: number;
+}
 
 export type ConnectorTrigger = FunctionTrigger & ConnectorTriggerOptions;

@@ -188,6 +188,14 @@ export function mcpPrompt(options: McpPromptTriggerOptions): McpPromptTrigger {
 }
 
 export function connectorTrigger(options: ConnectorTriggerOptions): ConnectorTrigger {
+    if (options.deliveryMode === 'Poll') {
+        const missingOptions = ['connection', 'triggerConfigName'].filter(
+            (key) => options[key] === undefined || options[key] === null
+        );
+        if (missingOptions.length > 0) {
+            throw new Error(`The following options are required for Poll delivery mode: ${missingOptions.join(', ')}`);
+        }
+    }
     return addTriggerBindingName({
         ...options,
         type: 'connectorTrigger',
