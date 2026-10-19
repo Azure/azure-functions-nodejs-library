@@ -26,6 +26,38 @@ npm install @azure/functions
 - The programming model version is strictly tied to the version of the [`@azure/functions`](https://www.npmjs.com/package/@azure/functions) npm package, and is versioned independently of the [runtime](https://learn.microsoft.com/azure/azure-functions/functions-versions?pivots=programming-language-javascript). Both the runtime and the programming model use "4" as their latest major version, but that is purely a coincidence.
 - You can't mix the v3 and v4 programming models in the same function app. As soon as you register one v4 function in your app, any v3 functions registered in _function.json_ files are ignored.
 
+### Connector trigger TypeScript compatibility in 4.17.0
+
+Version 4.17.0 adds explicitly typed polling and batching properties to `ConnectorTriggerOptions` and `ConnectorTriggerFunctionOptions`.
+Previously, these properties were accepted through a `Record<string, unknown>` index signature.
+This tightens the TypeScript contract and can cause existing code to fail compilation, even when the configuration values are valid at runtime.
+Custom properties remain supported.
+
+In particular, TypeScript widens properties in an unannotated configuration variable to `string`:
+
+```typescript
+import { trigger } from '@azure/functions';
+
+const options = { deliveryMode: 'Webhook' };
+// No longer compiles: string is not assignable to 'Poll' | 'Webhook'.
+trigger.connectorTrigger(options);
+```
+
+Annotate configuration variables with the exported options type:
+
+```typescript
+import { trigger, type ConnectorTriggerOptions } from '@azure/functions';
+
+const options: ConnectorTriggerOptions = { deliveryMode: 'Webhook' };
+trigger.connectorTrigger(options);
+```
+
+For `app.connectorTrigger`, use `ConnectorTriggerFunctionOptions<T>` for a configuration variable that includes a handler.
+Alternatively, preserve literal types using `as const`, or pass the options object directly to the API.
+Use the exact values `'Poll'` or `'Webhook'` for `deliveryMode`, and `'one'` or `'many'` for `cardinality`.
+The connection and trigger configuration names must be strings; batch size, concurrency, and scaling threshold overrides must be numbers.
+Poll delivery also now checks at registration that both `connection` and `triggerConfigName` are supplied.
+
 ## Usage
 
 ### TypeScript

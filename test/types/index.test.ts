@@ -72,6 +72,7 @@ const invalidServiceBusTopicTriggerOptions: ServiceBusTopicTriggerOptions = {
 };
 
 declare const app: typeof import('../../types').app;
+declare const trigger: typeof import('../../types').trigger;
 function registerServiceBusTopic(): void {
     app.serviceBusTopic<string>('serviceBusTopic', serviceBusTopicFunctionOptions);
 }
@@ -96,6 +97,35 @@ const connectorPollOptions: ConnectorTriggerFunctionOptions<TodoItem[]> = {
 
 const connectorWebhookOptions: ConnectorTriggerOptions = { deliveryMode: 'Webhook' };
 const connectorDefaultOptions: ConnectorTriggerOptions = {};
+
+function configureConnectorTriggerFromVariables(): void {
+    const widenedOptions = { deliveryMode: 'Webhook' };
+    // @ts-expect-error unannotated configuration variables widen deliveryMode to string
+    trigger.connectorTrigger(widenedOptions);
+
+    const typedOptions: ConnectorTriggerOptions = { deliveryMode: 'Webhook' };
+    trigger.connectorTrigger(typedOptions);
+
+    const literalOptions = { deliveryMode: 'Webhook' } as const;
+    trigger.connectorTrigger(literalOptions);
+
+    const widenedBatchOptions = { cardinality: 'many' };
+    // @ts-expect-error unannotated configuration variables widen cardinality to string
+    trigger.connectorTrigger(widenedBatchOptions);
+
+    const typedBatchOptions: ConnectorTriggerOptions = { cardinality: 'many' };
+    trigger.connectorTrigger(typedBatchOptions);
+
+    const widenedFunctionOptions = { deliveryMode: 'Webhook', handler: () => {} };
+    // @ts-expect-error function configuration variables also need literal deliveryMode types
+    app.connectorTrigger('widenedConnector', widenedFunctionOptions);
+
+    const typedFunctionOptions: ConnectorTriggerFunctionOptions = {
+        deliveryMode: 'Webhook',
+        handler: () => {},
+    };
+    app.connectorTrigger('typedConnector', typedFunctionOptions);
+}
 
 const invalidConnectorOptions: ConnectorTriggerOptions = {
     // @ts-expect-error deliveryMode only accepts Poll or Webhook
@@ -145,6 +175,7 @@ void registerServiceBusTopic;
 void connectorPollOptions;
 void connectorWebhookOptions;
 void connectorDefaultOptions;
+void configureConnectorTriggerFromVariables;
 void invalidConnectorOptions;
 void registerConnectorTrigger;
 void validHandlerAssignableToAvad;
