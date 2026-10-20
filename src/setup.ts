@@ -12,12 +12,20 @@ export function lockSetup(): void {
     setupLocked = true;
 }
 
+export let structuredLogProperties: SetupOptions['structuredLogProperties'];
 export let enableHttpStream = false;
 export const capabilities: Record<string, string> = {};
 
 export function setup(opts: SetupOptions): void {
     if (setupLocked) {
         throw new AzFuncSystemError("Setup options can't be changed after app startup has finished.");
+    }
+
+    if (isDefined(opts.structuredLogProperties)) {
+        if (opts.structuredLogProperties !== 'lastPlainObject') {
+            throw new AzFuncSystemError('Unsupported structuredLogProperties option.');
+        }
+        structuredLogProperties = opts.structuredLogProperties;
     }
 
     if (opts.enableHttpStream) {

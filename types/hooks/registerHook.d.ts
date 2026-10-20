@@ -4,7 +4,7 @@
 import { Disposable } from '../index';
 import { AppStartHandler, AppTerminateHandler } from './appHooks';
 import { PostInvocationHandler, PreInvocationHandler } from './invocationHooks';
-import { LogHookHandler } from './logHooks';
+import { LogHookHandler, LogHookOptions } from './logHooks';
 
 /**
  * Register a hook to be run at the start of your application
@@ -47,4 +47,4 @@ export function postInvocation(handler: PostInvocationHandler): Disposable;
  * @param handler the handler for the hook
  * @returns a `Disposable` object that can be used to unregister the hook
  */
-export function log(handler: LogHookHandler): Disposable;
+export function log(handler: LogHookHandler, options?: LogHookOptions): Disposable;

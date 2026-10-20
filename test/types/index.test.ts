@@ -180,3 +180,20 @@ void invalidConnectorOptions;
 void registerConnectorTrigger;
 void validHandlerAssignableToAvad;
 void invalidHandlerAssignableToAvad;
+
+const structuredLogSetup: import('../../types').SetupOptions = { structuredLogProperties: 'lastPlainObject' };
+const structuredLogHook: import('../../types').LogHookOptions = { structuredLogProperties: true };
+const structuredAttributes: import('../../types').LogHookContextInit = {
+    attributes: { model: 'olive', attempts: 2, enabled: true },
+};
+void structuredLogSetup;
+void structuredLogHook;
+void structuredAttributes;
+// @ts-expect-error Only the explicit final-object mode is supported.
+const invalidStructuredSetup: import('../../types').SetupOptions = { structuredLogProperties: 'allObjects' };
+const invalidStructuredAttributes: import('../../types').LogHookContextInit = {
+    // @ts-expect-error Structured attributes are flat scalar values.
+    attributes: { nested: { model: 'olive' } },
+};
+void invalidStructuredSetup;
+void invalidStructuredAttributes;

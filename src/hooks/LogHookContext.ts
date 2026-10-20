@@ -41,6 +41,14 @@ export class LogHookContext extends HookContext implements types.LogHookContext 
         throw new ReadOnlyError('category');
     }
 
+    get attributes(): Readonly<Record<string, string | number | boolean>> | undefined {
+        return this.#init.attributes;
+    }
+
+    set attributes(_value: Readonly<Record<string, string | number | boolean>> | undefined) {
+        throw new ReadOnlyError('attributes');
+    }
+
     get invocationContext(): types.InvocationContext | undefined {
         return this.#init.invocationContext;
     }

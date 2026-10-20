@@ -26,12 +26,15 @@ import { waitForProxyRequest } from './http/httpProxy';
 import { createStreamRequest } from './http/HttpRequest';
 import { InvocationContext } from './InvocationContext';
 import { PromptInvocationContext } from './mcp/PromptInvocationContext';
-import { enableHttpStream } from './setup';
+import { enableHttpStream, structuredLogProperties } from './setup';
+import { extractLogAttributes } from './utils/extractLogAttributes';
 import { isHttpTrigger, isMcpPromptTrigger, isMcpToolTrigger, isTimerTrigger, isTrigger } from './utils/isTrigger';
 import { isDefined, nonNullProp, nonNullValue } from './utils/nonNull';
+import { tryGetCoreApiLazy } from './utils/tryGetCoreApiLazy';
 
 export class InvocationModel implements coreTypes.InvocationModel {
     #isDone = false;
+    #structuredLogWarnings = new Set<string>();
     #coreCtx: CoreInvocationContext;
     #functionName: string;
     #bindings: Record<string, RpcBindingInfo>;
@@ -195,6 +198,25 @@ export class InvocationModel implements coreTypes.InvocationModel {
             badAsyncMsg += `Function name: ${this.#functionName}. Invocation Id: ${this.#coreCtx.invocationId}.`;
             this.#systemLog('warning', badAsyncMsg);
         }
+        if (structuredLogProperties === 'lastPlainObject') {
+            const extracted = extractLogAttributes(args[args.length - 1]);
+            if (extracted.reason) {
+                this.#structuredLogWarning(extracted.reason, extracted.rejectedCount);
+            }
+            if (extracted.attributes) {
+                if (tryGetCoreApiLazy()?.supportsStructuredLogProperties) {
+                    this.#coreCtx.log(level, 'user', format(...args), { attributes: extracted.attributes });
+                    return;
+                }
+                this.#structuredLogWarning('structured_log_worker_unavailable', 0);
+            }
+        }
         this.#log(level, 'user', ...args);
+    }
+    #structuredLogWarning(reason: string, rejectedCount: number): void {
+        if (!this.#structuredLogWarnings.has(reason)) {
+            this.#structuredLogWarnings.add(reason);
+            this.#systemLog('warning', `${reason}: rejectedProperties=${rejectedCount}`);
+        }
     }
 }

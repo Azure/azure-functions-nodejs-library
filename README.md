@@ -97,3 +97,11 @@ app.http('httpTrigger1', {
     }
 });
 ```
+
+## Opt-in structured log properties
+
+Enable extraction during application startup with `app.setup({ structuredLogProperties: 'lastPlainObject' })`. Existing calls such as `context.error('Job submission failed', { model: 'olive', errorCode: 'COMPONENT_NOT_FOUND' })` keep their original formatted message and additionally expose the final plain object's own enumerable string, boolean and finite-number properties as `LogHookContext.attributes`. The option is disabled by default. Earlier arguments, arrays, Error instances and nested objects are not sources of structured properties.
+
+A log exporter registers with `app.hook.log(handler, { structuredLogProperties: true })` once it can export the attributes. This requires a worker advertising `supportsStructuredLogProperties` and a compatible exporter; enabling the library option alone does not make fields queryable in Application Insights. Unsupported workers keep the original text and issue a system warning once per invocation. Invalid or reserved properties are omitted with bounded diagnostics that do not include their values; getters are not invoked by extraction. The original text is unchanged, so omitting a property from attributes does not redact it from the message.
+
+Reserved keys include `CategoryName`, `__proto__`, `prototype`, `constructor`, and names beginning with `exception.`, `_MS`, `microsoft` or `ai.` (case-insensitive). These prevent application properties from changing exporter routing or correlation. Diagnostics and buffering remain subject to the configured logging pipeline; this option does not guarantee delivery after process or network failure.

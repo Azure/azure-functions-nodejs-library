@@ -30,6 +30,9 @@ export declare class LogHookContext extends HookContext {
      */
     readonly category: LogCategory;
 
+    /** Flat properties supplied by an invocation with structured logging enabled. */
+    readonly attributes?: Readonly<Record<string, string | number | boolean>>;
+
     /**
      * Changes to this value _will_ affect the resulting log, but only for user-generated logs.
      */
@@ -53,6 +56,13 @@ export interface LogHookContextInit extends HookContextInit {
     category?: LogCategory;
 
     message?: string;
+
+    attributes?: Readonly<Record<string, string | number | boolean>>;
 }
 
 export type LogCategory = 'user' | 'system' | 'customMetric';
+
+export interface LogHookOptions {
+    /** Declare that this hook exports structured attributes using a configured exporter. */
+    structuredLogProperties?: boolean;
+}

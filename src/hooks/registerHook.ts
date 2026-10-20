@@ -5,6 +5,7 @@ import {
     AppStartHandler,
     AppTerminateHandler,
     LogHookHandler,
+    LogHookOptions,
     PostInvocationHandler,
     PreInvocationHandler,
 } from '@azure/functions';
@@ -18,7 +19,11 @@ import { LogHookContext } from './LogHookContext';
 import { PostInvocationContext } from './PostInvocationContext';
 import { PreInvocationContext } from './PreInvocationContext';
 
-function registerHook(hookName: string, callback: coreTypes.HookCallback): coreTypes.Disposable {
+function registerHook(
+    hookName: string,
+    callback: coreTypes.HookCallback,
+    options?: LogHookOptions
+): coreTypes.Disposable {
     const coreApi = tryGetCoreApiLazy();
     if (!coreApi) {
         console.warn(
@@ -30,7 +35,9 @@ function registerHook(hookName: string, callback: coreTypes.HookCallback): coreT
             );
         });
     } else {
-        return coreApi.registerHook(hookName, callback);
+        return hookName === 'log' && options
+            ? coreApi.registerHook(hookName, callback, options)
+            : coreApi.registerHook(hookName, callback);
     }
 }
 
@@ -58,11 +65,15 @@ export function postInvocation(handler: PostInvocationHandler): Disposable {
     });
 }
 
-export function log(handler: LogHookHandler): Disposable {
+export function log(handler: LogHookHandler, options?: LogHookOptions): Disposable {
     try {
-        return registerHook('log', (coreContext) => {
-            return handler(new LogHookContext(coreContext));
-        });
+        return registerHook(
+            'log',
+            (coreContext) => {
+                return handler(new LogHookContext(coreContext));
+            },
+            options
+        );
     } catch (err) {
         const error = ensureErrorType(err);
         if (error.name === 'RangeError' && error.isAzureFunctionsSystemError) {
