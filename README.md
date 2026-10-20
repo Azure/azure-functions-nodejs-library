@@ -25,6 +25,7 @@ npm install @azure/functions
   - _**Runtime**_: Defines underlying behavior of Azure Functions and is shared across all languages.
 - The programming model version is strictly tied to the version of the [`@azure/functions`](https://www.npmjs.com/package/@azure/functions) npm package, and is versioned independently of the [runtime](https://learn.microsoft.com/azure/azure-functions/functions-versions?pivots=programming-language-javascript). Both the runtime and the programming model use "4" as their latest major version, but that is purely a coincidence.
 - You can't mix the v3 and v4 programming models in the same function app. As soon as you register one v4 function in your app, any v3 functions registered in _function.json_ files are ignored.
+- By default, trigger metadata strings will be converted to JSON if they can successfully be interpreted as JSON. This behavior can be disabled by setting the `enablePlainRpcStrings` option to `true` in the setup.
 
 ### Connector trigger TypeScript compatibility in 4.17.0
 
