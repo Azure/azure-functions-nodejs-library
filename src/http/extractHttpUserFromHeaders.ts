@@ -45,7 +45,8 @@ export function extractHttpUserFromHeaders(headers: Headers): HttpRequestUser | 
             user = {
                 type: 'AppService',
                 id: nonNullValue(headers.get('x-ms-client-principal-id'), 'user-id'),
-                username: nonNullValue(headers.get('x-ms-client-principal-name'), 'user-name'),
+                // App Service sends no name header for callers without a name claim, such as service principals
+                username: headers.get('x-ms-client-principal-name') ?? '',
                 identityProvider: nonNullValue(headers.get('x-ms-client-principal-idp'), 'user-idp'),
                 claimsPrincipalData,
             };
