@@ -12,6 +12,22 @@ import * as workerLogModule from '../../src/utils/workerSystemLog';
 chai.use(chaiAsPromised);
 
 describe('HttpRequest', () => {
+    it('preserves a QUERY request method and JSON body when cloned', async () => {
+        const body = { filter: 'active' };
+        const req = new HttpRequest({
+            method: 'QUERY',
+            url: 'http://localhost:7071/api/search',
+            headers: { 'content-type': 'application/json' },
+            body: { string: JSON.stringify(body) },
+        });
+        const cloned = req.clone();
+
+        expect(req.method).to.equal('QUERY');
+        expect(cloned.method).to.equal('QUERY');
+        expect(await req.json()).to.deep.equal(body);
+        expect(await cloned.json()).to.deep.equal(body);
+    });
+
     it('clone', async () => {
         const req = new HttpRequest({
             method: 'POST',

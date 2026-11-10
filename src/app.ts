@@ -87,6 +87,10 @@ export function post(name: string, optionsOrHandler: HttpMethodFunctionOptions |
     http(name, convertToHttpOptions(optionsOrHandler, 'POST'));
 }
 
+export function query(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
+    http(name, convertToHttpOptions(optionsOrHandler, 'QUERY'));
+}
+
 export function patch(name: string, optionsOrHandler: HttpMethodFunctionOptions | HttpHandler): void {
     http(name, convertToHttpOptions(optionsOrHandler, 'PATCH'));
 }

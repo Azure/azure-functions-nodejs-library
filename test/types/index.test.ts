@@ -73,6 +73,24 @@ const invalidServiceBusTopicTriggerOptions: ServiceBusTopicTriggerOptions = {
 
 declare const app: typeof import('../../types').app;
 declare const trigger: typeof import('../../types').trigger;
+function registerHttpQuery(): void {
+    app.query('queryHandler', async (request, context) => {
+        context.log(request.method);
+        return { jsonBody: await request.json() };
+    });
+    app.query('queryOptions', {
+        route: 'search',
+        authLevel: 'function',
+        handler: async (request) => ({ body: await request.text() }),
+    });
+    app.http('queryMethods', {
+        methods: ['GET', 'QUERY'],
+        handler: () => ({ body: 'results' }),
+    });
+    trigger.http({ methods: ['QUERY'] });
+}
+void registerHttpQuery;
+
 function registerServiceBusTopic(): void {
     app.serviceBusTopic<string>('serviceBusTopic', serviceBusTopicFunctionOptions);
 }
