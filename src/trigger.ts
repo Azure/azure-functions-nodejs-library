@@ -198,6 +198,8 @@ export function connectorTrigger(options: ConnectorTriggerOptions): ConnectorTri
     }
     return addTriggerBindingName({
         ...options,
+        deliveryMode: options.deliveryMode ?? 'Webhook',
+        cardinality: options.cardinality ?? 'one',
         type: 'connectorTrigger',
     });
 }

@@ -79,6 +79,8 @@ function registerServiceBusTopic(): void {
 
 type ConnectorTriggerOptions = import('../../types').ConnectorTriggerOptions;
 type ConnectorTriggerFunctionOptions<T = unknown> = import('../../types').ConnectorTriggerFunctionOptions<T>;
+declare const DeliveryMode: typeof import('../../types').DeliveryMode;
+declare const Cardinality: typeof import('../../types').Cardinality;
 
 const connectorPollOptions: ConnectorTriggerFunctionOptions<TodoItem[]> = {
     deliveryMode: 'Poll',
@@ -97,6 +99,26 @@ const connectorPollOptions: ConnectorTriggerFunctionOptions<TodoItem[]> = {
 
 const connectorWebhookOptions: ConnectorTriggerOptions = { deliveryMode: 'Webhook' };
 const connectorDefaultOptions: ConnectorTriggerOptions = {};
+
+function configureConnectorTriggerFromEnums(): void {
+    const options = {
+        deliveryMode: DeliveryMode.Poll,
+        cardinality: Cardinality.Many,
+        connection: 'ConnectorNamespace',
+        triggerConfigName: '%TriggerConfigName%',
+    };
+    trigger.connectorTrigger(options);
+    app.connectorTrigger<TodoItem[]>('enumConnector', { ...options, handler: () => {} });
+
+    const webhookOptions: ConnectorTriggerOptions = {
+        deliveryMode: DeliveryMode.Webhook,
+        cardinality: Cardinality.One,
+    };
+    trigger.connectorTrigger(webhookOptions);
+
+    trigger.connectorTrigger({ deliveryMode: DeliveryMode.Poll, cardinality: 'many' });
+    trigger.connectorTrigger({ deliveryMode: 'Webhook', cardinality: Cardinality.One });
+}
 
 function configureConnectorTriggerFromVariables(): void {
     const widenedOptions = { deliveryMode: 'Webhook' };
@@ -175,6 +197,7 @@ void registerServiceBusTopic;
 void connectorPollOptions;
 void connectorWebhookOptions;
 void connectorDefaultOptions;
+void configureConnectorTriggerFromEnums;
 void configureConnectorTriggerFromVariables;
 void invalidConnectorOptions;
 void registerConnectorTrigger;

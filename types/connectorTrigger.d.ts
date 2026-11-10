@@ -4,6 +4,22 @@
 import { FunctionOptions, FunctionResult, FunctionTrigger, RetryOptions } from './index';
 import { InvocationContext } from './InvocationContext';
 
+/**
+ * The connector event delivery mode.
+ */
+export enum DeliveryMode {
+    Webhook = 'Webhook',
+    Poll = 'Poll',
+}
+
+/**
+ * The number of connector events passed to each function invocation.
+ */
+export enum Cardinality {
+    One = 'one',
+    Many = 'many',
+}
+
 export type ConnectorTriggerHandler<T = unknown> = (triggerInput: T, context: InvocationContext) => FunctionResult;
 
 export interface ConnectorTriggerFunctionOptions<T = unknown>
@@ -22,9 +38,10 @@ export interface ConnectorTriggerFunctionOptions<T = unknown>
 
 export interface ConnectorTriggerOptions extends Record<string, unknown> {
     /**
-     * The connector event delivery mode. If omitted, the Functions host defaults to `Webhook`.
+     * The connector event delivery mode. Accepts enum members or the supported string values.
+     * Defaults to `Webhook` when omitted.
      */
-    deliveryMode?: 'Poll' | 'Webhook';
+    deliveryMode?: DeliveryMode | 'Poll' | 'Webhook';
 
     /**
      * The connector connection setting. Required when `deliveryMode` is `Poll`.
@@ -38,10 +55,11 @@ export interface ConnectorTriggerOptions extends Record<string, unknown> {
     triggerConfigName?: string;
 
     /**
-     * Set to `many` to enable batching. If omitted or set to `one`, a single event is passed to the function.
+     * Set to `many` to enable batching. Accepts enum members or the supported string values.
+     * Defaults to `one`, which passes a single event to the function.
      * For batches, use an array as the handler's payload type, for example `app.connectorTrigger<MyEvent[]>`.
      */
-    cardinality?: 'many' | 'one';
+    cardinality?: Cardinality | 'many' | 'one';
 
     /**
      * An optional per-function override for the maximum number of events per batch.
