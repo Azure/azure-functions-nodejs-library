@@ -4,12 +4,16 @@
 import { RpcTypedData } from '@azure/functions-core';
 import { ResourceFactoryResolver } from '@azure/functions-extensions-base';
 import { HttpRequest } from '../http/HttpRequest';
+import { enablePlainRpcStrings } from '../setup';
 import { isDefined } from '../utils/nonNull';
 
 export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown {
     if (!data) {
         return undefined;
     } else if (isDefined(data.string)) {
+        if (enablePlainRpcStrings) {
+            return data.string;
+        }
         return tryJsonParse(data.string);
     } else if (isDefined(data.json)) {
         return JSON.parse(data.json);
@@ -26,6 +30,9 @@ export function fromRpcTypedData(data: RpcTypedData | null | undefined): unknown
     } else if (data.collectionBytes && isDefined(data.collectionBytes.bytes)) {
         return data.collectionBytes.bytes.map((d) => Buffer.from(d));
     } else if (data.collectionString && isDefined(data.collectionString.string)) {
+        if (enablePlainRpcStrings) {
+            return data.collectionString.string;
+        }
         return data.collectionString.string.map(tryJsonParse);
     } else if (data.collectionDouble && isDefined(data.collectionDouble.double)) {
         return data.collectionDouble.double;

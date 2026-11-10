@@ -10,6 +10,7 @@ import Long = require('long');
 import { ResourceFactoryResolver } from '@azure/functions-extensions-base';
 import sinon = require('sinon');
 import { RpcTypedData } from '@azure/functions-core';
+import { setup } from '../../src/setup';
 
 describe('fromRpcTypedData', () => {
     it('null', () => {
@@ -26,6 +27,20 @@ describe('fromRpcTypedData', () => {
         expect(fromRpcTypedData({ string: 'false' })).to.equal(false);
         expect(fromRpcTypedData({ string: '1' })).to.equal(1);
         expect(fromRpcTypedData({ string: '0' })).to.equal(0);
+
+        setup({ enablePlainRpcStrings: true });
+        try {
+            expect(fromRpcTypedData({ string: 'test' })).to.equal('test');
+            expect(fromRpcTypedData({ string: '{ "a": "b" }' })).to.equal('{ "a": "b" }');
+            expect(fromRpcTypedData({ string: '{ "a": "b" ' })).to.equal('{ "a": "b" ');
+            expect(fromRpcTypedData({ string: '[1,2]' })).to.equal('[1,2]');
+            expect(fromRpcTypedData({ string: 'true' })).to.equal('true');
+            expect(fromRpcTypedData({ string: 'false' })).to.equal('false');
+            expect(fromRpcTypedData({ string: '1' })).to.equal('1');
+            expect(fromRpcTypedData({ string: '0' })).to.equal('0');
+        } finally {
+            setup({ enablePlainRpcStrings: false });
+        }
     });
 
     it('json', () => {
@@ -99,6 +114,24 @@ describe('fromRpcTypedData', () => {
             '{"a": "b"',
             'test2',
         ]);
+
+        setup({ enablePlainRpcStrings: true });
+        try {
+            expect(fromRpcTypedData({ collectionString: { string: ['test1', 'test2'] } })).to.deep.equal([
+                'test1',
+                'test2',
+            ]);
+            expect(fromRpcTypedData({ collectionString: { string: ['{"a": "b"}', 'test2'] } })).to.deep.equal([
+                '{"a": "b"}',
+                'test2',
+            ]);
+            expect(fromRpcTypedData({ collectionString: { string: ['{"a": "b"', 'test2'] } })).to.deep.equal([
+                '{"a": "b"',
+                'test2',
+            ]);
+        } finally {
+            setup({ enablePlainRpcStrings: false });
+        }
     });
 
     it('collectionDouble', () => {

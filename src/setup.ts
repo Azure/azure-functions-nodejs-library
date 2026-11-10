@@ -13,6 +13,7 @@ export function lockSetup(): void {
 }
 
 export let enableHttpStream = false;
+export let enablePlainRpcStrings = false;
 export const capabilities: Record<string, string> = {};
 
 export function setup(opts: SetupOptions): void {
@@ -31,6 +32,10 @@ export function setup(opts: SetupOptions): void {
 
     if (isDefined(opts.enableHttpStream)) {
         enableHttpStream = opts.enableHttpStream;
+    }
+
+    if (isDefined(opts.enablePlainRpcStrings)) {
+        enablePlainRpcStrings = opts.enablePlainRpcStrings;
     }
 
     if (opts.capabilities) {

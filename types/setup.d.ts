@@ -13,4 +13,9 @@ export interface SetupOptions {
      * This will be merged with existing capabilities specified by the Node.js worker and library.
      */
     capabilities?: Record<string, string | boolean>;
+
+    /**
+     * Don't convert RPC strings to JSON just because they have the shape of valid JSON.
+     */
+    enablePlainRpcStrings?: boolean;
 }

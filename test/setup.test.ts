@@ -3,7 +3,7 @@
 
 import 'mocha';
 import { expect } from 'chai';
-import { capabilities, enableHttpStream, setup } from '../src/setup';
+import { capabilities, enableHttpStream, enablePlainRpcStrings, setup } from '../src/setup';
 
 describe('setup', () => {
     it('enableHttpStream', () => {
@@ -23,6 +23,25 @@ describe('setup', () => {
         // set to false
         setup({ enableHttpStream: false });
         expect(enableHttpStream).to.equal(false);
+    });
+
+    it('enablePlainRpcStrings', () => {
+        // default
+        expect(enablePlainRpcStrings).to.equal(false);
+
+        // set to true
+        setup({ enablePlainRpcStrings: true });
+        expect(enablePlainRpcStrings).to.equal(true);
+
+        // don't change if not explicitly set
+        setup({});
+        expect(enablePlainRpcStrings).to.equal(true);
+        setup({ capabilities: {} });
+        expect(enablePlainRpcStrings).to.equal(true);
+
+        // set to false
+        setup({ enablePlainRpcStrings: false });
+        expect(enablePlainRpcStrings).to.equal(false);
     });
 
     it('capabilities', () => {
