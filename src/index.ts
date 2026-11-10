@@ -30,6 +30,16 @@ export { Disposable } from './utils/Disposable';
 export { McpContent } from './utils/mcpContentMarker';
 export { arg } from './utils/toolProperties';
 
+export enum ConnectorDeliveryMode {
+    Webhook = 'Webhook',
+    Poll = 'Poll',
+}
+
+export enum ConnectorCardinality {
+    One = 'one',
+    Many = 'many',
+}
+
 export enum CosmosDBChangeFeedMode {
     LatestVersion = 'LatestVersion',
     AllVersionsAndDeletes = 'AllVersionsAndDeletes',

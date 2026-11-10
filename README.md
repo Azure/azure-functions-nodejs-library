@@ -58,6 +58,40 @@ Use the exact values `'Poll'` or `'Webhook'` for `deliveryMode`, and `'one'` or 
 The connection and trigger configuration names must be strings; batch size, concurrency, and scaling threshold overrides must be numbers.
 Poll delivery also now checks at registration that both `connection` and `triggerConfigName` are supplied.
 
+### Connector trigger enums and defaults in 4.17.1
+
+`ConnectorDeliveryMode` and `ConnectorCardinality` are exported runtime enums for
+both JavaScript and TypeScript:
+
+```typescript
+import { app, ConnectorCardinality, ConnectorDeliveryMode } from '@azure/functions';
+
+app.connectorTrigger('onNewEmail', {
+    deliveryMode: ConnectorDeliveryMode.Poll,
+    cardinality: ConnectorCardinality.Many,
+    connection: 'ConnectorNamespace',
+    triggerConfigName: '%OnNewEmailTriggerConfigName%',
+    handler: async (events, context) => {
+        context.log('Received connector events.');
+    },
+});
+```
+
+JavaScript can import the same values with
+`const { app, ConnectorDeliveryMode, ConnectorCardinality } = require('@azure/functions')`.
+The existing supported string values remain valid: `'Poll'` / `'Webhook'` and
+`'one'` / `'many'`. Unsupported or widened arbitrary strings remain type errors.
+Enum members can also be used in unannotated configuration variables without
+the string-widening problem described above.
+
+Both `app.connectorTrigger` and `trigger.connectorTrigger` explicitly default
+omitted `deliveryMode` to `'Webhook'` and omitted `cardinality` to `'one'` in the
+generated binding metadata. Explicit settings are preserved, and caller options
+are not modified. Batch size, concurrency, and scaling thresholds remain omitted
+unless specified, so the host continues to supply their defaults.
+These options also apply to typed connector helpers that use the base library's
+`ConnectorTriggerOptions`.
+
 ## Usage
 
 ### TypeScript

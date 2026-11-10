@@ -3,13 +3,22 @@
 
 import 'mocha';
 import { expect } from 'chai';
-import { app, trigger } from '../src';
+import * as sinon from 'sinon';
+import { app, ConnectorCardinality, ConnectorDeliveryMode, trigger } from '../src';
 import { fromRpcTypedData } from '../src/converters/fromRpcTypedData';
 import { toCoreFunctionMetadata } from '../src/converters/toCoreFunctionMetadata';
 import { ConnectorTriggerFunctionOptions, ConnectorTriggerOptions, InvocationContext } from '../types';
 
 describe('connectorTrigger', () => {
     const _handler = (_triggerInput: unknown, _context: InvocationContext) => {};
+
+    it('should export the supported delivery modes as runtime enum values', () => {
+        expect(ConnectorDeliveryMode).to.deep.equal({ Webhook: 'Webhook', Poll: 'Poll' });
+    });
+
+    it('should export the supported cardinalities as runtime enum values', () => {
+        expect(ConnectorCardinality).to.deep.equal({ One: 'one', Many: 'many' });
+    });
 
     describe('trigger.connectorTrigger', () => {
         const pollOptions: ConnectorTriggerOptions = {
@@ -55,18 +64,92 @@ describe('connectorTrigger', () => {
             expect(trigger.connectorTrigger(options)).to.include(options);
         });
 
-        it('should leave optional polling settings omitted so the host supplies defaults', () => {
+        it('should leave numeric polling settings omitted so the host supplies defaults', () => {
             const result = trigger.connectorTrigger(pollOptions);
 
-            expect(result).to.have.all.keys('name', 'type', 'deliveryMode', 'connection', 'triggerConfigName');
+            expect(result).to.have.all.keys(
+                'name',
+                'type',
+                'deliveryMode',
+                'connection',
+                'triggerConfigName',
+                'cardinality'
+            );
+            expect(result.cardinality).to.equal('one');
         });
 
-        it('should leave the default delivery mode omitted', () => {
-            expect(trigger.connectorTrigger({})).to.have.all.keys('name', 'type');
+        it('should default to Webhook delivery and one event', () => {
+            const result = trigger.connectorTrigger({});
+
+            expect(result).to.have.all.keys('name', 'type', 'deliveryMode', 'cardinality');
+            expect(result).to.include({ deliveryMode: 'Webhook', cardinality: 'one' });
+        });
+
+        it('should apply defaults to explicitly undefined settings', () => {
+            expect(trigger.connectorTrigger({ deliveryMode: undefined, cardinality: undefined })).to.include({
+                deliveryMode: 'Webhook',
+                cardinality: 'one',
+            });
+        });
+
+        it('should not mutate caller options when applying defaults', () => {
+            const options: ConnectorTriggerOptions = Object.freeze({});
+
+            expect(trigger.connectorTrigger(options)).to.include({ deliveryMode: 'Webhook', cardinality: 'one' });
+            expect(options).to.deep.equal({});
+        });
+
+        it('should generate the same binding name for omitted and explicit defaults', () => {
+            expect(trigger.connectorTrigger({}).name).to.equal(
+                trigger.connectorTrigger({
+                    deliveryMode: ConnectorDeliveryMode.Webhook,
+                    cardinality: ConnectorCardinality.One,
+                }).name
+            );
         });
 
         it('should accept Webhook without polling settings', () => {
             expect(trigger.connectorTrigger({ deliveryMode: 'Webhook' })).to.include({ deliveryMode: 'Webhook' });
+        });
+
+        for (const [label, deliveryMode] of [
+            ['enum', ConnectorDeliveryMode.Poll],
+            ['string', 'Poll'],
+        ] as const) {
+            for (const cardinality of [ConnectorCardinality.One, ConnectorCardinality.Many]) {
+                it(`should accept ${label} Poll delivery with cardinality ${cardinality}`, () => {
+                    expect(trigger.connectorTrigger({ ...pollOptions, deliveryMode, cardinality })).to.include({
+                        deliveryMode: 'Poll',
+                        cardinality,
+                    });
+                });
+            }
+
+            it(`should still require connection settings for ${label} Poll delivery`, () => {
+                expect(() => trigger.connectorTrigger({ deliveryMode })).to.throw(
+                    'The following options are required for Poll delivery mode: connection, triggerConfigName'
+                );
+            });
+        }
+
+        it('should preserve explicitly selected Webhook enum and many cardinality', () => {
+            expect(
+                trigger.connectorTrigger({
+                    deliveryMode: ConnectorDeliveryMode.Webhook,
+                    cardinality: ConnectorCardinality.Many,
+                })
+            ).to.include({ deliveryMode: 'Webhook', cardinality: 'many' });
+        });
+
+        it('should default only omitted settings', () => {
+            expect(trigger.connectorTrigger({ cardinality: 'many' })).to.include({
+                deliveryMode: 'Webhook',
+                cardinality: 'many',
+            });
+            expect(trigger.connectorTrigger({ ...pollOptions, deliveryMode: ConnectorDeliveryMode.Poll })).to.include({
+                deliveryMode: 'Poll',
+                cardinality: 'one',
+            });
         });
 
         for (const key of ['connection', 'triggerConfigName']) {
@@ -143,6 +226,8 @@ describe('connectorTrigger', () => {
                     [connectorTriggerBinding.name]: {
                         type: 'connectorTrigger',
                         name: connectorTriggerBinding.name,
+                        deliveryMode: 'Webhook',
+                        cardinality: 'one',
                         direction: 'in',
                         properties: {
                             supportsDeferredBinding: 'false',
@@ -155,6 +240,40 @@ describe('connectorTrigger', () => {
     });
 
     describe('app.connectorTrigger', () => {
+        afterEach(() => {
+            sinon.restore();
+        });
+
+        it('should apply default metadata during function registration', () => {
+            const createTrigger = sinon.spy(trigger, 'connectorTrigger');
+
+            app.connectorTrigger('defaultConnectorTrigger', { handler: _handler });
+
+            sinon.assert.calledOnce(createTrigger);
+            expect(createTrigger.firstCall.returnValue).to.include({
+                deliveryMode: 'Webhook',
+                cardinality: 'one',
+            });
+        });
+
+        it('should accept enum options during function registration', () => {
+            const createTrigger = sinon.spy(trigger, 'connectorTrigger');
+
+            app.connectorTrigger('enumConnectorTrigger', {
+                deliveryMode: ConnectorDeliveryMode.Poll,
+                cardinality: ConnectorCardinality.Many,
+                connection: 'ConnectorNamespace',
+                triggerConfigName: 'config',
+                handler: _handler,
+            });
+
+            sinon.assert.calledOnce(createTrigger);
+            expect(createTrigger.firstCall.returnValue).to.include({
+                deliveryMode: 'Poll',
+                cardinality: 'many',
+            });
+        });
+
         it('should register a typed batch handler with polling settings', () => {
             const options: ConnectorTriggerFunctionOptions<string[]> = {
                 deliveryMode: 'Poll',
