@@ -76,6 +76,20 @@ export function post(name: string, handler: HttpHandler): void;
 export function post(name: string, options: HttpMethodFunctionOptions): void;
 
 /**
+ * Registers an http function in your app that will be triggered by making a 'QUERY' request to the function url
+ * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
+ * @param handler The handler for this function
+ */
+export function query(name: string, handler: HttpHandler): void;
+
+/**
+ * Registers an http function in your app that will be triggered by making a 'QUERY' request to the function url
+ * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
+ * @param options Configuration options describing the inputs, outputs, and handler for this function
+ */
+export function query(name: string, options: HttpMethodFunctionOptions): void;
+
+/**
  * Registers an http function in your app that will be triggered by making a 'PATCH' request to the function url
  * @param name The name of the function. This will be the route unless a route is explicitly configured in the `HttpTriggerOptions`
  * @param handler The handler for this function

@@ -219,7 +219,17 @@ export interface HttpRequestUser {
 /**
  * Possible values for an HTTP request method.
  */
-export type HttpMethod = 'GET' | 'POST' | 'DELETE' | 'HEAD' | 'PATCH' | 'PUT' | 'OPTIONS' | 'TRACE' | 'CONNECT';
+export type HttpMethod =
+    | 'GET'
+    | 'POST'
+    | 'DELETE'
+    | 'HEAD'
+    | 'PATCH'
+    | 'PUT'
+    | 'OPTIONS'
+    | 'TRACE'
+    | 'CONNECT'
+    | 'QUERY';
 
 /**
  * Possible values for an HTTP Request user type
