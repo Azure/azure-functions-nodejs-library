@@ -4,7 +4,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { app, ConnectorCardinality, ConnectorDeliveryMode, trigger } from '../src';
+import { app, Cardinality, DeliveryMode, trigger } from '../src';
 import { fromRpcTypedData } from '../src/converters/fromRpcTypedData';
 import { toCoreFunctionMetadata } from '../src/converters/toCoreFunctionMetadata';
 import { ConnectorTriggerFunctionOptions, ConnectorTriggerOptions, InvocationContext } from '../types';
@@ -13,11 +13,11 @@ describe('connectorTrigger', () => {
     const _handler = (_triggerInput: unknown, _context: InvocationContext) => {};
 
     it('should export the supported delivery modes as runtime enum values', () => {
-        expect(ConnectorDeliveryMode).to.deep.equal({ Webhook: 'Webhook', Poll: 'Poll' });
+        expect(DeliveryMode).to.deep.equal({ Webhook: 'Webhook', Poll: 'Poll' });
     });
 
     it('should export the supported cardinalities as runtime enum values', () => {
-        expect(ConnectorCardinality).to.deep.equal({ One: 'one', Many: 'many' });
+        expect(Cardinality).to.deep.equal({ One: 'one', Many: 'many' });
     });
 
     describe('trigger.connectorTrigger', () => {
@@ -102,8 +102,8 @@ describe('connectorTrigger', () => {
         it('should generate the same binding name for omitted and explicit defaults', () => {
             expect(trigger.connectorTrigger({}).name).to.equal(
                 trigger.connectorTrigger({
-                    deliveryMode: ConnectorDeliveryMode.Webhook,
-                    cardinality: ConnectorCardinality.One,
+                    deliveryMode: DeliveryMode.Webhook,
+                    cardinality: Cardinality.One,
                 }).name
             );
         });
@@ -113,10 +113,10 @@ describe('connectorTrigger', () => {
         });
 
         for (const [label, deliveryMode] of [
-            ['enum', ConnectorDeliveryMode.Poll],
+            ['enum', DeliveryMode.Poll],
             ['string', 'Poll'],
         ] as const) {
-            for (const cardinality of [ConnectorCardinality.One, ConnectorCardinality.Many]) {
+            for (const cardinality of [Cardinality.One, Cardinality.Many]) {
                 it(`should accept ${label} Poll delivery with cardinality ${cardinality}`, () => {
                     expect(trigger.connectorTrigger({ ...pollOptions, deliveryMode, cardinality })).to.include({
                         deliveryMode: 'Poll',
@@ -135,8 +135,8 @@ describe('connectorTrigger', () => {
         it('should preserve explicitly selected Webhook enum and many cardinality', () => {
             expect(
                 trigger.connectorTrigger({
-                    deliveryMode: ConnectorDeliveryMode.Webhook,
-                    cardinality: ConnectorCardinality.Many,
+                    deliveryMode: DeliveryMode.Webhook,
+                    cardinality: Cardinality.Many,
                 })
             ).to.include({ deliveryMode: 'Webhook', cardinality: 'many' });
         });
@@ -146,7 +146,7 @@ describe('connectorTrigger', () => {
                 deliveryMode: 'Webhook',
                 cardinality: 'many',
             });
-            expect(trigger.connectorTrigger({ ...pollOptions, deliveryMode: ConnectorDeliveryMode.Poll })).to.include({
+            expect(trigger.connectorTrigger({ ...pollOptions, deliveryMode: DeliveryMode.Poll })).to.include({
                 deliveryMode: 'Poll',
                 cardinality: 'one',
             });
@@ -260,8 +260,8 @@ describe('connectorTrigger', () => {
             const createTrigger = sinon.spy(trigger, 'connectorTrigger');
 
             app.connectorTrigger('enumConnectorTrigger', {
-                deliveryMode: ConnectorDeliveryMode.Poll,
-                cardinality: ConnectorCardinality.Many,
+                deliveryMode: DeliveryMode.Poll,
+                cardinality: Cardinality.Many,
                 connection: 'ConnectorNamespace',
                 triggerConfigName: 'config',
                 handler: _handler,

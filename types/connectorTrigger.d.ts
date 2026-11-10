@@ -7,7 +7,7 @@ import { InvocationContext } from './InvocationContext';
 /**
  * The connector event delivery mode.
  */
-export enum ConnectorDeliveryMode {
+export enum DeliveryMode {
     Webhook = 'Webhook',
     Poll = 'Poll',
 }
@@ -15,7 +15,7 @@ export enum ConnectorDeliveryMode {
 /**
  * The number of connector events passed to each function invocation.
  */
-export enum ConnectorCardinality {
+export enum Cardinality {
     One = 'one',
     Many = 'many',
 }
@@ -41,7 +41,7 @@ export interface ConnectorTriggerOptions extends Record<string, unknown> {
      * The connector event delivery mode. Accepts enum members or the supported string values.
      * Defaults to `Webhook` when omitted.
      */
-    deliveryMode?: ConnectorDeliveryMode | 'Poll' | 'Webhook';
+    deliveryMode?: DeliveryMode | 'Poll' | 'Webhook';
 
     /**
      * The connector connection setting. Required when `deliveryMode` is `Poll`.
@@ -59,7 +59,7 @@ export interface ConnectorTriggerOptions extends Record<string, unknown> {
      * Defaults to `one`, which passes a single event to the function.
      * For batches, use an array as the handler's payload type, for example `app.connectorTrigger<MyEvent[]>`.
      */
-    cardinality?: ConnectorCardinality | 'many' | 'one';
+    cardinality?: Cardinality | 'many' | 'one';
 
     /**
      * An optional per-function override for the maximum number of events per batch.

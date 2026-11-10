@@ -60,15 +60,15 @@ Poll delivery also now checks at registration that both `connection` and `trigge
 
 ### Connector trigger enums and defaults in 4.17.1
 
-`ConnectorDeliveryMode` and `ConnectorCardinality` are exported runtime enums for
+`DeliveryMode` and `Cardinality` are exported runtime enums for
 both JavaScript and TypeScript:
 
 ```typescript
-import { app, ConnectorCardinality, ConnectorDeliveryMode } from '@azure/functions';
+import { app, Cardinality, DeliveryMode } from '@azure/functions';
 
 app.connectorTrigger('onNewEmail', {
-    deliveryMode: ConnectorDeliveryMode.Poll,
-    cardinality: ConnectorCardinality.Many,
+    deliveryMode: DeliveryMode.Poll,
+    cardinality: Cardinality.Many,
     connection: 'ConnectorNamespace',
     triggerConfigName: '%OnNewEmailTriggerConfigName%',
     handler: async (events, context) => {
@@ -78,7 +78,7 @@ app.connectorTrigger('onNewEmail', {
 ```
 
 JavaScript can import the same values with
-`const { app, ConnectorDeliveryMode, ConnectorCardinality } = require('@azure/functions')`.
+`const { app, DeliveryMode, Cardinality } = require('@azure/functions')`.
 The existing supported string values remain valid: `'Poll'` / `'Webhook'` and
 `'one'` / `'many'`. Unsupported or widened arbitrary strings remain type errors.
 Enum members can also be used in unannotated configuration variables without

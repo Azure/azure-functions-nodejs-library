@@ -30,12 +30,12 @@ export { Disposable } from './utils/Disposable';
 export { McpContent } from './utils/mcpContentMarker';
 export { arg } from './utils/toolProperties';
 
-export enum ConnectorDeliveryMode {
+export enum DeliveryMode {
     Webhook = 'Webhook',
     Poll = 'Poll',
 }
 
-export enum ConnectorCardinality {
+export enum Cardinality {
     One = 'one',
     Many = 'many',
 }

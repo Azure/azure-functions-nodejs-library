@@ -1,14 +1,14 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the MIT License.
 
-import { ConnectorCardinality, ConnectorDeliveryMode, CosmosDBv4ChangeFeedMode } from '../../types';
+import { Cardinality, CosmosDBv4ChangeFeedMode, DeliveryMode } from '../../types';
 
 const latestVersionMode = CosmosDBv4ChangeFeedMode.LatestVersion;
 const allVersionsAndDeletesMode = CosmosDBv4ChangeFeedMode.AllVersionsAndDeletes;
-const pollDeliveryMode = ConnectorDeliveryMode.Poll;
-const webhookDeliveryMode = ConnectorDeliveryMode.Webhook;
-const singleEventCardinality = ConnectorCardinality.One;
-const batchCardinality = ConnectorCardinality.Many;
+const pollDeliveryMode = DeliveryMode.Poll;
+const webhookDeliveryMode = DeliveryMode.Webhook;
+const singleEventCardinality = Cardinality.One;
+const batchCardinality = Cardinality.Many;
 
 void latestVersionMode;
 void allVersionsAndDeletesMode;
